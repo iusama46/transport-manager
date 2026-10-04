@@ -10,6 +10,7 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 - [x] Define apps/web, apps/mobile, packages/shared and docs folder structure.
 - [x] Add implementation checklist and credential/data exclusions.
 - [x] Document multiple fuel suppliers, their branches and both payment methods.
+- [x] Add the [client overview](CLIENT_OVERVIEW.md) as the main editable source, with shareable [PDF](client/CLIENT_OVERVIEW.pdf) and [PowerPoint](client/Transport_Manager_Client_Presentation.pptx) snapshots linked from README.md. Documentation only; no application functionality is marked implemented.
 - [ ] Review open business and technical decisions with the owner.
 
 ## 1. Project setup

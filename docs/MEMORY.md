@@ -63,3 +63,7 @@ This supersedes the historical “implementation not started” foundation note 
 - Production dependency audit: zero findings. Full audit: five high findings in the development lint dependency chain, rooted in braces advisory GHSA-vfj7-8cjw-p6xm; automatic major downgrade not applied. ESLint 9 emitted an upstream deprecation notice. Revisit compatible lint-tool updates separately.
 
 No domain test runner or PRD acceptance workflows were implemented. Do not treat the shell as authenticated or production-ready. Stop after setup as requested; next phase requires explicit direction and resolution of the relevant open decisions. See TASKS.md for completed checks and outstanding work.
+
+## Client overview documents — 5 October 2026
+
+Added the supplied [client overview Markdown](CLIENT_OVERVIEW.md), [PDF overview](client/CLIENT_OVERVIEW.pdf) and [PowerPoint presentation](client/Transport_Manager_Client_Presentation.pptx). Markdown is the main editable source; PDF and PowerPoint are shareable snapshots to refresh when the source changes. README.md links to all three files. Verified that the files exist and the relative links resolve. This milestone adds documentation of planned scope only; it does not implement application functionality or complete any business acceptance tests.

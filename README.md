@@ -17,6 +17,10 @@ Setup phase: npm workspaces and a Next.js App Router dashboard shell with TypeSc
 
 Start with [PRD](docs/PRD.md), [Decisions](docs/DECISIONS.md) and [Tasks](docs/TASKS.md). Other references: [Architecture](docs/ARCHITECTURE.md), [Design](docs/DESIGN.md), [Security](docs/SECURITY.md), [Test Plan](docs/TEST_PLAN.md) and [Memory](docs/MEMORY.md).
 
+## Client overview
+
+The [client overview Markdown](docs/CLIENT_OVERVIEW.md) is the main editable source. The [PDF overview](docs/client/CLIENT_OVERVIEW.pdf) and [PowerPoint presentation](docs/client/Transport_Manager_Client_Presentation.pptx) are shareable snapshots; refresh them when the source changes. These documents describe planned scope, not implemented application functionality.
+
 ## Local setup
 
 Use Node.js 20.9 or newer and npm 10 or newer. Verified with Node.js 20.19.5 and npm 10.8.2. Run all commands from the repository root:

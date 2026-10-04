@@ -3,7 +3,7 @@ Updated: 5 October 2026
 Purpose: Project continuity only; no personal biography or credentials.
 
 ## Current state
-Documentation phase. PRD plus architecture, design, test plan, security and decision log created. This task has not built, tested or deployed the dashboard. No database/provider selection or migration has been completed.
+Setup phase completed locally. npm workspaces contain the Next.js dashboard shell and a shared TypeScript/Zod package. All business screens are clearly labelled placeholders with no operational data. Lint, type checks and the production build passed. Nothing has been deployed; database/provider selection and migration remain open.
 
 ## Read order
 1. [PRD.md](PRD.md): business scope, requirements and acceptance criteria.
@@ -49,3 +49,17 @@ Treat PRD as scope authority and DECISIONS as decision history. Update this file
 Repository: https://github.com/iusama46/transport-manager. User authorized adding documents despite public visibility. No business source spreadsheets or credentials are included. Monorepo folders: apps/web, apps/mobile, packages/shared, docs. TASKS.md is the ordered implementation checklist, beginning with setup, authentication, roles/permissions and user management. Application implementation remains not started.
 
 Fuel scope now includes multiple suppliers and their branches, branch payments and central payments allocated across branches of one supplier. PRD FR-12 and AC-19–22 capture this extension; companion documents include model, UX, security and test requirements.
+
+## Setup milestone — 5 October 2026
+
+This supersedes the historical “implementation not started” foundation note above. User explicitly requested npm workspaces, Next.js App Router with TypeScript/Tailwind/ESLint, a shared types/validation package, and dashboard navigation only.
+
+- Root private npm workspace and lockfile added. Web uses Next.js 16.3.8, React 19 and Tailwind 4; shared exports a provider-independent Zod UI placeholder contract and inferred type, consumed by web.
+- Sidebar, header, overview and 15 other section placeholders match DESIGN.md; Fuel Management also links Suppliers, Branches, Purchases, Payments and Statements. Includes responsive navigation, active links, focus styles, skip link and unknown-route page. Browser interaction review remains pending.
+- apps/mobile remains reserved and unchanged; no Expo dependencies. No database SDK, connection, schema, auth provider or financial logic was added.
+- Existing documentation retained; child README reservation notes preserved with dated updates. Root README now documents installation, development, formatting, linting, type checking and production commands. No environment configuration is needed. All environment files, .refact and common credential paths are ignored.
+- Verified with Node 20.19.5/npm 10.8.2: clean-copy npm ci, web/shared lint and type checks, Webpack production build, formatting, diff whitespace and Git exclusions. All 21 application routes returned 200 with placeholder labels; two invalid routes returned 404. Generated links resolve. Evidence is for this working tree, not a committed fresh checkout.
+- Turbopack CSS-worker port binding was blocked locally; dev/build scripts use Webpack. Production server smoke tests passed with permission. Browser connector could not start, so no visual/keyboard QA claim.
+- Production dependency audit: zero findings. Full audit: five high findings in the development lint dependency chain, rooted in braces advisory GHSA-vfj7-8cjw-p6xm; automatic major downgrade not applied. ESLint 9 emitted an upstream deprecation notice. Revisit compatible lint-tool updates separately.
+
+No domain test runner or PRD acceptance workflows were implemented. Do not treat the shell as authenticated or production-ready. Stop after setup as requested; next phase requires explicit direction and resolution of the relevant open decisions. See TASKS.md for completed checks and outstanding work.

@@ -2,7 +2,7 @@
 
 Updated: 5 October 2026
 
-Use this checklist in build order. [x] means the stated deliverable is completed; unchecked means not completed. Implementation and verification are separate tasks. No application functionality has been built or tested yet.
+Use this checklist in build order. [x] means the stated deliverable is completed; unchecked means not completed. Implementation and verification are separate tasks. The setup shell is implemented and verified as recorded below; operational functionality remains unimplemented.
 
 ## 0. Documentation and repository foundation
 
@@ -15,11 +15,17 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 ## 1. Project setup
 
 - [ ] Resolve database, authentication, storage and free hosting choices (O01/O09).
-- [ ] Choose package manager and workspace configuration.
-- [ ] Scaffold Next.js in apps/web and configure shared package.
-- [ ] Configure TypeScript, linting, formatting and environment template without secrets.
-- [ ] Configure local test runner and build checks within the free budget.
-- [ ] Verify a clean install and build from a fresh checkout.
+- [x] Choose package manager and workspace configuration (npm workspaces).
+- [x] Scaffold Next.js in apps/web and configure shared package.
+- [x] Configure TypeScript, ESLint and Prettier. No environment variables are required; all environment files remain ignored.
+- [ ] Add a provider-specific environment template when provider decisions are resolved.
+- [x] Configure and verify lint, type-check and production build commands.
+- [ ] Configure a local domain/workflow test runner when those features begin.
+- [x] Verify `npm ci`, lint, type checking and build in an isolated clean source copy with no dependencies or build caches.
+- [ ] Repeat verification from a fresh Git checkout after these setup changes are committed.
+- [x] Build sidebar, header and clearly labelled placeholders for all DESIGN.md navigation sections, plus five fuel subsections.
+- [x] Verify production HTTP responses for all 21 placeholder pages and 404 handling.
+- [ ] Complete browser visual and keyboard interaction review (browser connector unavailable during setup).
 
 ## 2. Authentication
 
@@ -135,3 +141,18 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 ## Update rules
 
 Record implementation commit and test evidence when completing a feature. A written plan is not implementation. Keep decision blockers in DECISIONS.md and current state in MEMORY.md.
+
+## Setup verification — 5 October 2026
+
+Evidence applies to the current working tree; no implementation commit was created in this task. Node.js 20.19.5, npm 10.8.2, Next.js 16.3.8.
+
+- `npm ci` in an isolated copy without node_modules or .next: passed.
+- `npm run lint`: passed for web/shared with zero warnings.
+- `npm run typecheck`: passed for web/shared, including route type generation before the clean build.
+- `npm run build`: passed using Webpack; 21 application placeholder pages plus framework error output prerendered.
+- `npm run format:check` and `git diff --check`: passed.
+- Generated HTML inspection: all 21 pages contain explicit placeholder/no-data text; internal navigation targets exist. Production HTTP checks: 21/21 return 200; two unknown routes return 404.
+- `git check-ignore`: confirmed .refact, root/nested environment files, credentials.json and .aws/credentials excluded.
+- `npm audit --omit=dev`: zero findings. Full audit reports five high-severity findings in the development-only eslint-config-next → fast-glob → micromatch → braces chain (GHSA-vfj7-8cjw-p6xm). Suggested automatic remediation downgrades eslint-config-next to 14.x and was not applied. ESLint 9 also emits an upstream deprecation notice; tooling upgrade remains follow-up work.
+
+Turbopack failed because its CSS worker could not bind a local port in this execution environment, including the escalated attempt. Development/build scripts explicitly use Webpack. Production start and HTTP smoke checks succeeded with local server permission. Browser visual/keyboard review could not run because the browser connector failed to launch its app-server. No PRD business acceptance tests, authentication tests or deployment checks are claimed. Stop here after setup; database/auth/storage/hosting and open business rules remain unresolved.

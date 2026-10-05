@@ -10,11 +10,17 @@
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@radix-ui/react-dialog": "^1.1.23",
+    "@radix-ui/react-dropdown-menu": "^2.1.24",
+    "@radix-ui/react-tooltip": "^1.2.16",
+    "@tanstack/react-table": "^9.2.6",
     "@transport-manager/shared": "*",
+    "lucide-react": "^0.468.0",
     "next": "16.3.8",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "lucide-react": "^0.468.0"
+    "react-hook-form": "^7.89.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",

@@ -1,0 +1,3 @@
+"use client";
+import {Controller,type Control,type FieldValues,type FieldPath,type RegisterOptions} from "react-hook-form";import {TextField,type TextFieldProps} from "./text-field";
+export function ControlledTextField<T extends FieldValues>({control,name,rules,...props}:Omit<TextFieldProps,"name"|"value"|"onChange"|"onBlur"|"ref"> & {control:Control<T>;name:FieldPath<T>;rules?:Omit<RegisterOptions<T,FieldPath<T>>,"valueAsNumber"|"valueAsDate"|"setValueAs"|"disabled">}) {return <Controller control={control} name={name} rules={rules} render={({field,fieldState})=><TextField {...props} {...field} error={fieldState.error?.message??props.error}/>}/>;}

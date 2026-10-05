@@ -3,10 +3,10 @@ export default function NotFound() {
   return (
     <>
       <h1 className="text-3xl font-semibold">Page not found</h1>
-      <p className="my-4 text-slate-600">
+      <p className="my-4 text-muted-foreground">
         This page is not part of the workspace.
       </p>
-      <Link href="/" className="text-blue-700 underline">
+      <Link href="/" className="text-primary underline">
         Return to overview
       </Link>
     </>

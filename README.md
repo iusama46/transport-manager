@@ -52,7 +52,7 @@ The shared workspace exports TypeScript source and is transpiled by Next.js. It 
 
 ## Data and secrets
 
-Do not commit `.refact`, credentials, environment files, private customer spreadsheets or identity documents. Local environment files (including `.env.example`) are ignored. No environment variables are needed in this phase; add documented variable names only after provider decisions are made. Private data belongs outside Git, for example in the ignored `private-data/` directory.
+Do not commit `.refact`, credentials, environment files, private customer spreadsheets or identity documents. Actual `.env` and `.env.*` files are ignored at every directory level; reviewed `.env.example` templates are allowed. No application environment variables are needed in this phase. See [environment setup and production configuration](docs/ENVIRONMENT.md). Private data belongs outside Git, for example in the ignored `private-data/` directory.
 
 ## Verification notes
 

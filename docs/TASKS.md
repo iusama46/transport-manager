@@ -1,6 +1,6 @@
 # Implementation Tasks
 
-Updated: 5 October 2026
+Updated: 6 October 2026
 
 Use this checklist in build order. [x] means the stated deliverable is completed; unchecked means not completed. Implementation and verification are separate tasks. The setup shell is implemented and verified as recorded below; operational functionality remains unimplemented.
 
@@ -18,8 +18,11 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 - [ ] Resolve database, authentication, storage and free hosting choices (O01/O09).
 - [x] Choose package manager and workspace configuration (npm workspaces).
 - [x] Scaffold Next.js in apps/web and configure shared package.
-- [x] Configure TypeScript, ESLint and Prettier. No environment variables are required; all environment files remain ignored.
-- [ ] Add a provider-specific environment template when provider decisions are resolved.
+- [x] Configure TypeScript, ESLint and Prettier. No application environment variables are required; actual environment files remain ignored, with safe `.env.example` templates allowed.
+- [x] Add comment-only web/mobile environment templates matching the current zero-variable implementation and document local/production setup in ENVIRONMENT.md.
+- [x] Add Node-only web configuration validation, reject unapproved public-prefix variables, and verify value-free required-variable errors and recursive Git ignore rules.
+- [x] Inspect existing server operations and scan current tracked files for environment files/common credential patterns; scope and limitations recorded in SECURITY.md and ENVIRONMENT.md.
+- [ ] Add provider-specific required names, format validation and safe template placeholders when providers and their integrations are implemented.
 - [x] Configure and verify lint, type-check and production build commands.
 - [ ] Configure a local domain/workflow test runner when those features begin.
 - [x] Verify `npm ci`, lint, type checking and build in an isolated clean source copy with no dependencies or build caches.
@@ -157,3 +160,15 @@ Evidence applies to the current working tree; no implementation commit was creat
 - `npm audit --omit=dev`: zero findings. Full audit reports five high-severity findings in the development-only eslint-config-next → fast-glob → micromatch → braces chain (GHSA-vfj7-8cjw-p6xm). Suggested automatic remediation downgrades eslint-config-next to 14.x and was not applied. ESLint 9 also emits an upstream deprecation notice; tooling upgrade remains follow-up work.
 
 Turbopack failed because its CSS worker could not bind a local port in this execution environment, including the escalated attempt. Development/build scripts explicitly use Webpack. Production start and HTTP smoke checks succeeded with local server permission. Browser visual/keyboard review could not run because the browser connector failed to launch its app-server. No PRD business acceptance tests, authentication tests or deployment checks are claimed. Stop here after setup; database/auth/storage/hosting and open business rules remain unresolved.
+
+## Environment/security verification — 6 October 2026
+
+Evidence applies to this working tree; no commit or push was made.
+
+- `node --test scripts/environment.test.mjs`: 4/4 passed, covering empty configuration, required-value errors, both public prefixes and nested ignore/template rules.
+- A Next production build with a synthetic `NEXT_PUBLIC_SECURITY_PROBE` variable failed at configuration loading with its name, without its value, as intended.
+- Targeted current-index scan: 89 tracked files, no environment files or common credential-pattern findings. See ENVIRONMENT.md for exclusions; no complete secret audit is claimed.
+- Inspection found only public placeholders and UI demos, no protected business operations. Authentication, permissions and company-access enforcement remain unchecked above.
+- Full lint failed on existing UI hook issues; type checking and production build failed on existing `@tanstack/react-table` API/type mismatches in `src/components/common/data-table.tsx` and `src/app/dev/components/showcase.tsx`. The previous setup verification does not establish a passing build for this current tree. Fix the UI compatibility issues and rerun full checks before release.
+
+- Targeted lint for the changed web configuration, targeted Prettier checks and `git diff --check`: passed.

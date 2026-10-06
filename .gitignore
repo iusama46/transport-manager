@@ -8,6 +8,8 @@ playwright-report/
 test-results/
 .env
 .env.*
+# Only reviewed, secret-free templates may be committed at any depth.
+!.env.example
 *.log
 .DS_Store
 private-data/

@@ -1,6 +1,17 @@
 # Security Requirements
-Updated: 5 October 2026  
-Status: Planned controls; no security assessment has been performed.
+Updated: 6 October 2026
+Status: Environment foundations implemented and checked; business security controls remain planned. No comprehensive security assessment has been performed.
+
+## Implemented scope and verification
+
+The current application contains public placeholder pages and UI demos only. Inspection found no API handlers, server actions, persistence, private records, exports or attachment operations to authorize. The existing `/dev/components` page checks execution mode on the server and returns not-found outside development. This is not user authentication.
+
+- Actual environment files are ignored at every monorepo depth; exact `.env.example` templates are allowed. Web and reserved mobile templates contain comments only because no application variables are required.
+- Node-only configuration validation is invoked by the web Next configuration. Required-name validation produces errors without values; the current required list is empty. All public-prefix variables are rejected until explicitly reviewed public configuration is implemented.
+- Environment tests verify empty configuration, missing/blank required values, public-prefix rejection without value disclosure, and root/nested Git ignore behavior.
+- A targeted scan of 89 tracked index files found no actual environment files or recognizable credential patterns. This does not cover Git history or every secret format. See [ENVIRONMENT.md](ENVIRONMENT.md) for setup, boundaries and scan limitations.
+
+Authentication, session handling, role/permission checks, company/record scoping and provider data policies are **not implemented or verified**. There are no implemented protected business operations to retrofit. Add server enforcement and adversarial direct-request tests with the first protected operation; do not infer protection from this foundation. All requirements below remain planned unless explicitly identified above.
 
 ## Protected data and boundaries
 Protect customer contacts, driver CNIC/licence information, private receipts/proof, financial transactions, exports and credentials. The browser is untrusted. Authentication establishes identity; backend/data policies establish permission for every operation. See [ARCHITECTURE.md](ARCHITECTURE.md).

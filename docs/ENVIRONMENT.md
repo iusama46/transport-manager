@@ -1,6 +1,6 @@
 # Environment setup and production configuration
 
-Updated: 6 October 2026
+Updated: 7 October 2026
 
 ## Current configuration
 
@@ -20,7 +20,7 @@ Keep secret consumption in server-only modules, with a framework server-only imp
 
 ## Production
 
-Run `npm ci`, `npm run lint`, `npm run typecheck`, `node --test scripts/environment.test.mjs`, `npm run build`, then `npm start`. Current deployment serves a public UI preview only: no business records, authentication or protected operations exist. Do not load private data into this shell or describe it as an authenticated production system. `/dev/components` already rejects non-development requests on the server.
+Run `npm ci`, `npm run lint`, `npm run typecheck`, `node --test scripts/environment.test.mjs`, `npm run build`, then `npm start`. The current application is a public UI preview only; no deployment is claimed: no business records, authentication or protected operations exist. Do not load private data into this shell or describe it as an authenticated production system. `/dev/components` already rejects non-development requests on the server.
 
 No application secrets are currently needed in production. Once providers are approved, inject required secrets through the host's protected server environment, separately for each environment, and supply any variables required during both build and runtime. Do not copy local env files into source, static assets or deployment artifacts. Public bundled values require rebuilding when changed. Document rotation and validate runtime configuration for any standalone/container deployment path before adopting it; the current supported command is `npm start`.
 

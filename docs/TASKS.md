@@ -1,6 +1,6 @@
 # Implementation Tasks
 
-Updated: 6 October 2026
+Updated: 7 October 2026
 
 Use this checklist in build order. [x] means the stated deliverable is completed; unchecked means not completed. Implementation and verification are separate tasks. The setup shell is implemented and verified as recorded below; operational functionality remains unimplemented.
 
@@ -193,3 +193,19 @@ Sequence: implement authorization and audit foundations alongside authentication
 Reviewed all 15 existing repository Markdown files and added PERMISSIONS.md and AUDIT.md as canonical contracts. Replaced the fixed-role proposal, reconciled operating-company versus external-company terminology, added FR-13/14, AC-23–26 and planned T23–36, and corrected stale current-build claims. Requirements/design decisions are completed; all RBAC/audit implementation and acceptance execution remain unchecked. Only Markdown changed in this task. Historical client PDF/PPT snapshots still reflect 5 October scope and require regeneration before sharing as current requirements.
 
 Verification: reviewed searches for obsolete fixed-role assumptions, audit mutation allowances, tenant scope and provider finalization; remaining fixed-role mentions are explicitly superseded history. All local Markdown links resolve across 17 documents, and `git diff --check` passes. Only Markdown files are modified/added; no runtime tests or feature implementation are claimed.
+
+## Requirements re-verification — 7 October 2026
+
+The repeated RBAC/audit request is already incorporated in commit `3d3150a`. Reviewed all 17 repository Markdown files before changes; retained the established requirements instead of duplicating them. Corrected stale commit/deployment wording in MEMORY.md and ENVIRONMENT.md.
+
+| Requirement group | Canonical coverage | Planned verification |
+|---|---|---|
+| Custom roles, protected Owner, extensible granular permissions | PERMISSIONS.md; PRD FR-13; DECISIONS D18–D21 | T23–T28, T36 |
+| Company-aware server checks and frontend permission behavior | ARCHITECTURE.md authorization flow; SECURITY.md; DESIGN.md | T24–T27, T34 |
+| Immutable audit contract, action coverage and credential redaction | AUDIT.md; PRD FR-14; DECISIONS D22–D25 | T29–T32, T35 |
+| Roles dashboard, permission matrix, global log and record Activity | DESIGN.md; COMPONENTS.md | T23, T28, T33–T34, T36 |
+| Completed requirements versus pending implementation | MEMORY.md; checklist sections 3 and 18 | Implementation/test execution remains unchecked |
+
+Verification: all 56 requested permission keys match the master catalog; no audit edit/delete keys are present. Local Markdown links resolve. Searches and contextual review found no active fixed-business-role requirement or normal application audit mutation allowance. Database/provider choices remain open. Existing one-operating-business/multiple-counterparty scope and explicit denial of implicit Owner cross-tenant access remain consistent. `git diff --check` passed; this follow-up changes Markdown only and does not execute or certify application tests.
+
+Ready for the next requirements review. Outstanding decisions remain provider/hosting selection, financial/order rules, locale/print details, staff grants, Owner provisioning/transfer and backup/audit retention operations. Client PDF/PPT snapshots still need regeneration before being shared as current scope.

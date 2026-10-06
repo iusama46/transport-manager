@@ -1,5 +1,5 @@
 # Project Memory
-Updated: 6 October 2026
+Updated: 7 October 2026
 Purpose: Project continuity only; no personal biography or credentials.
 
 ## Current state
@@ -74,4 +74,4 @@ Dynamic custom roles, protected Owner/Super Admin, extensible `module.action` pe
 
 Preserve one operating business with multiple external company records. Customer (Client) is the direct customer; Consignee remains their receiver. Independent tenant onboarding is outside current scope. Authorization includes company context and rejects foreign records; Owner has no implicit cross-tenant access. Staff-specific grants, financial correction rules, Owner provisioning and audit retention/archival operations still need decisions. Database/auth/storage/hosting remain open; offline synchronization remains outside initial scope.
 
-Environment work is locally committed as `d0c714f`; push was rejected by automatic approval review pending explicit destination approval. Do not treat it as published. The documentation updates here are uncommitted. Client PDF/PowerPoint snapshots have not been refreshed and must not be represented as the updated scope. Next step is requirements review of remaining operational/business/provider choices, followed by authorized implementation and actual test execution.
+Environment work is locally committed as `d0c714f`; push was rejected by automatic approval review pending explicit destination approval. Do not treat it as published. The RBAC/audit documentation was subsequently committed as `3d3150a`, verified locally on 7 October 2026; remote publication was not checked. Client PDF/PowerPoint snapshots have not been refreshed and must not be represented as the updated scope. Next step is requirements review of remaining operational/business/provider choices, followed by authorized implementation and actual test execution.

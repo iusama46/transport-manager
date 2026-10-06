@@ -1,9 +1,9 @@
 # Project Memory
-Updated: 5 October 2026  
+Updated: 6 October 2026
 Purpose: Project continuity only; no personal biography or credentials.
 
 ## Current state
-Setup phase completed locally. npm workspaces contain the Next.js dashboard shell and a shared TypeScript/Zod package. All business screens are clearly labelled placeholders with no operational data. Lint, type checks and the production build passed. Nothing has been deployed; database/provider selection and migration remain open.
+Setup phase completed locally. npm workspaces contain the Next.js dashboard shell and a shared TypeScript/Zod package. All business screens are clearly labelled placeholders with no operational data. Historical setup checks passed; the latest 6 October checks found existing UI hook lint and table-library type/build failures (TASKS.md). Nothing has been deployed; database/provider selection and migration remain open.
 
 ## Read order
 1. [PRD.md](PRD.md): business scope, requirements and acceptance criteria.
@@ -57,13 +57,21 @@ This supersedes the historical “implementation not started” foundation note 
 - Root private npm workspace and lockfile added. Web uses Next.js 16.3.8, React 19 and Tailwind 4; shared exports a provider-independent Zod UI placeholder contract and inferred type, consumed by web.
 - Sidebar, header, overview and 15 other section placeholders match DESIGN.md; Fuel Management also links Suppliers, Branches, Purchases, Payments and Statements. Includes responsive navigation, active links, focus styles, skip link and unknown-route page. Browser interaction review remains pending.
 - apps/mobile remains reserved and unchanged; no Expo dependencies. No database SDK, connection, schema, auth provider or financial logic was added.
-- Existing documentation retained; child README reservation notes preserved with dated updates. Root README now documents installation, development, formatting, linting, type checking and production commands. No environment configuration is needed. All environment files, .refact and common credential paths are ignored.
+- Existing documentation retained; child README reservation notes preserved with dated updates. Root README now documents installation, development, formatting, linting, type checking and production commands. No environment configuration is needed. Actual environment files, .refact and common credential paths are ignored; the later environment foundation permits safe `.env.example` templates.
 - Verified with Node 20.19.5/npm 10.8.2: clean-copy npm ci, web/shared lint and type checks, Webpack production build, formatting, diff whitespace and Git exclusions. All 21 application routes returned 200 with placeholder labels; two invalid routes returned 404. Generated links resolve. Evidence is for this working tree, not a committed fresh checkout.
 - Turbopack CSS-worker port binding was blocked locally; dev/build scripts use Webpack. Production server smoke tests passed with permission. Browser connector could not start, so no visual/keyboard QA claim.
 - Production dependency audit: zero findings. Full audit: five high findings in the development lint dependency chain, rooted in braces advisory GHSA-vfj7-8cjw-p6xm; automatic major downgrade not applied. ESLint 9 emitted an upstream deprecation notice. Revisit compatible lint-tool updates separately.
 
-No domain test runner or PRD acceptance workflows were implemented. Do not treat the shell as authenticated or production-ready. Stop after setup as requested; next phase requires explicit direction and resolution of the relevant open decisions. See TASKS.md for completed checks and outstanding work.
+No domain test runner or PRD acceptance workflows were implemented. Do not treat the shell as authenticated or production-ready. The setup task stopped there; subsequent authorized work added environment foundations and documentation, not business workflows. See TASKS.md for completed checks and outstanding work.
 
 ## Client overview documents — 5 October 2026
 
 Added the supplied [client overview Markdown](CLIENT_OVERVIEW.md), [PDF overview](client/CLIENT_OVERVIEW.pdf) and [PowerPoint presentation](client/Transport_Manager_Client_Presentation.pptx). Markdown is the main editable source; PDF and PowerPoint are shareable snapshots to refresh when the source changes. README.md links to all three files. Verified that the files exist and the relative links resolve. This milestone adds documentation of planned scope only; it does not implement application functionality or complete any business acceptance tests.
+
+## RBAC and audit requirements milestone — 6 October 2026
+
+Dynamic custom roles, protected Owner/Super Admin, extensible `module.action` permissions, frontend/server checks, core Activity Log, immutable company-aware events and credential redaction are finalized requirements (D18–D25). They are no longer open architectural questions. PERMISSIONS.md owns the catalog/lifecycle/company scope; AUDIT.md owns event fields, coverage and security. PRD, architecture, design, components, security, test plan, client overview and task tracker reference those contracts. No application code was implemented in this milestone.
+
+Preserve one operating business with multiple external company records. Customer (Client) is the direct customer; Consignee remains their receiver. Independent tenant onboarding is outside current scope. Authorization includes company context and rejects foreign records; Owner has no implicit cross-tenant access. Staff-specific grants, financial correction rules, Owner provisioning and audit retention/archival operations still need decisions. Database/auth/storage/hosting remain open; offline synchronization remains outside initial scope.
+
+Environment work is locally committed as `d0c714f`; push was rejected by automatic approval review pending explicit destination approval. Do not treat it as published. The documentation updates here are uncommitted. Client PDF/PowerPoint snapshots have not been refreshed and must not be represented as the updated scope. Next step is requirements review of remaining operational/business/provider choices, followed by authorized implementation and actual test execution.

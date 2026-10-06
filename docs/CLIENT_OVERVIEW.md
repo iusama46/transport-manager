@@ -2,7 +2,7 @@
 
 ## Client Overview & Scope
 
-5 October 2026 | Draft for client review
+6 October 2026 | Updated requirements for client review
 
 This document describes planned capabilities. It does not certify completed features.
 
@@ -14,14 +14,14 @@ Transport Manager will give one transport business a shared place to manage tran
 
 ### Who will use it
 
-The proposed users are the business owner, operations staff, accounts staff and users with view-only access. Each person will see and change only the information allowed by their role. Exact staff access will be agreed before launch.
+A protected Owner/Super Admin has full supported access within the authorized operating business. Authorized staff can create custom roles with any name, select granular permissions and assign roles to users. Titles such as Accountant or Fuel Manager do not automatically confer access. Each person sees and changes only permitted information; the server also rejects unauthorized requests. Exact staff grants will be agreed before launch.
 
 ### People and businesses involved
 
 | Item | Description |
 |---|---|
 | Factory | The business or location from which the goods originate. |
-| Customer | Your direct customer who arranges transportation. |
+| Customer (Client) | Your direct customer who arranges transportation. |
 | Consignee (Receiver) | Your customer’s customer who receives the goods. |
 | Vehicle owner | Your business or another company that owns the vehicle. |
 | Transport partner | An outside transporter assigned an outsourced order. |
@@ -63,7 +63,7 @@ Prepare bills from selected orders, calculate totals and print or save them as P
 
 ### Access, settings and existing records
 
-Manage staff accounts and permissions, business details and bill settings. Record important changes for review. Existing spreadsheet data will be checked before import, including inconsistent vehicle numbers, unclear dates and incomplete payment details. Export records and reports when needed.
+Manage staff accounts, custom Roles & Permissions, business details and bill settings. Protect the Owner role and reassign active users before removing their custom role. Maintain an immutable Activity Log of important business/security actions with actor, time, company and safe change details. Authorized users can filter/search the global log, export with explicit permission and inspect Activity history on individual records. No normal application user can edit/delete audit history, and credentials never enter the log. Existing spreadsheet data will be checked before import, including inconsistent vehicle numbers, unclear dates and incomplete payment details. Export records and reports when needed.
 
 ## Delivery plan and client review
 
@@ -71,7 +71,7 @@ Manage staff accounts and permissions, business details and bill settings. Recor
 
 | Item | Description |
 |---|---|
-| 1. Foundation | Staff login, permissions, users and business settings. |
+| 1. Foundation | Staff login, custom roles/permissions, users, immutable audit capture and business settings. |
 | 2. Daily operations | Companies, customers, receivers, vehicles, drivers and orders. |
 | 3. Costs and partners | Outsourced jobs, fuel suppliers/branches, repairs and expenses. |
 | 4. Billing and reporting | Bills, collections, settlements, statements and overview reports. |
@@ -97,3 +97,9 @@ Who will check imported records and maintain backups?
 ### How the first release will be accepted
 
 Staff should be able to follow an order from entry through delivery and billing; print a bill longer than 14 rows; record partial payments; view separate customer and partner balances; reconcile branch and supplier fuel statements; and access only permitted information. Existing records must import without unintended duplicates, and a backup must be successfully restored before launch.
+
+## Company scope and document versions
+
+Multiple companies can be recorded as factories, customers, vehicle owners, suppliers and transport partners within one operating business. This does not grant access to independent companies' private records. Permissions and audit events use the operating-company context; Owner access does not imply cross-tenant access. Factory → Customer/Client → Consignee relationships and existing transport/financial workflows are unchanged.
+
+This Markdown includes the finalized 6 October RBAC/audit requirements. The existing PDF and PowerPoint are historical 5 October snapshots and have not been regenerated in this documentation-only update.

@@ -1,19 +1,19 @@
 # Product and Interface Design
-Updated: 5 October 2026  
+Updated: 6 October 2026
 Status: Proposed UX specification grounded in [PRD.md](PRD.md).
 
 ## Design goals
 Make daily order entry, cost recording and balance lookup fast. Prefer readable tables, clear forms and consistent terminology. Desktop and tablet are the first targets; preserve basic usability on narrow screens. Styling is proposed, not an approved visual mockup.
 
 ## Navigation
-Group the PRD’s 16 sections without removing any:
+Group the PRD’s 17 planned sections without removing any (the existing shell still has 16):
 - Overview.
 - Operations: Orders & Deliveries, Outsourced Orders.
 - Directory: Companies & Transport Partners, Factories, Customers & Consignees, Vehicles, Drivers.
 - Costs: Fuel Management, Maintenance & Expenses.
 - Finance: Billing & Invoices, Payments & Settlements.
 - Reports.
-- Administration: Data Import & Export, Users & Permissions, Business Settings.
+- Administration: Data Import & Export, Users & Permissions (Users; Roles & Permissions), Activity Log, Business Settings.
 
 Outsourced Orders filters the same order records and uses the same details page.
 
@@ -29,7 +29,7 @@ Support loading, empty, filtered-empty, unauthorized, validation-error, network-
 Default columns: order number/date, factory, customer, consignee, cargo, vehicle or partner, delivery status and billing state. Financial columns appear only to authorized users.
 Create form sections: customer relationships; cargo/quantity/unit; route and ordered stops; fulfilment; dates and notes. Selecting a new customer clears or asks to remap an incompatible consignee. Provide lookup/create shortcuts only where permission allows.
 Fulfilment choice: business-managed assignment or outsourced partner. Vehicle owner is displayed independently from partner.
-Detail tabs: Overview, Stops & Delivery, Assignments, Expenses, Billing/Payments and History. Show unavailable tabs according to permission without leaking totals.
+Detail tabs: Overview, Stops & Delivery, Assignments, Expenses, Billing/Payments and Activity. Show unavailable tabs according to permission without leaking totals.
 Reordering stops must work with keyboard controls as well as drag-and-drop.
 
 ## Outsourcing
@@ -56,7 +56,7 @@ The current PRD calls the receiver Consignee (Receiver), formerly Party. Do not 
 Forms need labels, required indicators, inline errors and an error summary. Dialogs manage focus and keyboard escape appropriately. Tables have accessible headings and status text. Warn about unsaved form changes; preserve entered values after recoverable failures.
 
 ## Review needed
-Business branding, final language(s), date/currency presentation, staff roles, payment responsibility and exact invoice template remain open. See [DECISIONS.md](DECISIONS.md).
+Business branding, final language(s), date/currency presentation, staff permission assignments, payment responsibility and exact invoice template remain open. See [DECISIONS.md](DECISIONS.md).
 
 ## Fuel supplier and branch screens
 
@@ -128,3 +128,15 @@ Inputs always have visible labels and connected help/errors. Validate on submit 
 Base UI: apps/web/src/components/ui. Reusable composites: components/common. Form adapters: components/forms. Business controls: features/<module>/components. Share domain types/validation in packages/shared; web DOM controls are separate from future Expo native controls.
 
 Create a development-only /dev/components showcase with synthetic fixtures. Demonstrate controls, overlays, tables, feedback, long text, narrow screens and dependent entity pickers. Verify contrast, keyboard focus, zoom, async races and recovery before rollout. Components are specified separately in COMPONENTS.md. Exact branding, language and invoice template remain open.
+
+## Roles & Permissions dashboard
+
+Roles list shows custom name, description, active/system status and assigned-user count with permission-aware create/edit/deactivate/delete actions. Create/Edit Role uses a custom name and description, then a reusable PermissionMatrix grouped by catalog module and action. Support labelled checkboxes, keyboard use, module selection and indeterminate partial selection. Show action descriptions and unavailable/non-delegable grants. Do not hardcode Accountant/Dispatcher screens or infer grants from a role name. New catalog actions appear without redesigning the matrix.
+
+Save validates catalog keys, delegation scope and concurrency on the server, then refreshes effective permissions. User create/edit offers role assignment within the current company and the actor's assignment authority. Protected Owner is visibly locked; custom role deletion/deactivation is blocked while active users remain assigned. Provide an authorized reassignment flow before removal, with conflict feedback if membership changes concurrently. Preserve form input on validation failure. No privileged controls or data may be exposed by UI-only checks.
+
+## Global Activity Log and record history
+
+Add an Activity Log navigation entry gated by `activity_logs.view`. Filters: date/date range, user, module, action, company where applicable, record/reference ID and text search; provide sortable columns, stable pagination and clear filters. Company selection lists only authorized contexts; current single-business scope does not show an all-tenants option. Columns include time, actor snapshot, action, module, reference and safe description. Expand an event for permitted previous/new values and changed fields. Export requires `activity_logs.export` as well as view and uses the same scoped filters on the server.
+
+Use a reusable read-only ActivityHistory/AuditTimeline in record Activity tabs for Orders, Vehicles, Drivers, Clients, Fuel transactions, Expenses, Invoices, Payments, Settlements, Users and Roles. An order can expose Details | Documents | Payments | Activity alongside its operational tabs. Record history is chronological, paginated and restricted to both audit and parent-record access. Show unavailable/redacted fields explicitly without fetching hidden values. Include loading, empty, denied and failure states. No event edit/delete controls exist, even for Owner. Use configured timezone and label missing actor/device information without inventing it. See AUDIT.md for the full event contract.

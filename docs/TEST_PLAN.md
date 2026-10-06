@@ -1,6 +1,6 @@
 # Test Plan
-Updated: 5 October 2026  
-Status: Planned tests only. No application tests have run.
+Updated: 6 October 2026
+Status: Business/RBAC/audit tests below are planned, not executed. Existing environment/shell verification and current build blockers are recorded in TASKS.md.
 
 ## Scope and strategy
 Validate [PRD.md](PRD.md) using domain unit tests, data/service integration tests, browser workflows and targeted manual print/accessibility checks. Vitest and Playwright are proposed. Provider-specific tests follow the database decision. Use synthetic fixtures; do not copy private identity documents into test repositories.
@@ -37,7 +37,7 @@ Test leap dates, month boundaries and business timezone conversions. Preserve un
 Fuel source reports and overall reports must reconcile to the same accepted purchases.
 
 ## Security and file cases
-Run each role against read/write/finalize/reverse/admin/export actions. Alter record IDs and object keys, spoof role fields, try expired/revoked sessions and direct requests bypassing UI.
+Run generated custom roles with explicit permission sets against read/write/finalize/reverse/access-management/export actions; never infer authorization from role names. Alter record IDs and object keys, spoof role fields, try expired/revoked sessions and direct requests bypassing UI.
 Test uploads with oversized files, spoofed extensions and unsafe content types; private attachments must not become public. CSV exports containing formula-leading text must be neutralized without changing stored data. Logs must not expose credentials or full identity numbers.
 
 ## UX and compatibility
@@ -55,3 +55,26 @@ For every run record date, commit, environment, fixtures, test command, pass/fai
 ## Fuel extension tests
 
 T19 / AC-19: create two suppliers with two branches each; selection and direct requests reject mismatched supplier/branch IDs. T20 / AC-20: purchases A=10,000 and B=20,000, central payment allocations A=5,000/B=10,000 leave consolidated 15,000. T21 / AC-21: pay branch A another 5,000; only A clears. T22 / AC-22: reject cross-supplier/currency allocation; preserve unallocated credit separately; reverse a central payment and restore each affected branch balance. Exercise simultaneous allocations to the same purchase and reject over-allocation. Verify archived branches remain in historical statements and imports flag unknown suppliers/branches. These tests are planned, not executed.
+
+## Dynamic RBAC and Activity Log acceptance — planned
+
+Use synthetic users and at least two operating-company fixtures, plus separate external counterparties. The second company is an isolation adversary, not a commitment to tenant onboarding. Cover frontend states and direct server/API/data access. All cases below are unexecuted.
+
+| Test | Criteria | Scenario and expected result |
+|---|---|---|
+| T23 | AC-23 | Create an arbitrary custom name/description and catalog grants; save/reload/edit role; renaming changes no authorization; unknown keys fail |
+| T24 | AC-23 | Assigned active user performs a granted operation successfully; ungranted action and spoofed role/company fail via direct API despite crafted UI requests |
+| T25 | AC-23 | Assign/change role, remove permission, deactivate user/role after reassignment; existing sessions lose old rights without retaining cached access |
+| T26 | AC-23 | Guess another company's resource/role/audit IDs in reads, writes, counts, related IDs, downloads and exports; reject without leaking data; Owner has no implicit foreign membership |
+| T27 | AC-24 | Attempts to delete/deactivate protected Owner, remove critical permissions or remove last active Owner fail; custom-role administrator cannot grant/assign higher privileges or forge system-role status |
+| T28 | AC-24 | Delete/deactivate role with active assignments fails; authorized atomic reassignment permits safe archival/removal; concurrent new assignment cannot bypass guard; history remains linked |
+| T29 | AC-25 | Exercise auth, user/role/grant, transport/master, outsourcing, fuel/expense, invoice/payment/settlement, import/export and settings actions from AUDIT.md; verify correct action, actor snapshot, company, resource and server time |
+| T30 | AC-25 | Update vehicle/rate; persisted before/after and changed fields match actual data; create has no previous state; renamed/archived actor/resource preserves history; failed mutation produces no false success event |
+| T31 | AC-25 | Inject synthetic password/token/API-key values into nested fields, descriptions, errors and request metadata; no credentials persist in audit storage, archives or exports; permitted business fields remain useful |
+| T32 | AC-25 | Normal users and Owner cannot update/delete historical events through UI, crafted API or normal app database credentials; trusted writer can append only; provider tests wait for selection |
+| T33 | AC-26 | Date/range boundaries, user/module/action/company/reference/text filters, stable sorting and pagination return only permitted matching events, including counts and empty states |
+| T34 | AC-26 | View-only audit reader cannot export; export-only grant without view also fails; both grants allow scoped export and generate its audit event; record Activity additionally requires parent/field permissions |
+| T35 | AC-25 | Audit-write failure rolls back sensitive mutation or preserves a tested durable outbox guarantee; retries produce one committed success event; safe denied/auth-failure events use restricted unknown-company handling |
+| T36 | AC-23–26 | Keyboard/assistive use of permission matrix, role assignment and Activity history; protected controls locked, errors recoverable, redacted fields never fetched then hidden |
+
+Verify retention/archival permissions and restoration once O10/O12 are resolved. Permission additions require new allow/deny/resource-scope tests; catalog changes must not grant custom roles new capabilities automatically. Include direct financial posting, reversal, branch/supplier and identity-file tests when their action semantics are finalized.

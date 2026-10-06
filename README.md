@@ -19,7 +19,7 @@ Start with [PRD](docs/PRD.md), [Decisions](docs/DECISIONS.md) and [Tasks](docs/T
 
 ## Client overview
 
-The [client overview Markdown](docs/CLIENT_OVERVIEW.md) is the main editable source. The [PDF overview](docs/client/CLIENT_OVERVIEW.pdf) and [PowerPoint presentation](docs/client/Transport_Manager_Client_Presentation.pptx) are shareable snapshots; refresh them when the source changes. These documents describe planned scope, not implemented application functionality.
+The [client overview Markdown](docs/CLIENT_OVERVIEW.md) is the main editable source. The [PDF overview](docs/client/CLIENT_OVERVIEW.pdf) and [PowerPoint presentation](docs/client/Transport_Manager_Client_Presentation.pptx) are shareable snapshots; refresh them when the source changes. The Markdown includes the 6 October custom-RBAC/audit requirements; the PDF and PowerPoint remain historical 5 October snapshots pending regeneration. These documents describe planned scope, not implemented application functionality.
 
 ## Local setup
 
@@ -56,6 +56,10 @@ Do not commit `.refact`, credentials, environment files, private customer spread
 
 ## Verification notes
 
-A clean source copy passed installation, linting, type checking and the production build. All 21 placeholder routes passed HTTP smoke checks. Scripts use Webpack because Turbopack's CSS worker could not bind a port in the setup environment. Browser visual/keyboard review remains pending due to an unavailable browser connector. See [Tasks](docs/TASKS.md) for full evidence.
+The 5 October clean source copy passed installation, linting, type checking and the production build. Latest 6 October checks fail on existing UI hook lint errors and table-library API/type incompatibilities; do not infer a passing current build from the historical result. All 21 placeholder routes passed HTTP smoke checks. Scripts use Webpack because Turbopack's CSS worker could not bind a port in the setup environment. Browser visual/keyboard review remains pending due to an unavailable browser connector. See [Tasks](docs/TASKS.md) for full evidence.
 
 Production dependency audit reported no vulnerabilities. The full audit reported five high-severity findings in the development lint dependency chain; automatic remediation would downgrade the Next.js lint configuration to 14.x and was not applied. ESLint 9 also emits a deprecation notice. These tooling limitations are recorded for follow-up.
+
+## Finalized access and audit requirements
+
+Dynamic custom roles with a protected Owner/Super Admin and company-scoped granular permissions are specified in the [master permission catalog](docs/PERMISSIONS.md). The [Activity Log contract](docs/AUDIT.md) defines immutable, redacted global and record history. These requirements are finalized; implementation remains pending. Existing navigation is the original 16-section shell, while the updated design adds Activity Log and Roles & Permissions workflows.

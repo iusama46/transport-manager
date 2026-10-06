@@ -1,5 +1,5 @@
 # Architecture
-Updated: 5 October 2026  
+Updated: 6 October 2026
 Status: Proposed implementation design; database and deployment decisions remain open.
 
 ## Scope and references
@@ -35,7 +35,11 @@ This is conceptual, not an approved SQL schema or MongoDB collection layout.
 | Record | Relationships / important fields |
 |---|---|
 | Business | Settings, currency, timezone |
-| UserMembership | User, business, role, active status |
+| User | Provider identity reference, display name, active status |
+| UserMembership / UserRole | User, operating company, assigned role, active status; one role per membership initially |
+| Role | Stable ID, company context, custom name/description, status, protected-system marker |
+| Permission | Stable module.action catalog key, resource/action semantics |
+| RolePermission | Role-to-permission association; no SQL-specific representation assumed |
 | ContactEntity | Person/company, business roles, contact details |
 | CustomerConsignee | Customer-to-receiver relationship |
 | Vehicle | Normalized registration, current owner, type, capacity |
@@ -49,7 +53,7 @@ This is conceptual, not an approved SQL schema or MongoDB collection layout.
 | PartnerObligation | Outsourced order, agreed calculation inputs and payable |
 | Payment / Allocation | Direction, counterparty, currency, target obligation, amount |
 | Attachment | Private object key, parent record, uploader and metadata |
-| AuditEvent | Actor, action, record, timestamp and permitted change summary |
+| AuditLog | Immutable event contract in AUDIT.md: actor/name snapshot, company, action/resource, redacted diff, time and safe request metadata |
 | ImportBatch / ImportRow | Source provenance, review results, commit status |
 
 Stable IDs establish relationships. Keep normalized registration matching separate from display values. Do not introduce multiple operating tenants as a product feature merely because records include business IDs.
@@ -81,4 +85,16 @@ Resolve database/provider choice, billing responsibility, partner settlement int
 
 Add FuelSupplier and FuelBranch (supplier ID, name, contact, location, active status). FuelTransaction references both supplier and branch with an enforced relationship. Payment identifies the supplier/payee and optional branch scope; allocations reference specific fuel purchases. A central supplier payment may allocate across that supplier’s branches, while a branch-scoped payment allocates only to that branch. All allocations must match supplier and currency. Validate sums and remaining obligations atomically. Derive branch and supplier totals from the same effective allocations; report unallocated supplier credit separately. Keep branch history stable and require import review for missing branch mappings.
 
-Repository layout is a monorepo: apps/web, apps/mobile, packages/shared and docs. The proposed src paths above live under apps/web unless deliberately shared. Applications and workspace tooling are not scaffolded yet.
+Repository layout is a monorepo: apps/web, apps/mobile, packages/shared and docs. The proposed src paths above live under apps/web unless deliberately shared. Web/shared workspaces and a public placeholder shell exist; protected operations, RBAC and audit persistence are not implemented.
+
+## Authorization and audit flow — finalized design
+
+[PERMISSIONS.md](PERMISSIONS.md) owns permission names, role lifecycle, delegation and company boundaries; [AUDIT.md](AUDIT.md) owns event fields, coverage, redaction and retention. These concepts are provider-independent, not a finalized SQL schema or MongoDB collection design.
+
+Request → verify authentication/session → resolve active user and company membership → load active role/effective catalog grants → check action and scoped resource/relationships → validate business change → persist change and immutable redacted audit event → return only permitted data. Frontend receives a safe effective-permission view for navigation and actions, but the server repeats checks. Client-supplied role/company flags never establish authority. Revalidate after role/assignment changes; any caching requires invalidation/version checks so revoked permissions cannot remain active.
+
+All server components, API handlers, jobs and future mobile APIs use the same authorization services. Scope repositories, joins/lookups, counts, attachments and exports to company context. A protected Owner still needs authorized company context and cannot modify audit history. External companies remain counterparties within one operating business; independent tenant onboarding and Owner cross-tenant access are not supported by the current scope.
+
+Role updates and active-user reassignment/deletion checks require concurrency-safe persistence. Permission keys come from the central catalog; role names remain arbitrary. Appending a new catalog action does not silently grant it to custom roles.
+
+For successful sensitive changes, derive the diff from trusted previous and persisted new states and atomically persist business state with audit history. Provider-specific transaction or durable outbox mechanics remain an implementation gate. Authentication failures/denials use the separately protected event path described in AUDIT.md. Database access must prevent ordinary application identities from updating/deleting audit events. No application audit mutation API is designed.

@@ -1,5 +1,5 @@
 # Reusable Components
-Updated: 5 October 2026
+Updated: 6 October 2026
 Status: Implementation specification; components are not yet claimed as implemented.
 
 ## Ownership and file structure
@@ -110,3 +110,13 @@ Build a development-only showcase using synthetic data. Include long labels, 200
 5. Business selectors/editors as modules are implemented.
 
 Add this sequence to TASKS.md before individual screens. Record implementation and verification separately; writing this specification does not complete those tasks.
+
+## Planned RBAC and audit composites — 6 October 2026
+
+- PermissionMatrix: accepts the centralized catalog, selected keys, delegable keys and read-only/system constraints; renders reusable module/action selections with keyboard labels and partial-selection states. It has no hard-coded business-role behavior.
+- RolePicker: company-scoped active roles permitted for assignment; preserves IDs independently of custom names and handles stale/deactivated choices.
+- PermissionGate: uses effective action grants and scope for presentation only; every backing operation repeats server authorization.
+- ActivityLogFilters: date/range, actor, module, action, permitted company, reference and text, composed with server sorting/pagination.
+- ActivityHistory/AuditTimeline: read-only, chronological, paginated safe event details for global/record views, including actor snapshot and permitted before/after changes. No edit/delete affordances; no hidden secrets in component props.
+
+These composites and their integration remain unimplemented. Contracts follow PERMISSIONS.md, AUDIT.md and DESIGN.md; test stale permissions, denied views/exports and sensitive-field masking as well as accessibility.

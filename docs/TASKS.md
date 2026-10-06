@@ -27,20 +27,23 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 - [ ] Configure a local domain/workflow test runner when those features begin.
 - [x] Verify `npm ci`, lint, type checking and build in an isolated clean source copy with no dependencies or build caches.
 - [ ] Repeat verification from a fresh Git checkout after these setup changes are committed.
-- [x] Build sidebar, header and clearly labelled placeholders for all DESIGN.md navigation sections, plus five fuel subsections.
+- [x] Build sidebar, header and placeholders for the original 16 navigation sections, plus five fuel subsections (5 October scope; new Activity Log/Roles designs are not implemented).
 - [x] Verify production HTTP responses for all 21 placeholder pages and 404 handling.
 - [ ] Complete browser visual and keyboard interaction review (browser connector unavailable during setup).
 
 ## 2. Authentication
 
-- [ ] Configure provider and initial administrator provisioning.
+- [ ] Configure provider and protected Owner/Super Admin provisioning.
 - [ ] Implement login, logout, session expiry and account recovery.
 - [ ] Protect routes and backend operations.
 - [ ] Verify expired/revoked sessions and unauthorized direct requests.
 
 ## 3. Roles and permissions
 
-- [ ] Confirm Admin, Operations, Accounts and Viewer permission matrix.
+- [x] Finalize dynamic custom RBAC, protected Owner/Super Admin, granular catalog and frontend/server enforcement requirements (D18–D21).
+- [x] Document Roles & Permissions UI, reusable permission matrix, company isolation and safe role lifecycle.
+- [ ] Confirm actual staff assignments, financial correction grants and Owner provisioning/transfer workflow.
+- [ ] Implement the centralized permission catalog, custom role CRUD, assignment and protected Owner/delegation safeguards.
 - [ ] Implement permission checks for reads, writes, exports and financial actions.
 - [ ] Apply database access policies appropriate to the selected provider.
 - [ ] Verify each role through direct API/data requests, including restricted files.
@@ -163,7 +166,7 @@ Turbopack failed because its CSS worker could not bind a local port in this exec
 
 ## Environment/security verification — 6 October 2026
 
-Evidence applies to this working tree; no commit or push was made.
+Evidence was collected before commit `d0c714f`; the environment/security work was subsequently committed locally. Push was blocked by automatic approval review and remains unverified.
 
 - `node --test scripts/environment.test.mjs`: 4/4 passed, covering empty configuration, required-value errors, both public prefixes and nested ignore/template rules.
 - A Next production build with a synthetic `NEXT_PUBLIC_SECURITY_PROBE` variable failed at configuration loading with its name, without its value, as intended.
@@ -172,3 +175,21 @@ Evidence applies to this working tree; no commit or push was made.
 - Full lint failed on existing UI hook issues; type checking and production build failed on existing `@tanstack/react-table` API/type mismatches in `src/components/common/data-table.tsx` and `src/app/dev/components/showcase.tsx`. The previous setup verification does not establish a passing build for this current tree. Fix the UI compatibility issues and rerun full checks before release.
 
 - Targeted lint for the changed web configuration, targeted Prettier checks and `git diff --check`: passed.
+
+## 18. Activity Log / Audit Trail foundation
+
+- [x] Finalize core audit requirements, immutable history, company context and credential exclusion (D22–D25).
+- [x] Document event fields/action coverage, global screen, reusable record Activity and planned tests T23–T36.
+- [ ] Implement trusted redacted event capture and atomic/durable integration with each sensitive operation.
+- [ ] Implement provider-level append-only policies and restricted audit reader/writer capabilities.
+- [ ] Implement global filters, sorting, pagination, permission-controlled export and record history.
+- [ ] Resolve O12 retention/archival/security-event policy with O10 backup responsibilities.
+- [ ] Execute RBAC, isolation, audit redaction/tampering and UI tests with evidence.
+
+Sequence: implement authorization and audit foundations alongside authentication before adding protected business mutations; integrate coverage into every module, not only at the end of this numbered checklist.
+
+## Documentation review — 6 October 2026
+
+Reviewed all 15 existing repository Markdown files and added PERMISSIONS.md and AUDIT.md as canonical contracts. Replaced the fixed-role proposal, reconciled operating-company versus external-company terminology, added FR-13/14, AC-23–26 and planned T23–36, and corrected stale current-build claims. Requirements/design decisions are completed; all RBAC/audit implementation and acceptance execution remain unchecked. Only Markdown changed in this task. Historical client PDF/PPT snapshots still reflect 5 October scope and require regeneration before sharing as current requirements.
+
+Verification: reviewed searches for obsolete fixed-role assumptions, audit mutation allowances, tenant scope and provider finalization; remaining fixed-role mentions are explicitly superseded history. All local Markdown links resolve across 17 documents, and `git diff --check` passes. Only Markdown files are modified/added; no runtime tests or feature implementation are claimed.

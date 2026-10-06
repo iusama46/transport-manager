@@ -24,7 +24,7 @@ Run `npm ci`, `npm run lint`, `npm run typecheck`, `node --test scripts/environm
 
 No application secrets are currently needed in production. Once providers are approved, inject required secrets through the host's protected server environment, separately for each environment, and supply any variables required during both build and runtime. Do not copy local env files into source, static assets or deployment artifacts. Public bundled values require rebuilding when changed. Document rotation and validate runtime configuration for any standalone/container deployment path before adopting it; the current supported command is `npm start`.
 
-Before implementing protected operations, establish verified server identity and active membership, enforce approved action permissions and operating-company/record scope in every read and mutation, and test direct requests, guessed IDs, revoked sessions and cross-company access. Client role flags and navigation visibility are never authorization. Authentication/provider selection and the role matrix remain release gates.
+Before implementing protected operations, establish verified server identity and active membership, enforce approved action permissions and operating-company/record scope in every read and mutation, and test direct requests, guessed IDs, revoked sessions and cross-company access. Client role flags and navigation visibility are never authorization. Authentication/provider selection and staff-specific permission assignments remain release gates. Dynamic custom RBAC and immutable company-aware audit requirements are finalized in [PERMISSIONS.md](PERMISSIONS.md) and [AUDIT.md](AUDIT.md), but are not implemented. Never pass credentials into audit payloads.
 
 ## Verification scope
 

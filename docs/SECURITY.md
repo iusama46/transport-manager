@@ -16,18 +16,10 @@ Authentication, session handling, role/permission checks, company/record scoping
 ## Protected data and boundaries
 Protect customer contacts, driver CNIC/licence information, private receipts/proof, financial transactions, exports and credentials. The browser is untrusted. Authentication establishes identity; backend/data policies establish permission for every operation. See [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Proposed permissions
-| Capability | Admin | Operations | Accounts | Viewer |
-|---|---|---|---|---|
-| Orders and master operational records | Manage | Manage | Read | Read if granted |
-| Fuel/maintenance entry | Manage | Enter | Review/read | Read if granted |
-| Financial posting/finalization | Manage | No by default | Yes | No |
-| Reversal/correction | Yes | No | Explicit grant | No |
-| Staff, roles and settings | Yes | No | No | No |
-| Sensitive identity files | Explicit need | Explicit need | Explicit need | No |
-| Export financial/private data | Explicit grant | No by default | Explicit grant | No by default |
+## Dynamic RBAC and least privilege
+Use dynamic custom roles and the central [permission catalog](PERMISSIONS.md); no fixed job-title grants. A protected Owner/Super Admin has full supported access within the authorized operating company, not an implicit cross-tenant bypass. Enforce least privilege and deny unknown/ungranted actions. Protect Owner critical permissions and the last active Owner. Apply delegation ceilings to role edits and assignments; a role-management grant must not allow privilege escalation. Reassign active users before deleting/deactivating their custom role, with concurrent assignment checks.
 
-This is a proposal for staff review. Do not treat a menu item being hidden as authorization. Check current account status and permissions after role changes.
+Frontend permission gates control navigation/actions; server checks independently authorize every operation. Reload active membership and effective role permissions after role or account changes; stale sessions cannot preserve revoked grants. See PERMISSIONS.md for exact lifecycle rules.
 
 ## Authentication and secrets
 Use a maintained authentication provider selected alongside hosting; do not create password cryptography. Support session expiry and revocation, protect credential-reset routes and rate-limit login attempts. Decide MFA availability for administrators during provider selection.
@@ -38,7 +30,7 @@ Scope queries and mutations to the operating business and actor’s permitted re
 
 ## Financial integrity
 Recompute totals on trusted code, use exact decimal handling and atomic posting. Protect invoice numbers and billed-order allocations from concurrency. Persist idempotency outcomes so timeout retries cannot create additional payments.
-Use linked reversals/adjustments and reasons rather than destructive edits. Record actors and timestamps, restrict audit modification and keep financial history readable after master-data archival. Customer and subcontractor balances remain independent.
+Use linked reversals/adjustments and reasons rather than destructive edits. Record actors and timestamps, prohibit historical audit modification through normal application operations and keep financial history readable after master-data archival. Customer and subcontractor balances remain independent.
 
 ## Attachments and imports
 Keep all business documents private by default. Validate object access against parent-record permissions before issuing short-lived downloads. Use unpredictable storage keys, bounded upload sizes and allowlisted types. Verify content signatures where practical; do not trust filename or client MIME alone. Avoid rendering active HTML/SVG as trusted attachments.
@@ -56,8 +48,16 @@ Define no-cost encrypted exports, protected storage, retention and a responsible
 If credentials leak: revoke/rotate, disable affected sessions, inspect audit history, contain exposure and document impact. If financial inconsistency appears: suspend affected posting, preserve evidence and reconcile before resuming. Do not delete logs or source records to hide an incident.
 
 ## Release checks
-Validate role matrix through direct requests, private downloads, session revocation, secret scanning, dependency review, upload/import abuse cases and recovery. See [TEST_PLAN.md](TEST_PLAN.md). Unresolved provider choice, backup ownership and staff permissions are implementation gates, not completed controls.
+Validate custom permission sets through direct requests, private downloads, session revocation, secret scanning, dependency review, upload/import abuse cases and recovery. See [TEST_PLAN.md](TEST_PLAN.md). Unresolved provider choice, backup ownership and staff permissions are implementation gates, not completed controls.
 
 ## Fuel settlement authorization
 
-Treat branch and central supplier payments as financial posting actions under Accounts/Admin permissions. Validate supplier, branch, purchase and currency relationships server-side. Operations users entering fuel purchases do not automatically gain settlement authority. Audit allocations and reversals. Direct requests cannot bypass branch scope or allocate another supplier’s payment.
+Treat branch and central supplier payments as financial posting actions requiring the applicable explicit payment/settlement grants from the catalog, independently of custom role names. Validate supplier, branch, purchase and currency relationships server-side. Users granted fuel purchase entry do not automatically gain settlement authority. Audit allocations and reversals. Direct requests cannot bypass branch scope or allocate another supplier’s payment.
+
+## Company isolation and audit protection
+
+Authorize User + Company/Tenant + Role + Permission + Resource in server services and data policies. Scope reads, mutations, related IDs, private downloads, history, counts and exports to verified membership; never trust a client-supplied company or role. External counterparties do not confer tenant membership. Owner cannot bypass company scope. Independent tenant onboarding/cross-tenant ownership is outside current scope.
+
+[AUDIT.md](AUDIT.md) is the authoritative event/redaction/retention contract. Capture events on trusted code; never persist passwords, tokens, secrets, API keys or other credentials in before/after fields, descriptions or request metadata. Use safe field allowlists and preserve actor/resource history. Audit reading requires `activity_logs.view`; export also requires `activity_logs.export`; record history additionally checks parent access and sensitive fields. Neither ordinary users nor administrators may edit/delete historical events through the application.
+
+Require append-only provider protections, restricted infrastructure access, durable event capture and protected archives/backups before release. Retention periods and exceptional infrastructure disposal remain policy decisions, not application permissions. Test direct API bypass, cross-company IDs, role escalation/revocation, audit tampering and redaction as specified in TEST_PLAN.md. These controls remain unimplemented.

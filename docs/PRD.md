@@ -1,8 +1,8 @@
 # Transport Management Dashboard
-## Product Requirements Document — v0.3
+## Product Requirements Document — v0.4
 
-Updated: 5 October 2026  
-Status: Documentation baseline; supersedes v0.2; open business rules remain unresolved  
+Updated: 6 October 2026
+Status: Documentation baseline; supersedes v0.3; open business rules remain unresolved
 Phase 1: Web dashboard. Phase 2: Expo mobile app.  
 Budget constraint: $0 recurring service cost. No paid plans or add-ons without explicit approval.
 
@@ -22,7 +22,7 @@ Who owes each transport bill and the exact partner settlement rules remain to be
 |---|---|
 | Operating business | The one transport business using the dashboard |
 | Factory | Originating factory/company for the goods |
-| Customer | The transport business’s direct customer |
+| Customer (Client) | The transport business’s direct customer; `clients.*` is its permission namespace |
 | Consignee (Receiver) | The customer’s customer receiving the goods; replaces the label Party |
 | Vehicle owner | The business/company owning a vehicle |
 | Transport partner / Subcontractor | An external individual or company fulfilling an outsourced order |
@@ -48,14 +48,15 @@ Customers can have multiple consignees. Companies can have several roles. Vehicl
 | 12. Payments & Settlements | Customer receipts, partner/supplier payments, advances and balances |
 | 13. Reports | Customer/partner statements, operations, costs, commissions, receivables and payables |
 | 14. Data Import & Export | CSV/XLSX mapping, validation, duplicate checks and exports |
-| 15. Users & Permissions | Accounts, access roles and audit history |
+| 15. Users & Permissions | Accounts, custom Roles & Permissions dashboard and company-scoped assignments |
 | 16. Business Settings | Business identity, currency, timezone, numbering, branding and categories |
+| 17. Activity Log | Global immutable audit trail, filters, controlled export and record-specific Activity history |
 
 ## 4. Users and permissions
 
-Proposed roles: Owner/Admin, Operations, Accounts and Viewer. Actual staff assignments remain open. Admin manages configuration and access. Operations manages orders and operating records. Accounts manages financial posting and settlements. Viewer has authorized read access only.
+Dynamic/custom RBAC is finalized. Keep a protected Owner/Super Admin role and let authorized users create arbitrarily named custom roles with granular `module.action` grants from [PERMISSIONS.md](PERMISSIONS.md). Business job titles carry no automatic permissions. Enforce effective permissions in frontend flows and independently in every backend/API operation, with User + Company/Tenant + Role + Permission + Resource checks.
 
-Enforce permissions in backend operations and data access, not just hidden buttons. Restrict CNIC/licence documents and financial information to authorized staff. Audit important changes with actor, timestamp and before/after values.
+The existing multi-company scope includes external company records inside one operating business, not independent tenants. Owner full access is limited to the authorized operating company; cross-tenant access is not implied. Actual staff assignments and financial correction grants remain open. Restrict identity files and financial information to authorized staff. [AUDIT.md](AUDIT.md) defines the core immutable, company-aware Activity Log and redacted change history.
 
 ## 5. Functional requirements
 
@@ -229,7 +230,7 @@ GPS tracking, offline sync, automated dispatch, customer/partner portals, multip
 | One order with multiple vehicles or consignees? | Order/assignment model |
 | Per-trip, weight, distance or negotiated charges; taxes/discounts? | Invoice rules |
 | Business name, currency, timezone, language and exact print template? | Configuration |
-| Which staff and access roles? | Permissions |
+| Which staff receive which custom permissions, including financial correction authority? | Assignments; dynamic role architecture is finalized |
 | Backup/export schedule, retention and recovery expectations? | Production operations |
 
 These items are explicitly unresolved and must be settled before implementing their affected rules.
@@ -245,3 +246,16 @@ FR-12: Support multiple fuel suppliers, each with multiple branches/petrol pumps
 Support both branch-specific settlement and a central supplier payment covering multiple branches. Allocate payments to individual purchases belonging to the same supplier and currency. Never allocate across suppliers. Branch outstanding equals branch purchases less effective allocated payments; consolidated supplier outstanding is the sum of branch outstanding. Show unallocated supplier credits separately, not as a payment assigned to every branch. Reversals restore affected purchase balances. Archive used suppliers/branches rather than deleting history. Legacy fuel source labels such as Agency/Petrol Pump are not sufficient to invent a supplier or branch: flag unmapped values for review.
 
 AC-19: A selected supplier shows only its branches and invalid branch IDs are rejected server-side. AC-20: Branch A purchases 10,000 and B purchases 20,000; a central payment of 15,000 allocated 5,000 to A and 10,000 to B leaves A 5,000 and B 10,000, consolidated 15,000. AC-21: A subsequent branch-A payment of 5,000 clears A without changing B. AC-22: Cross-supplier allocations are rejected; unallocated credit and reversals reconcile without double-counting.
+
+## 14. Finalized RBAC and Activity Log — 6 October 2026
+
+FR-13 — Dynamic roles: provide Roles list, create/edit name and description, reusable module/action permission matrix, save, user assignment, and safe deactivation/deletion. Enforce protected Owner and last-Owner safeguards, delegation limits, immediate effective-permission changes and active-user reassignment rules from PERMISSIONS.md. The master catalog grows with modules without redesigning roles. Unknown or ungranted actions are denied.
+
+FR-14 — Activity Log: automatically capture important business/security actions using the full event contract and coverage in AUDIT.md. Preserve immutable redacted before/after history, actor snapshots and company context. No normal application user, including Owner, may modify historical events. Global Activity Log supports date/range, user, module, action, company where applicable, record/reference ID, text search, sorting, pagination and permission-controlled export. Provide reusable record Activity/History for Orders, Vehicles, Drivers, Clients, Fuel, Expenses, Invoices, Payments, Settlements, Users and Roles where appropriate.
+
+AC-23: An authorized user creates an arbitrarily named role, edits granular grants and assigns it; authorized operations succeed and unauthorized UI/API/direct-ID requests fail, including foreign-company requests and revoked grants.
+AC-24: Protected Owner restrictions hold, delegated administrators cannot escalate access, and an assigned custom role cannot be removed/deactivated before safe reassignment.
+AC-25: Important actions produce accurate, durable, company-aware events with permitted before/after fields; credentials never enter audit payloads; normal application operations cannot alter historical events.
+AC-26: Global filters, sorting, pagination and export respect audit permissions/company scope; record Activity additionally enforces parent-resource and sensitive-field access.
+
+These are completed requirements/design decisions, not implemented features or executed acceptance tests.

@@ -11,7 +11,8 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 - [x] Add implementation checklist and credential/data exclusions.
 - [x] Document multiple fuel suppliers, their branches and both payment methods.
 - [x] Add the [client overview](CLIENT_OVERVIEW.md) as the main editable source, with shareable [PDF](client/CLIENT_OVERVIEW.pdf) and [PowerPoint](client/Transport_Manager_Client_Presentation.pptx) snapshots linked from README.md. Documentation only; no application functionality is marked implemented.
-- [ ] Review open business and technical decisions with the owner.
+- [x] Close final business-policy review gates through D51–D69; business requirements/policies finalized, no material policy gaps remain.
+- [ ] Complete final conceptual data model review, then resolve open technical decisions and company/launch configuration.
 
 ## 1. Project setup
 
@@ -42,7 +43,7 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 
 - [x] Finalize dynamic custom RBAC, protected Owner/Super Admin, granular catalog and frontend/server enforcement requirements (D18–D21).
 - [x] Document Roles & Permissions UI, reusable permission matrix, company isolation and safe role lifecycle.
-- [ ] Confirm actual staff assignments, financial correction grants and Owner provisioning/transfer workflow.
+- [ ] Configure actual staff grants and provider-specific first-Owner provisioning; implement finalized protected transfer/last-active-Owner workflow and correction grants.
 - [ ] Implement the centralized permission catalog, custom role CRUD, assignment and protected Owner/delegation safeguards.
 - [ ] Implement permission checks for reads, writes, exports and financial actions.
 - [ ] Apply database access policies appropriate to the selected provider.
@@ -57,7 +58,7 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 
 ## 5. Business settings
 
-- [ ] Confirm business identity, currency, timezone, languages and rounding.
+- [ ] Configure business identity/base currency/timezone/languages and finalized configurable rounding rules without rewriting historical values.
 - [ ] Configure numbering, categories and print branding.
 - [ ] Verify setting changes preserve historical invoices.
 
@@ -77,7 +78,8 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 ## 8. Orders and deliveries
 
 - [x] Finalize Order → 1..N Trips and separate movement Orders (D26).
-- [ ] Review remaining multi-consignee rules (O05), quantity policy (O14) and lifecycle transitions (O15).
+- [x] Finalize multi-consignee, quantity/shortage/remaining and manual Order completion policies (D53/D56–D58/D62).
+- [ ] Map finalized relationships/snapshots and lifecycle/correction fields in final conceptual model review; implement warning-preserving manual completion/reopen.
 - [ ] Build order entry, filters, pagination and detail view.
 - [ ] Add assignments, unlimited ordered stops, status history and delivery proof.
 - [ ] Verify six-stop orders, reassignment, conflicts and delivery/payment independence.
@@ -85,7 +87,8 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 ## 9. Outsourced orders
 
 - [ ] Add partner assignment and filtered outsourced view of the same orders.
-- [ ] Confirm fare, commission, advance and deduction rules (O03/O04).
+- [x] Finalize configurable fixed/percentage multiple commission/deduction rules with explicit debtor and payment direction (D51/D52).
+- [ ] Implement snapshotted agreement charges/deductions and advances without double-counting.
 - [ ] Add agreed partner obligations and settlement breakdown.
 - [ ] Verify no duplicate jobs or double-counted advances.
 
@@ -107,7 +110,8 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 
 ## 12. Billing and invoices
 
-- [ ] Confirm billing account, fare basis, tax/discount and rounding rules (O02/O06).
+- [x] Finalize explicit Bill To, both Trip pricing methods, preserved gross, discounts/rounding and same-currency invoice settlement (D51/D54/D55/D61).
+- [ ] Implement finalized billing rules, controlled correction/reissue or linked notes with effective balance reconciliation.
 - [ ] Add draft invoices and eligible Trip selection with default full/authorized partial billing.
 - [ ] Implement atomic, idempotent finalization and correction workflow.
 - [ ] Implement A4 printing and browser PDF output.
@@ -140,7 +144,7 @@ V2 backlog (not V1):
 
 - [ ] Execute TEST_PLAN.md and record actual results.
 - [ ] Complete access, accessibility, print and representative performance checks.
-- [ ] Define provider-dependent multiple-daily automatic backup schedule/mechanism/retention and owner; demonstrate documented restricted secure restoration.
+- [ ] Define provider-dependent multiple-daily automatic backup schedule/mechanism/retention and owner; document restore procedure and test restricted secure restoration before production launch.
 - [ ] Confirm free-plan compatibility, quotas and absence of paid add-ons.
 - [ ] Deploy dashboard and perform smoke checks.
 
@@ -213,7 +217,7 @@ The repeated RBAC/audit request is already incorporated in commit `3d3150a`. Rev
 
 Verification: all 56 requested permission keys match the master catalog; no audit edit/delete keys are present. Local Markdown links resolve. Searches and contextual review found no active fixed-business-role requirement or normal application audit mutation allowance. Database/provider choices remain open. Existing one-operating-business/multiple-counterparty scope and explicit denial of implicit Owner cross-tenant access remain consistent. `git diff --check` passed; this follow-up changes Markdown only and does not execute or certify application tests.
 
-Ready for the next requirements review. Outstanding decisions remain provider/hosting selection, financial/order rules, locale/print details, staff grants, Owner provisioning/transfer and backup/audit retention operations. Client PDF/PPT snapshots still need regeneration before being shared as current scope.
+Historical 7 October status: ready for the next requirements review; provider/hosting, financial/order, locale/print, staff, Owner and retention/recovery decisions were outstanding. D51–D69 below now close the business-policy questions; technical/configuration/compliance work remains. Client PDF/PPT snapshots still need regeneration before being shared as current scope.
 
 ## 19. Finalized business-capability reconciliation — 9 October 2026
 
@@ -222,11 +226,12 @@ Ready for the next requirements review. Outstanding decisions remain provider/ho
 | Supplied finalized capability decisions D26–D50 | Requirements: Finalized |
 | Conceptual model, screens, security, permission/audit catalogs and planned tests | Design specification: Updated |
 | New business capabilities | Implementation: Not Started |
-| Full business-policy completion | Pending DECISIONS.md gates; no Development Ready v1.0 claim |
+| Full business-policy completion | Finalized by D51–D69; no material business-policy gaps; no Development Ready v1.0 claim |
 
 - [x] Reconcile V1 flexible Orders/Trips/rates/quantities, three ledgers, billing/corrections, accounts/tax/multi-currency, ownership/documents/expiry and lifecycle rules.
 - [x] Move bulk import to V2; record V1 auto-approval, full export and multiple-daily automatic backup requirements.
-- [ ] Perform final conceptual data-model/policy review of O02–O06 and O13–O18 before affected implementation.
+- [x] Close O02–O06/O13–O18 business-policy gates and finalize Owner/retention/recovery minimums; retain unrelated technical/configuration/compliance entries.
+- [ ] Perform FINAL CONCEPTUAL DATA MODEL REVIEW before database/backend selection; verify final policy-to-model and workflow mapping.
 - [ ] Select database/backend/auth/storage, then deployment, verifying $0 feasibility and financial/audit/backup capabilities.
 - [ ] Implement effective-dated transport rates/date configuration/Trip snapshots and permissioned overrides.
 - [ ] Implement optional planned, loaded/delivered/custom billable quantity and shortage handling.
@@ -237,7 +242,20 @@ Ready for the next requirements review. Outstanding decisions remain provider/ho
 - [ ] Implement fuel price history, calculated/final overrides, custom expense categories and attributable Trip margin.
 - [ ] Implement reusable documents/types/multi-file history, expiry and configurable dashboard reminders.
 - [ ] Implement cancellation/reopening, dependency-aware delete/archive/reactivation and granular audit coverage.
-- [ ] Execute T37–T60 plus existing applicable V1 tests; preserve unexecuted/policy-blocked status until evidence exists.
+- [ ] Execute T37–T81 plus existing applicable V1 tests; preserve unexecuted/provider-dependent status until actual evidence exists.
 - [ ] Refresh historical client PDF/PPT before sharing them as current scope (outside this Markdown-only task).
 
 Earlier dated reviews/test evidence above are historical. Their references to unresolved capability cardinality, V1 import or unspecified backup frequency are superseded by D26–D50. Setup/UI foundations already exist; no business feature completion is implied. See DOCUMENTATION_REVIEW.md for the current readiness report.
+
+## 20. Final business-policy documentation — 9 October 2026
+
+- [x] Finalize Business Requirements and Business Policies across PRD/decisions/model/UX/security/permission/audit/test/readiness documentation; no material business-policy gaps remain.
+- [x] Add planned T61–T81 and reconcile earlier policy-blocked scenarios; no runtime tests executed.
+- [ ] Implement explicit Bill To, multi-consignee Trip destinations and both calculated-rate/manual-total pricing with immutable snapshots.
+- [ ] Implement extensible fixed/percentage commission/deductions, discounts/rounding, original/normalized quantity conversion, configurable shortage/remaining basis and specific-rate/exact-condition overlap validation.
+- [ ] Enforce same-currency invoice settlement, controlled correction/reissue/notes, invoice-date revenue and shared expense allocation with exact reconciliation.
+- [ ] Implement warning-only document expiry, manual Order completion with unchanged unfinished Trips, protected Owner setup/transfer/last-active safeguards and retention-by-default.
+- [ ] Complete final conceptual model review → database/backend selection → auth/storage/hosting/backup architecture → final architecture audit. Only then assess Development Ready v1.0 and begin implementation.
+- [ ] Execute production-gate recovery evidence: multiple automatic backups/day, restricted access, documented restore tested with records/ledgers/audit/files.
+
+V2/Future additions: configurable document-type expiry assignment blocking and cross-currency invoice settlement/allocation if pursued. Existing controlled bulk import/manual approvals/mobile/dark mode and other future scope stay deferred. Earlier dated open-policy reviews are historical and superseded by D51–D69. Current documentation status does not complete implementation or certify providers/runtime tests.

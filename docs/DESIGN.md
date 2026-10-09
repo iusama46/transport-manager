@@ -26,14 +26,14 @@ Search, date range, relevant entity/status filters, sortable columns, pagination
 Support loading, empty, filtered-empty, unauthorized, validation-error, network-error and quota-exceeded states. An empty report says no matching records, not a misleading zero balance.
 
 ## Orders
-Default columns: order number/date, factory, customer, consignee, cargo, Trip count/summary, operational status and billing state. Financial columns appear only to authorized users.
-Create form sections: customer relationships; cargo/optional planned quantity/unit; route and ordered stops; fulfilment; dates and notes. Selecting a new customer clears or asks to remap an incompatible consignee. Provide lookup/create shortcuts only where permission allows.
+Default columns: order number/date, factory, customer, potential Consignees/actual Trip receivers, Bill To, cargo, Trip count/summary, operational status and billing state. Financial columns appear only to authorized users.
+Create form sections: operational customer/potential Consignee relationships and separate Bill To selection; cargo/optional planned quantity/unit/Loaded-or-Delivered remaining basis; route and ordered stops; fulfilment; dates and notes. Selecting a new customer clears or asks to remap an incompatible consignee. Provide lookup/create shortcuts only where permission allows.
 Each Trip chooses business-managed execution or outsourced partner. Vehicle owner is displayed independently from partner; an Order shows its Trip assignments.
 Detail tabs: Overview, Stops & Delivery, Assignments, Expenses, Billing/Payments and Activity. Show unavailable tabs according to permission without leaking totals.
 Reordering stops must work with keyboard controls as well as drag-and-drop.
 
 ## Outsourcing
-Show partner, fare, commission, agreed payable, advances/other payments and outstanding amount. Present customer collection separately. Calculation controls remain subject to settlement decisions. Show a breakdown rather than a single unexplained net figure. A payment dialog names its recipient and obligation before posting.
+Show partner, fare, commission, agreed payable, advances/other payments and outstanding amount. Present customer collection separately. Use configured fixed/percentage commission/deduction categories, with automatic/manual controls under permission and visible gross versus net snapshots; agreed partner obligation remains separate. Show a breakdown rather than a single unexplained net figure. A payment dialog names its recipient and obligation before posting.
 
 ## Fuel and maintenance
 Fuel form: supplier, its branch/pump, vehicle, optional Trip, date, fuel type, liters, historical rate, calculated and final amount, payment information, optional odometer/receipt. Show permitted overrides and their actor/time/reason separately.
@@ -56,7 +56,7 @@ The current PRD calls the receiver Consignee (Receiver), formerly Party. Do not 
 Forms need labels, required indicators, inline errors and an error summary. Dialogs manage focus and keyboard escape appropriately. Tables have accessible headings and status text. Warn about unsaved form changes; preserve entered values after recoverable failures.
 
 ## Review needed
-Business branding, final language(s), date/currency presentation, staff permission assignments, payment responsibility and exact invoice template remain open. See [DECISIONS.md](DECISIONS.md).
+Business branding, final language(s), date/currency presentation, staff permission assignments, exact invoice template remain configuration work. Bill To responsibility is finalized as explicit selectable debtor; business policies are finalized. See [DECISIONS.md](DECISIONS.md).
 
 ## Fuel supplier and branch screens
 
@@ -147,7 +147,7 @@ Use a reusable read-only ActivityHistory/AuditTimeline in record Activity tabs f
 |---|---|
 | Orders / Order Details | Optional planned quantity; Trip list with loaded/delivered/remaining where applicable; add one/multiple Trips or create separate movement Orders; reasoned cancel/reopen and dependency feedback |
 | Trips / Trip Details | Actual vehicle/driver/owner/affiliation, execution partner, quantities/difference, billing basis and historical billable quantity; stops/proof, Documents, Expenses, Billing and Activity tabs |
-| Rates / Rate History | Agreement dimensions, effective versions, configurable rate date; default/final snapshot and permitted exceptional override, optional reason |
+| Rates / Rate History | Agreement dimensions, valid effective versions, most-specific recommendation and authorized alternative valid selection; configured rate date, recommended/selected snapshots and exact-condition overlap rejection |
 | Clients / Factories / Consignees | Preserve direct Customer and linked receiver hierarchy, scoped selectors and history |
 | Vehicles / Drivers / Partners | Owner type/history, driver affiliation/assignment history, execution partner separate from owner; archive/reactivate with historical visibility |
 | Fuel Suppliers / Branches-Pumps / Fuel Transactions / Fuel Rate History | Supplier-dependent branch picker, transaction-date price, liters × rate preview, actual total override with actor/reason/time, cash/credit payment information |
@@ -156,7 +156,7 @@ Use a reusable read-only ActivityHistory/AuditTimeline in record Activity tabs f
 | Customer / Partner / Supplier Ledger | Invoice/payable totals, effective allocations, outstanding, separate unallocated/advance credit; original currency and base totals distinctly labelled |
 | Payments / Settlements | One or many eligible targets, partial/bulk allocations, later advance allocation; reasoned unallocate/reallocate/reverse/bounce/refund/partial refund, original history visible |
 | Financial Accounts / Account Transfers | Cash/bank/custom account balances, configurable methods, source/destination and reviewed currency/amount; transfer is not income/expense |
-| Documents / Document Expiry | Multiple private files, predefined/custom types, reference/date/notes/uploader/time; optional expiry, configurable reminder periods, expired/expiring-soon dashboard alerts |
+| Documents / Document Expiry | Multiple private files, predefined/custom types, reference/date/notes/uploader/time; optional expiry/reminder periods and dashboard alerts; V1 warning only, otherwise-authorized assignment remains possible |
 | Activity Log / Roles / Permission Matrix / Users | Existing immutable safe audit detail, custom grants and protected Owner design; additions follow the master catalog |
 | Reports / Export / Settings | Scoped PDF/XLSX/CSV, explicit date basis and transaction/base currency, historical FX/tax; numbering and external references distinct |
 
@@ -165,3 +165,22 @@ Draft/In Progress Trip forms permit authorized edits. Delivered sensitive contro
 V1 auto-approval shows permitted operations completed at the normal workflow stage without a pending-review queue. Draft save and invoice issue/payment post remain distinct user intentions. Do not include V1 bulk-import UI/API; V2 import and manual approvals remain visibly deferred. Future notification channels do not imply V1 external messages.
 
 Reuse Entity Activity Timeline, Documents/Attachments, Ledger, Payment Allocation, Status Badge, Money/Currency, Quantity, Rate History, Audit Detail, Archive/Deactivate Confirmation and Correction/Reason Dialog from COMPONENTS.md. All screens above are specifications, not claims about the current placeholder shell.
+
+## Final business-policy interactions
+
+| Flow | Required V1 presentation and behavior |
+|---|---|
+| Order parties and progress | Separate source Factory, commercial Client, potential Consignees and Bill To; permit separate receiver Orders or multiple potential receivers on one Order. Each Trip chooses actual receiver/destination. Show original and converted units, Loaded/Delivered remaining basis and shortage rule/effect |
+| Trip pricing | Label Calculated Rate or Manual Total. Calculated mode shows recommended most-specific valid match and selected match, source/date/quantity/unit/calculated gross; permitted alternative selection explains recommendation difference. Provisional estimates are visibly provisional until date event. Manual Total captures entered amount/creator/time without creating a unit rate |
+| Rate editing | Display effective interval and exact conditions; show conflict for identical-condition overlaps, allow different conditions; do not silently resolve equally specific/incomparable matches |
+| Charges | Show gross transport amount, itemized fixed/percentage commissions/deductions and bases, discount, tax, rounding/other adjustments and final billable/net receivable. Category/rule history and permission-aware adjustment controls retain original values |
+| Order completion | Dedicated orders.complete action warns/lists unfinished Trips. Preserve Trip statuses and show separate Order/Trip state in details/reports; reasoned reopen uses orders.reopen |
+| Invoice correction | Locked invoice/Trip snapshots offer permitted correction/reissue or Credit/Debit Note path. Require reason and show original, revised amounts and allocation/ledger effect before finalization; history links remain available |
+| Payments | Select invoice-compatible currency targets only; explain and server-reject mismatched invoice currency, including advances/reallocations. Show gross/net debt and unallocated credit distinctly |
+| Shared expense | Allocation editor selects equal, quantity with explicit compatible basis, manual amount or percentage; shows each Trip share and reconciliation/rounding remainder, preserves history and requires expenses.allocate |
+| Reports | Revenue filter labelled Invoice Date, cash filter Payment Date, operational filters Trip/dispatch/delivery date; later collection does not duplicate revenue. Trip profitability uses linked recognized invoice/note portions and allocated costs, excludes unallocated general expenses |
+| Expiry | Clear expired status/warning and dashboard reminders; otherwise-authorized assignment can proceed in V1. No active V1 Block Assignment toggle; configurable blocking is V2/Future |
+| Owner | Protected setup/transfer flow, eligible recipient, last-active-Owner guard and audit; ordinary role matrix cannot alter ownership. Provider mechanics remain unspecified |
+| Retention | Archive/deactivate retains history. Explicit document/unused-record removal shows dependency/integrity constraints. No automatic historical purge controls |
+
+Business branding/languages/staff assignments are company configuration, not unresolved business policies. V2/Future additionally defers cross-currency invoice settlement and document-type expiry blocking, preserving bulk import/manual approvals/mobile/dark mode and existing deferred scope. All interactions are specifications; no screens were implemented here.

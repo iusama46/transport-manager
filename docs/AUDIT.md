@@ -39,7 +39,7 @@ Only the trusted audit writer may append. Normal application identities, includi
 
 Global viewing requires `activity_logs.view`, active membership and company scope. Export requires both view and export permissions. Record history additionally requires view access to the parent resource and permitted fields. Apply the same filters/scope to queries, counts, detail views and exports. Audit readers cannot use record history to bypass a revoked resource permission. Audit exports themselves generate events.
 
-Retention duration, archival schedule, responsible operator and any exceptional disposal/legal-hold process remain open (O10/O12). No routine UI/API deletion is provided. Define any retention execution as a separate controlled infrastructure procedure with authorization, integrity verification and its own evidence. Backups and restores must preserve audit relationships, redaction and access restrictions. No legal compliance claim is made.
+V1 retention-by-default is FINALIZED: no automatic purge of Orders, Trips, invoices, payments, ledger/fuel/financial records, audit logs or other historically significant records, including archived/deactivated records. Documents remain retained except explicit permitted removal where business/legal rules and historical integrity allow it. No routine audit UI/API deletion is provided. Formal jurisdiction-specific periods, responsible operator/archival details and any exceptional legal disposal procedure remain compliance/technical operations decisions (O10/O12); they do not authorize an automatic V1 purge. Any legally permitted exceptional infrastructure action requires authorization, integrity verification and evidence. Backups and restores must preserve audit relationships, redaction and access restrictions. No legal compliance claim is made.
 
 ## Presentation
 
@@ -50,3 +50,20 @@ Use the global Activity Log and reusable record Activity tab specified in DESIGN
 Extend required events to Trip create/edit/delivered correction and snapshot changes; transport rate agreement/version changes and exceptional default/final overrides; fuel price changes and rate/amount override (calculated/final, actor, timestamp, safe reason); partial billing; payment allocation/unallocation/reallocation, reversal, bounce/failed correction, refund/partial refund; partner/fuel settlement and later advance allocation; account transfers/reversals; invoice issue/void/cancel and linked credit/debit note lifecycle; Order cancellation/reopening with reason; delete/archive/deactivate/reactivate; custom expense/document types; document upload/metadata/download/archive/delete/expiry/reminder configuration; tax/FX/numbering changes; financial corrections; scoped exports; role/grant changes.
 
 Every sensitive action retains original links and permitted before/after values with outcome. For denied attempts, do not expose foreign record contents. V1 auto-approved operations still audit performer/finalization; no second reviewer is invented. Import events are V2 only. Normal audit edit/delete remain unavailable, including for Owner; never store credentials, secrets, tokens or API keys in any audit payload.
+
+## Final business-policy event coverage
+
+| Action | Historical evidence required |
+|---|---|
+| Bill To change | Previous/new debtor identity, Order/agreement/invoice linkage; retain operational party roles |
+| Commission/deduction or discount change | Category, fixed/percentage method, calculation base, gross original, previous/new rule/amount, net/final effect |
+| Shortage/quantity/remaining-basis change | Original loaded/delivered quantities/units, conversion rule, difference, agreement rule and financial effect |
+| Rate recommendation/selection/override | Recommended and selected valid rate references/values, match/date context, actor/time, optional reason; configuration/version/overlap validation changes |
+| Manual Total entry/change or pricing-mode correction | Pricing method, entered total, creator/time and permitted before/after snapshot; no fabricated unit rate |
+| Manual Order completion/reopening | Actor, Order status before/after, unfinished-Trip warning/context; Trip statuses remain unchanged |
+| Invoice correction/reissue; Credit/Debit Note | Required reason, original and corrected/replacement/adjustment links, preserved financial values, effective billing/ledger/allocated-payment effects |
+| Shared expense allocation/change | Source expense, target Trips, method/quantity basis, previous/new shares, reconciliation including rounding remainder |
+| Owner creation/transfer/removal/deactivation | Verified actor/company, previous/new eligible ownership, protected last-active-Owner outcome; denied bypass safely logged |
+| Explicit retention-sensitive deletion where allowed | Permission, reason/business/legal eligibility, dependency/integrity check and permitted document/unused-record metadata; no automatic historical purge |
+
+Also audit configured conversion, rounding, shortage/remaining rules and relevant settings changes. Capture sensitive successful mutations with durable audit history and redacted allowlisted evidence; normal operations cannot mutate events, including for Owner. Denied attempts never expose unauthorized records. See PERMISSIONS.md for grants and TEST_PLAN.md T61–T81 for planned coverage.

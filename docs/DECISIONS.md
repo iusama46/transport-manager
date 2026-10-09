@@ -1,6 +1,6 @@
 # Decision Log
 Updated: 9 October 2026
-Status key: Confirmed = explicit user direction; Proposed = design recommendation; Open = unresolved.
+Status key: Confirmed = explicit user direction; FINALIZED = final business-policy decision; Closed = answered/superseded with traceability; Proposed = design recommendation; Open = unresolved technical/configuration/compliance item. Business Requirements: Finalized; Business Policies: Finalized; Conceptual Data Model: Next; Technical Architecture Providers: Open; Business Implementation: Not Started / existing shell only.
 
 ## Recorded decisions
 | ID | Status | Decision | Reason / consequence |
@@ -19,20 +19,30 @@ Status key: Confirmed = explicit user direction; Proposed = design recommendatio
 | D12 | Proposed | Atomic financial posting with idempotency and reversals | Prevent duplicate or untraceable transactions |
 | D13 | Proposed | Browser print/Save as PDF | Fits initial cost constraint; requires print QA |
 
-## Open decisions
-| ID | Question | Current evidence | Gate |
-|---|---|---|---|
-| O01 | Supabase, MongoDB now, or MongoDB later? | Supabase originally proposed; user said MongoDB later, without answering follow-up | Persistence/auth/hosting implementation |
-| O02 | Who owes the transport bill? | Asked but no unambiguous answer | Invoice account rules |
-| O03 | Does Munir receive net fare and advance? | File has 100,000, 3,000, 97,000, 30,000, 67,000; interpretation unconfirmed | Settlement engine |
-| O04 | Fixed or percentage commission; cost deductions? | Not specified | Settlement engine |
-| O05 | PARTLY RESOLVED: multiple vehicles via Trips finalized by D26; multi-consignee rules remain open | Order → 1..N Trips; separate movement Orders allowed | Consignee cardinality/Trip linkage review |
-| O06 | PARTLY RESOLVED: configurable billable quantity/rates/tax and multi-currency finalized; discounts, rounding/precision and FX allocation/differences remain open | D27–D29, D43–D44 | Financial calculation policy |
-| O07 | Currency, timezone, business name, languages? | PKR/Asia-Karachi proposed from records, not confirmed | Settings and print acceptance |
-| O08 | Which staff receive which custom grants and financial correction authority? | Role architecture resolved by D18–D21; actual assignments and detailed correction accounting policy remain open | Production access |
-| O09 | Hosting/auth/files within free constraints? | Cloudflare candidate; provider fit not verified | Deployment |
-| O10 | Backup owner, exact schedule/mechanism, retention and recovery target? | V1 multiple automatic backups daily and full export finalized; infrastructure-specific details open | Provider feasibility / launch |
-| O11 | Exact approved bill design? | Prior minimal multipage bill referenced; not revalidated in this task | Print layout implementation |
+## Decision disposition after final business-policy review
+
+Original questions are retained here with their final disposition on 9 October 2026. Closed policy gates are not awaiting further business approval.
+
+| ID | Original question | Disposition / replacement |
+|---|---|---|
+| O01 | Supabase, MongoDB now, or MongoDB later? | OPEN technical: database/backend selection; historical candidates are not selections |
+| O02 | Who owes the transport bill? | CLOSED — D51: explicit selectable Bill To determines debtor |
+| O03 | Does Munir receive net fare and advance? | CLOSED as a product-policy gate — D51/D52: explicit debtor, partner obligation and payment direction, configurable deductions; illustrative agreement is not verification of source-row events |
+| O04 | Fixed or percentage commission; cost deductions? | CLOSED — D52: both, multiple extensible categories, configured automatic/manual calculation and historical gross/net |
+| O05 | Multiple vehicles and multi-consignee linkage? | CLOSED — D26/D53: Trips; separate receiver Orders or one Order with multiple potential Consignees, actual Trip receiver/destination snapshot |
+| O06 | Fare basis, tax/currency, discounts/rounding/FX allocation? | CLOSED business policy — D27–D29/D44/D54/D55: configurable discounts/rounding preserve gross; V1 invoice settlement same currency. Physical decimal/FX and non-invoice transfer mechanics stay technical |
+| O07 | Currency, timezone, business name, languages? | OPEN company configuration: identity/base currency/timezone/languages; PKR/Asia-Karachi remain historical suggestions |
+| O08 | Which staff receive grants and correction authority? | OPEN deployment configuration: actual staff assignments; dynamic RBAC and granular correction/Owner safeguards finalized by PERMISSIONS.md |
+| O09 | Hosting/auth/files within free constraints? | OPEN technical: auth implementation, private object/file storage and hosting/deployment; no provider selected |
+| O10 | Backup owner/schedule/mechanism/retention/recovery target? | FINALIZED minimum — D69: multiple automatic backups/day, restricted access, documented and pre-launch tested restore. OPEN infrastructure operations: exact schedule/provider/mechanism/backup retention, operator and recovery targets |
+| O11 | Exact approved bill design? | OPEN presentation/configuration: exact branding/template; existing multipage/Urdu acceptance remains |
+| O12 | Audit/business/document retention and exceptional disposal? | FINALIZED default — D68: retained, no automatic historical purge; explicit permitted document removal only. Formal jurisdiction-specific periods/legal holds and exceptional lawful disposal remain compliance review; archival/security-stream mechanics remain technical |
+| O13 | Rate specificity, overlaps, missing dates and snapshot timing? | CLOSED — D59/D60/D61: most-specific valid recommendation, authorized alternative valid match, exact-condition interval rejection, provisional until rate-date resolved then historical lock |
+| O14 | Quantity units, remaining basis and shortage disposition? | CLOSED — D56–D58: compatible conversions, original values retained, configurable Loaded/Delivered remaining, agreement shortage effect. Optional target progress does not itself invent billing or forced completion |
+| O15 | Completion aggregation, delivered locks, cancel/reopen eligibility? | CLOSED business policy — D38/D40/D62: manual Order completion with warning, unfinished Trips unchanged; permissioned reasoned reopening/correction and dependency guards. Detailed state/field mapping is next conceptual/workflow review |
+| O16 | Credit/debit notes, rebilling and allocation consistency? | CLOSED business policy — D63 plus FR-07/08: legal/business-permitted correction/reissue with history OR original-linked note; reason/grants/audit, atomic effective balance reconciliation, no reset/double billing; provider posting mechanics remain open |
+| O17 | Revenue recognition/shared cost attribution? | CLOSED — D64/D65: Invoice Date management revenue, later receipt not new revenue; four shared expense allocation methods, exact reconciliation and unallocated general costs excluded |
+| O18 | Expired documents block assignment or warn? | CLOSED — D66: V1 warning only; configurable blocking by type V2/Future |
 
 ## Interpretation rules
 A short yes following several alternatives does not establish which financial rule was chosen. Sample figures demonstrate a possible calculation, not approved accounting policy. A company owning a vehicle need not be the subcontractor receiving payment.
@@ -67,11 +77,11 @@ Scope reconciliation: the new request refers to existing multi-company architect
 
 Supporting design: one role per active company membership initially, company-scoped custom roles, delegation ceilings, last-Owner protection and atomic reassignment checks are documented in PERMISSIONS.md. Provider-backed Owner provisioning/transfer details remain an implementation gate; arbitrary multi-role union is not assumed.
 
-O12 — Open operational policy: audit retention duration, archival schedule, operator, exceptional infrastructure disposal/legal hold and protection of unscoped authentication events. Coordinate with O10 backups/recovery; immutability through normal application operations is already finalized.
+O12 originally raised audit retention/archival/disposal. D68 now FINALIZES V1 retention-by-default and no automatic purge; only formal compliance periods/legal holds and technical archival/security-stream/operator details remain open. Coordinate infrastructure operations with O10; application audit immutability stays finalized.
 
 ## FINALIZED capability decisions — 9 October 2026
 
-These explicit product/architecture decisions supersede older conflicting proposals. Requirements: Finalized for this decision set. Design specification: Updated. Business implementation: Not Started. Detailed unresolved policies below are not silently finalized.
+These explicit product/architecture decisions supersede older conflicting proposals. Requirements: Finalized for this decision set. Design specification: Updated. Business implementation: Not Started. The final business-policy decisions D51–D69 below now close the narrower policies left open by this earlier capability review.
 
 | ID | Finalized decision | Canonical specification |
 |---|---|---|
@@ -80,7 +90,7 @@ These explicit product/architecture decisions supersede older conflicting propos
 | D28 | Effective-dated transport rate versions, optional matching dimensions, immutable Trip rate snapshot; authorized audited exception retains default/final rate | PRD FR-15 |
 | D29 | Agreement-specific Order/loading/delivery/custom rate date; no global hard-coded rule | PRD FR-15 |
 | D30 | One or multiple Trips per invoice; default full remaining billing, authorized audited partial billing, no duplicates/overbilling | PRD FR-07 |
-| D31 | Customer receivables with partial/multi-invoice allocations, unallocated/advance credit and traceable reallocation | PRD FR-08 |
+| D31 | Selected Bill To receivables (Customer Ledger namespace) with partial/multi-invoice allocations, unallocated/advance credit and traceable reallocation | PRD FR-08 |
 | D32 | Separate partner payables with partial/bulk/multi-Trip payments, advances and outstanding balances | PRD FR-08 |
 | D33 | Configurable expenses linked to Trip/Order/Vehicle/Driver/company; receipts and attributable Trip margin exclude general company costs | PRD FR-06 |
 | D34 | Supplier/branch fuel ledger, cash/credit, partial/bulk allocation and advances | PRD FR-05/12 |
@@ -101,27 +111,40 @@ These explicit product/architecture decisions supersede older conflicting propos
 | D49 | Preserve/extend dynamic RBAC, immutable credential-redacted audit and company isolation for every new concept | PERMISSIONS.md; AUDIT.md; SECURITY.md |
 | D50 | Preserve Factory → Customer (Client) → Consignee; separate V1 from V2 and conceptual model from provider schema | PRD; ARCHITECTURE.md |
 
-D11/D12 are now required in the scope above: outsourced views reuse existing records and financial posting preserves traceability/concurrency integrity. O05 vehicle cardinality and O06 capability questions are resolved as recorded; their narrower remaining policies are retained. Database/backend and hosting are NOT selected.
+D11/D12 are now required in the scope above: outsourced views reuse existing records and financial posting preserves traceability/concurrency integrity. O05/O06 capability questions were resolved here; D51–D69 now close the narrower remaining business-policy questions. Database/backend and hosting are NOT selected.
 
-## Remaining requirement/policy review gates
+## FINALIZED business-policy decisions — 9 October 2026
 
-| Gate | Unresolved policy and potential effect |
-|---|---|
-| O02 | Who legally/commercially owes charges (Client, Factory, Consignee or case-by-case)? Explicit billing account remains required; affects party links/credit ownership |
-| O03/O04 | Munir sample collection direction, fixed/percentage commission, agreed payable and fuel/repair deductions; affects settlement calculations, never inferred from a sample |
-| O05 | Can an Order/Trip involve multiple Consignees, and how do stops/delivery quantities map to them? Multiple Trips/vehicles is already finalized |
-| O06 | Quantity/rate/money precision, rounding stage, discounts, FX conversion/allocation and exchange differences (including cross-currency transfers/refunds); affects financial integrity |
-| O13 | Rate interval boundaries/overlaps, specificity precedence, missing rate/date handling and snapshot timing when Delivery Date is not known; affects pricing workflow |
-| O14 | Quantity unit conversion, remaining basis (loaded or delivered), over-fulfilment and shortage disposition; affects progress and billing calculations |
-| O15 | Exact lifecycle transitions/Order completion aggregation, delivered sensitive-field list, cancellation of dependent Trips and eligible reopening; affects operations/locks |
-| O16 | Credit/debit note scope, tax/FX effects, rebilling eligibility and cancellation/refund/unallocation sequence; affects Trip balances and ledger corrections |
-| O17 | Trip revenue recognition and shared Order/Vehicle/Driver expense/fuel attribution; affects profitability, avoids general expense/double-counting |
-| O18 | Expired licence/document assignment blocking versus warnings; alert capability finalized, blocking policy unresolved |
-| O07/O08/O11 | Identity/base currency/timezone/languages/print template; actual staff grants and Owner provisioning/transfer; defaults/production access still need agreement |
-| O10/O12 | Backup/recovery owner and targets, audit/business/document retention and exceptional infrastructure disposal; recovery and access policy gates |
+Final user direction closes the business-policy gates above. Rationale: preserve flexible commercial agreements, financial/operational separation, historical traceability and authorized actions without selecting providers. These supersede the prior review’s pending-policy wording; they do not verify historical spreadsheet transactions or implementation. Canonical details: PRD FR-02–09/15–19 and Owner policy, PERMISSIONS.md, AUDIT.md; planned tests T61–T81.
 
-These are material gaps. The finalized capability set is internally consistent, but the complete business specification is not yet certified complete and the project is not declared Development Ready v1.0. Review these before committing affected model/financial/auth/workflow designs.
+| ID | Status | Final decision | Traceability |
+|---|---|---|---|
+| D51 | FINALIZED | Configurable Bill To: Factory, Client, Consignee or supported other debtor, separate from operational roles | O02/O03; T61 |
+| D52 | FINALIZED | Fixed/percentage, multiple extensible commissions/deductions, configured automatic/manual calculation, historical gross → deductions → tax/other → net | O03/O04; T62 |
+| D53 | FINALIZED | Separate receiver Orders OR one Order/multiple potential Consignees; each Trip snapshots actual receiver/destination | O05; T63 |
+| D54 | FINALIZED | Fixed/percentage discounts, configurable rounding, original gross/calculated preserved, permissioned historical audit | O06; T64 |
+| D55 | FINALIZED | Multi-currency overall; payment MUST match invoice currency in V1; cross-currency invoice settlement/allocation V2/Future if pursued | O06; T65 |
+| D56 | FINALIZED | Compatible quantity conversion (kg↔ton), original quantity/unit plus normalized values and defined historical rule | O14; T66 |
+| D57 | FINALIZED | Shortage agreement chooses informational, billable-quantity effect or deduction/claim; retain loaded/delivered/difference/rule/effect | O14; T68 |
+| D58 | FINALIZED | Order/agreement Remaining Quantity basis configurable Loaded or Delivered | O14; T67 |
+| D59 | FINALIZED | Most-specific valid rate recommended; authorized alternative valid match retains recommendation/selection and audit, optional reason | O13; T69 |
+| D60 | FINALIZED | Reject overlapping effective periods with same exact match conditions; distinct conditions may coexist; interval validation | O13; T70 |
+| D61 | FINALIZED | CALCULATED_RATE or MANUAL_TOTAL Trip pricing; historical source/value/date/quantity snapshot or entered total/creator/time without fake unit rate; provisional until configured event, locked corrections | O13; T71 |
+| D62 | FINALIZED | Authorized manual Order completion despite unfinished Trips, warning, unchanged Trip states, audit and separate reporting | O15; T72 |
+| D63 | FINALIZED | Controlled legally/business-permitted invoice correction/reissue retaining history OR Credit/Debit Note preserving original; permissions/reason/audit/ledger consistency, no silent rebilling | O16; T73 |
+| D64 | FINALIZED | V1 management revenue by Invoice Date; payment changes receivable/cash, not new revenue; operational dates separate, no statutory certification | O17; T74 |
+| D65 | FINALIZED | Shared Trip expenses equal/quantity/manual amount/manual percentage allocation, method/values/history/audit and exact totals; unallocated general costs excluded | O17; T75 |
+| D66 | FINALIZED | V1 expiry warning/status/reminders only, no expiry-only assignment blocking; configurable blocking by type V2/Future | O18; T76 |
+| D67 | FINALIZED | First Owner at setup, authorized company access/user-role management, at least one active Owner, no last-Owner self-removal/deactivation, eligible protected transfer and audit | Owner policy; T77/T78 |
+| D68 | FINALIZED | V1 retention-by-default, no automatic historical operational/financial/audit purge; documents retained unless explicit permitted removal, no invented jurisdiction periods | O12; T79/T81 |
+| D69 | FINALIZED | Multiple automatic backups/day, restricted access, documented restore tested before production; infrastructure details remain open | O10; T80 |
 
-## Remaining technical choices
+V1/V2 scope, permission additions and audit events reflect these decisions in the companion documents. No material business-policy gaps remain. Business Requirements: Finalized; Business Policies: Finalized. Ready for FINAL CONCEPTUAL DATA MODEL REVIEW, not yet Development Ready v1.0. That review must validate relationships/snapshots, calculation configuration, rate ambiguity/state mapping, effective correction balances and concurrency safeguards against these finalized rules; it is not a new policy-approval gate.
 
-Database/backend technology; auth/private storage and Owner provisioning mechanism; hosting/deployment; exact backup frequency/mechanism/retention after infrastructure selection; provider-supported transaction/outbox, immutable audit protections, decimal/FX representation, export generation and secure file handling. Preserve the $0 constraint and validate multiple daily backups without selecting a provider in this task. Future import commit mechanics and future notification delivery remain deferred.
+## Remaining technical choices and operational configuration
+
+Remain OPEN: database/backend technology; authentication provider/implementation; private object/file storage; hosting/deployment; exact backup schedule/provider/mechanism/retention; provider-specific Owner provisioning; transaction/outbox implementation; append-only audit enforcement; physical decimal/FX representation; provider-specific export/file handling. Preserve the $0 constraint and prove backup/security/financial requirements with the eventual architecture. Non-invoice currency transfer representation must preserve explicit historical conversion and paired account effects without authorizing cross-currency invoice settlement. Future import commit mechanics and notification adapters remain deferred.
+
+Company identity/base currency/timezone/languages, actual staff grants, bill branding/template, backup operator/targets and formal jurisdiction-specific compliance/retention obligations remain configuration, operations or compliance work. They do not reopen configurable Bill To, discounts/rounding, Owner safeguards or retention defaults. No current material business gap is identified that requires a different schema, financial, authorization or core workflow policy; detailed conceptual mapping and technical feasibility are still to be reviewed.
+
+Required sequence: FINAL CONCEPTUAL DATA MODEL REVIEW → DATABASE/BACKEND SELECTION → AUTH/STORAGE/HOSTING/BACKUP ARCHITECTURE → FINAL ARCHITECTURE AUDIT → DEVELOPMENT READY V1.0 → IMPLEMENTATION.

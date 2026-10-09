@@ -22,7 +22,8 @@ A protected Owner/Super Admin has full supported access within the authorized op
 |---|---|
 | Factory | The business or location from which the goods originate. |
 | Customer (Client) | Your direct customer who arranges transportation. |
-| Consignee (Receiver) | Your customer’s customer who receives the goods. |
+| Consignee (Receiver) | Your customer’s customer who receives the goods; each Trip records its actual receiver/destination. |
+| Bill To / Paying Party | Explicitly selected Factory, Client, Consignee or another supported party responsible for payment; independent of operational roles. |
 | Vehicle owner | Your business, a partner company or an individual/external owner, with history. |
 | Transport partner | An outside transporter assigned an outsourced order. |
 
@@ -32,12 +33,12 @@ A protected Owner/Super Admin has full supported access within the authorized op
 2. They assign each Trip its actual vehicle and driver, or execute it with a transport partner.
 3. They update loading and delivery progress, including delays, returns and delivery proof.
 4. They record fuel, repairs and other relevant expenses.
-5. They prepare the transport bill and record customer payments.
+5. They prepare the transport bill for the selected Bill To debtor and record same-currency invoice payments.
 6. They separately record payments owed to transport partners and suppliers.
 
 ### A clear view of each job
 
-The order will connect its delivery history, assigned vehicle or partner, related charges and payments. Completing delivery will not automatically mark a bill as paid. Who is responsible for paying each transport bill still needs to be confirmed.
+The order will connect its delivery history, assigned vehicle or partner, related charges and payments. Completing delivery will not automatically mark a bill as paid. Staff explicitly select the Bill To debtor for each applicable Order/agreement. One Order may have multiple potential receivers, with actual receiver/destination recorded historically on each Trip; separate receiver Orders also remain available. Authorized manual Order completion warns about unfinished Trips and preserves their individual statuses.
 
 ## What the first release will include
 
@@ -47,7 +48,7 @@ Maintain factories, customers, their consignees, companies, vehicles and drivers
 
 ### Outsourced transport
 
-Execute relevant Trips of an existing Order with an outside transport partner without entering the job twice. Track the agreed fare, commission, partner amount, advances, later payments and remaining balance. Keep customer collections separate from payments to the partner. The commission calculation and responsibility for expenses must be agreed.
+Execute relevant Trips of an existing Order with an outside transport partner without entering the job twice. Track the agreed fare, commission, partner amount, advances, later payments and remaining balance. Keep customer collections separate from payments to the partner. Configured agreements support fixed/percentage and multiple extensible commissions/deductions with automatic or authorized manual calculation. Preserve gross revenue, itemized adjustments and net receivable; partner payable and its advances remain separate.
 
 ### Fuel suppliers and branches
 
@@ -85,14 +86,9 @@ A mobile app is planned after the dashboard. Live GPS tracking, offline synchron
 
 The initial target is no monthly software-service subscription cost. Free services have limits, so file storage, usage and backup arrangements must be checked before launch. Paid services will require explicit approval. This document is a scope overview, not a price quotation or delivery-date commitment.
 
-### Decisions to confirm
+### Remaining configuration and technical work
 
-Who pays the transport bill: customer, receiver, factory or case-by-case?
-How are fares, commission, partner advances and expense deductions agreed?
-Multiple vehicles via Trips is finalized; multiple receiver/stop linkage still needs review.
-Full multi-currency and configurable tax are finalized; agree base currency, FX/rounding/discount policies, language and bill format.
-Which staff can change records, finalize bills and record or reverse payments?
-Who maintains backups/recovery and reviews future V2 imports?
+Business requirements and policies are finalized; no material business-policy gaps remain. Final conceptual data model review is next. Company identity/base currency/timezone/languages, staff-specific grants, invoice branding and backup operator/targets remain configuration work. Database/backend, auth/private storage/hosting and exact backup arrangements remain open technical decisions. Formal jurisdiction-specific invoice/retention obligations require compliance review; this overview does not certify statutory compliance.
 
 ### How the first release will be accepted
 
@@ -108,8 +104,18 @@ This Markdown includes the finalized 9 October capability decisions and earlier 
 
 Orders may have one or multiple Trips, with separate Orders also available for individual movements. Planned quantity is optional; loaded/delivered quantities, shortage and agreed billable quantity remain distinct. Effective-dated transport rates use the agreement's Order/loading/delivery/custom date and preserve actual historical rates; authorized exceptions are traceable.
 
-Customer, partner and fuel supplier ledgers support partial/multiple allocations, bulk payments, unallocated credit and advances. Issued invoices and settled relevant Trip fields lock; cancellation, credit/debit notes, reversals, failed-payment corrections, refunds and reallocations preserve originals and ledger history. Cash/bank/custom accounts, own-account transfers, configurable methods/tax/numbering and historical multi-currency are included. Transfers are not income/expense.
+Selected Bill To receivables (Customer Ledger), partner and fuel supplier ledgers support partial/multiple allocations, bulk payments, unallocated credit and advances. Issued invoices and settled relevant Trip fields lock; cancellation, credit/debit notes, reversals, failed-payment corrections, refunds and reallocations preserve originals and ledger history. Cash/bank/custom accounts, own-account transfers, configurable methods/tax/numbering and historical multi-currency are included. Transfers are not income/expense.
 
 Custom expense categories and Trip/Order/Vehicle/Driver/company expenses support attributable Trip margin, excluding general company expenses. Fuel prices retain history; liters × rate and authorized actual-total overrides stay visible. Ownership, driver affiliation and assignments retain history. Multiple documents use predefined/custom types and optional expiry with configurable dashboard reminders.
 
-V1 defaults to auto-approval for authorized operations at their normal workflow stage. Configurable/manual approvals and controlled bulk import are V2. Detailed payer/commission, multi-consignee, pricing/FX/rounding, corrections and profitability policies still require review; database/backend and hosting remain open. These capabilities are planned, not implemented.
+V1 defaults to auto-approval for authorized operations at their normal workflow stage. Configurable/manual approvals and controlled bulk import are V2. Bill To, commission/deduction, multi-consignee, pricing/discount/rounding, quantity/shortage, correction and profitability policies are finalized; database/backend/auth/storage/hosting remain open. These capabilities are planned, not implemented.
+
+### Final first-release financial and control policies
+
+Trips use Calculated Rate or an authorized Manual Total, preserving historical pricing without inventing a unit rate. The most specific valid rate is suggested; authorized alternatives preserve recommendation/selection and audit. Identical-condition rate periods cannot overlap. Compatible quantity conversion retains original entries; shortage can be informational, affect billable quantity or create an agreed deduction/claim, and Order remaining uses configured Loaded or Delivered quantity.
+
+Fixed/percentage discounts and configured rounding preserve gross/calculated amounts and historical changes. The system supports multiple currencies overall, but V1 payments must match invoice currency. Post-invoice correction uses authorized permitted correction/reissue retaining history or original-linked Credit/Debit Notes, with reason and reconciled balances. Management revenue is reported by Invoice Date; later receipts reduce debt/change cash without new revenue. This is application reporting policy, not statutory accounting certification.
+
+Shared expenses can split equally, by quantity, manual amount or percentage, reconciling to the source expense; Trip profitability uses only allocated shares and excludes unallocated company expenses. Expired documents warn and show reminders without expiry-only assignment blocking in V1. Owner setup and eligible transfer retain at least one active Owner, prevent last-Owner removal/deactivation and produce audit history. V1 retains historical business/financial/audit records without automatic purging; documents stay unless explicitly removable under permission and integrity/business/legal rules. Multiple automatic backups/day and documented, pre-launch tested restore remain required.
+
+V2/Future also includes configurable document-type expiry blocking and cross-currency invoice settlement/allocation if pursued; bulk import/manual approvals/mobile and the other deferred items remain future scope. No implementation or passing runtime tests are claimed.

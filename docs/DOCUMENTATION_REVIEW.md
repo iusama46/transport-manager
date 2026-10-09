@@ -1,70 +1,91 @@
-# Documentation reconciliation and development-readiness report
+# Final business-policy documentation review
 
-Reviewed: 9 October 2026. Documentation only; no application code, database schema, deployment or artifact regeneration performed.
+Reviewed: 9 October 2026. This report supersedes the earlier capability-reconciliation report’s open business-policy gates. Documentation only: no application code, physical schema, provider selection, deployment or client PDF/PPT regeneration; no runtime tests executed.
 
-## 1. Markdown files reviewed
+## 1. Files reviewed
 
-All 17 existing repository Markdown files were read before editing: README.md; docs/PRD.md, ARCHITECTURE.md, DESIGN.md, SECURITY.md, TEST_PLAN.md, DECISIONS.md, MEMORY.md, TASKS.md, PERMISSIONS.md, AUDIT.md, COMPONENTS.md, CLIENT_OVERVIEW.md, ENVIRONMENT.md; apps/web/README.md, apps/mobile/README.md and packages/shared/README.md. No repository AGENTS.md or separate database/API/roadmap document was found; their relevant contracts reside in architecture/PRD/tasks/permissions.
+All 18 repository Markdown files: README.md; docs/DOCUMENTATION_REVIEW.md, PRD.md, ARCHITECTURE.md, DESIGN.md, SECURITY.md, TEST_PLAN.md, DECISIONS.md, MEMORY.md, TASKS.md, PERMISSIONS.md, AUDIT.md, COMPONENTS.md, CLIENT_OVERVIEW.md, ENVIRONMENT.md; apps/web/README.md, apps/mobile/README.md, packages/shared/README.md. The supplied final-policy request was read in full. No applicable AGENTS.md was found in the repository/ancestor locations checked.
 
-## 2. Markdown files modified
+## 2. Files modified
 
-README.md and the 12 docs files PRD, ARCHITECTURE, DESIGN, SECURITY, TEST_PLAN, DECISIONS, MEMORY, TASKS, PERMISSIONS, AUDIT, COMPONENTS and CLIENT_OVERVIEW. This report is the only new Markdown file. ENVIRONMENT and the three workspace READMEs required no scope changes. Existing PDF/PPT snapshots remain historical.
+14 Markdown files: README.md and docs/DOCUMENTATION_REVIEW.md, PRD.md, ARCHITECTURE.md, DESIGN.md, SECURITY.md, TEST_PLAN.md, DECISIONS.md, MEMORY.md, TASKS.md, PERMISSIONS.md, AUDIT.md, COMPONENTS.md, CLIENT_OVERVIEW.md. ENVIRONMENT.md and the three workspace READMEs required no policy changes. Historical client PDF/PPT and implementation files remain unchanged.
 
-## 3. New/updated sections
+## 3. Open policy decisions closed
 
-PRD v0.5 reconciles FR-02–08/10/11, acceptance/delivery scope and adds FR-15–19 and V1/V2 scope. Architecture updates conceptual entities, financial invariants/lifecycles, service/API boundaries, rates, documents/reminders, approval/export and recovery. Design/components add Trip/rate/ledger/account/note/document/expiry/correction screens and reusable contracts. Security/audit extend integrity, override, correction, export/file and backup protections. Permissions expands scoped actions; Test Plan adds planned T37–T60 and marks T10/T11 V2. Decisions records finalized D26–D50 and narrowed/open policy gates. Memory/tasks separate finalized requirements and updated specifications from pending implementation. Client overview/README reconcile current scope and stale snapshots.
+DECISIONS.md preserves original questions and marks O02–O06 and O13–O18 CLOSED as business-policy gates, tracing final decisions D51–D69. O03’s source figures remain illustrative rather than verification of historical cash direction; explicit configured obligations/payment direction resolves the product-policy gate. O10’s recovery minimum and O12’s retention default are FINALIZED, retaining infrastructure/compliance details. Owner business lifecycle/transfer is finalized; provider provisioning remains open. O01/O09 technical choices and O07/O08/O11 company configuration are not silently closed.
 
-## 4. Finalized business decisions
+## 4. Permissions added/changed
 
-The supplied capability set is finalized: flexible Orders/Trips, optional target and loaded/delivered/billable quantities; effective-dated transport/fuel prices and immutable historical snapshots; configurable rate dates and authorized overrides; full/partial Trip billing; separate customer/partner/supplier ledgers with advances and allocation history; configurable expenses and attributable Trip margin; flexible vehicle ownership/driver affiliation/history; reusable documents and configurable expiry reminders; status locks, hybrid deletion/archive, controlled Order/invoice/payment corrections; accounts/transfers, tax, historical multi-currency and numbering/external references. Preserve dynamic RBAC, protected Owner, immutable credential-redacted audit, company isolation and Factory → Customer (Client) → Consignee.
+14 new V1 keys, bringing the catalog from 231 to 245 unique keys:
 
-## 5. V1 scope
+- orders.complete; trips.manual_price; trips.adjust_charges.
+- invoices.adjust_charges; invoices.correct; invoices.reissue.
+- expenses.allocate; owners.transfer.
+- deduction_categories.view/create/edit/delete/archive/reactivate (six distinct keys).
 
-All finalized capabilities above, maintenance/service reminders and multipage printing, AUTO APPROVAL at the normal permitted workflow stage, multiple automated backups daily with documented secure restoration, and full authorized PDF/XLSX/CSV exports. No normal financial/audit deletion or silent historical rewrites. Existing shell/environment foundations do not implement these business workflows.
+Existing orders.reopen, trips.correct/override_rate, rates.view/create/edit, credit_notes.create/issue and debit_notes.create/issue are reused with clarified semantics. orders.edit covers mutable Bill To/agreement settings; settings.edit covers rounding/conversion configuration. customer_ledger keeps its existing namespace while covering the explicitly selected supported Bill To debtor. No duplicate note/ledger permissions or audit mutation grants were introduced. Authorization remains server-side, company/resource scoped, with Owner protection, lifecycle and financial invariants independent of grants.
 
-## 6. V2/Future scope
+## 5. Test cases added/changed
 
-Controlled Excel/CSV bulk import (upload/map/preview/validate/duplicates/errors/confirmation/provenance/audit) and configurable/manual approval workflows beyond V1. Expo mobile and dark mode remain deferred. GPS, offline sync, automated dispatch, portals, payroll, full accounting, bank integrations, external messaging and independent tenant onboarding remain future proposals outside current approval.
+Added planned, unexecuted T61–T81: all four Bill To types/debtor ownership; fixed/percentage/multiple deductions; both multi-consignee workflows; discounts/rounding/gross history; same-currency success/cross-currency rejection; original kg↔ton conversion; both remaining bases; all three shortage effects; specific-rate recommendation/authorized valid alternative/denied override; interval conflicts/different conditions; both pricing modes/provisional-final snapshot/no fake unit rate; manual completion preserving unfinished Trips/denial/audit; correction/reissue/Credit/Debit Notes/history; invoice-date revenue/no later receipt revenue; all four shared allocation methods/reconciliation/profitability; expiry warnings/assignment/no blocking; last-Owner guard/transfer/audit; no automatic historical purge; multiple backups/day and documented pre-launch tested restore; explicit permitted document deletion/audit.
 
-## 7. Contradictions found and corrected
+Updated T13 and T38–T60 to remove answered business-policy blockers and use configured fixtures; earlier cases remain required. Provider-backed execution is still pending. No runtime tests are marked passing.
 
-| Earlier active wording | Reconciled requirement |
+## 6. V1 scope changes
+
+Finalized policies specify explicit configurable Bill To; extensible fixed/percentage commissions/deductions; separate receiver Orders or multiple potential Order Consignees with actual Trip receiver snapshots; discounts/configured rounding preserving gross; same-currency invoice settlement within overall multi-currency; compatible original/normalized quantity conversion; configurable shortage and Loaded/Delivered remaining basis; most-specific valid recommendation and exact-condition rate-overlap rejection; calculated-rate/manual-total pricing; manual Order completion with unfinished Trips; controlled correction/reissue or original-linked notes; Invoice Date management revenue; equal/quantity/manual amount/manual percentage shared expense allocation; expiry warnings only; protected Owner setup/transfer/always-active safeguard; retention-by-default; multiple daily automatic backups and documented restore tested before production. Other finalized V1 capabilities are preserved.
+
+## 7. V2/Future changes
+
+Explicitly defer configurable document-expiry assignment blocking by document type and cross-currency invoice settlement/allocation if pursued. Preserve controlled bulk Excel/CSV import and configurable/manual approvals, later Expo/mobile and dark mode, plus GPS/offline sync/dispatch/portals/payroll/full accounting/bank integrations/messaging/independent tenant onboarding as previously deferred proposals requiring separate scope approval.
+
+## 8. Contradictions found/fixed
+
+| Previous active ambiguity or gate | Consistent final documentation |
 |---|---|
-| One active vehicle assignment per Order; multi-vehicle cardinality open | Order → 1..N Trips; actual assignments per Trip; separate movement Orders valid |
-| Required numeric Order quantity | Optional planned target and separate actual Trip quantities |
-| Each Order billed once; split billing open; eligible Order picker | Eligible Trip amount balances; full/default or permitted partial billing; no duplicate/overbilling |
-| V1 import screens/services/tasks/acceptance/client launch | V2 import only; V1 export and explicit absence checks |
-| Owner company only and order-level historical assignments | Company/partner/individual ownership, driver affiliation/assignment history and actual Trip snapshots |
-| Simple fuel cost and generic adjustments | Effective prices, calculated/final totals, dedicated authorized audited overrides |
-| Generic backup/export procedure with no minimum schedule | Multiple automatic backups daily, restricted security/restore; provider details remain open |
-| Fare/tax/currency capability all open | Configurable historical rates/tax and full multi-currency finalized; detailed policies still gated |
-| Original small permission catalog lacked cancellation/reopen/correction/transfer/document actions | Expanded granular master catalog; audit still view/export only |
+| Bill debtor and commission rules awaiting confirmation; Customer Ledger implied only Clients | Explicit supported Bill To owns debt; operational parties remain separate; configurable charges and ledger namespace clarified |
+| Singular Order Consignee and linkage policy open | Multiple potential receivers allowed, actual Trip receiver/destination historical; separate Orders also valid |
+| Conversion, remaining basis and shortage policy open | Original/normalized compatible units, configured Loaded/Delivered remaining and three agreement shortage effects |
+| Rate precedence/intervals/snapshot timing unresolved; all Trip snapshots assumed a rate | Most-specific recommendation, alternative valid match, exact-condition overlap rejection, provisional-date handling; Manual Total has no fabricated rate |
+| Discounts/rounding/FX allocation still an unresolved V1 policy | Preserved gross/adjustments; same-currency V1 invoice allocation, cross-currency deferred |
+| Completion aggregation and correction/rebilling gates open | Manual completion with warning/unchanged Trips; controlled versioned correction/reissue or linked notes and effective billing/ledger reconciliation |
+| Revenue/shared-cost attribution unresolved | Invoice-date management revenue, payment separate; four reconciled allocation methods and general-cost exclusion |
+| Expiry assignment policy open | V1 warning only, blocking V2/Future |
+| Owner transfer/business retention still open | Protected eligible Owner transfer/last-active guard; retention-by-default, no automatic historical purge |
+| Readiness report/memory/tasks still required answered policy approval | Business requirements/policies Finalized; next conceptual review; technical/configuration/compliance work distinguished |
 
-Other requested contradiction patterns (hard-coded business roles, mutable audit, deletion of posted payments/referenced records, free editing of issued invoices, no advances, fixed one-branch fuel supplier, selected database) were either already prohibited or absent; existing protections were preserved and extended. No mandatory manual V1 reviewer was previously explicit. Dated milestone evidence remains historical and explicitly superseded where scope changed.
+Other forbidden contradiction patterns (Factory always pays, gross overwritten, arbitrary unauthorized rate, silent issued-history rewrite, payment-date revenue, automatic Trip completion/cancellation, Owner self-removal or automatic historical purging) were absent or already prohibited; explicit final safeguards and tests now make them reviewable. Multiple daily backups already existed; the pre-production documented/tested restore gate is reinforced. Earlier dated implementation/test evidence is retained as history, not current verification.
 
-## 8. Remaining open requirements/policies
+## 9. Remaining business requirement gaps
 
-DECISIONS.md owns O02–O06 and O13–O18: charge debtor and commission/settlement/deductions; multi-consignee linkage; precision/rounding/discount and cross-currency allocation/conversion/differences; rate matching/interval/date availability and snapshot timing; quantity conversion/remaining/shortage policy; lifecycle/aggregation/eligible reopening and sensitive correction fields; note/cancellation/refund/rebilling effects; revenue recognition and shared cost attribution; expiry assignment blocking. O07/O08/O11 cover identity/locale/print, staff grants and Owner provisioning/transfer. O10/O12 cover recovery ownership/targets and audit/business/document retention. These are not reopened finalized capability questions.
+No material business-policy gaps remain. Company identity/base currency/timezone/languages, actual staff grants and exact bill branding/template remain configuration work. Formal jurisdiction-specific invoice/retention obligations require compliance review; no statutory certification or invented retention period is claimed. Source spreadsheet interpretation is data verification, not a missing global policy.
 
-## 9. Remaining technical decisions
+## 10. Remaining technical decisions
 
-Database/backend; auth/private object storage; hosting/deployment; exact backup schedule/mechanism/retention with chosen infrastructure; transaction/outbox and append-only audit enforcement; decimal/FX representation, export/file handling and provider-backed Owner lifecycle. No technology/provider was selected here. Evaluate the $0 constraint against the mandatory backup/security/financial requirements.
-
-## 10. Documentation gaps discovered
-
-Detailed financial-policy and lifecycle examples need owner review before schema/workflow finalization. No approved rate precedence, FX allocation, correction-rebilling or shared cost attribution policy exists yet. Client PDF/PPT are outdated and need later regeneration; this task is Markdown only. Existing UI lint/type/build blockers and pending browser checks remain historical known issues; they were not addressed or retested. Jurisdiction-specific invoice/retention compliance has not been determined or certified.
+OPEN: database/backend technology; authentication provider/implementation; private object/file storage provider; hosting/deployment provider; exact backup schedule/provider/mechanism/retention and recovery operations/targets; provider-specific Owner provisioning; transaction/outbox implementation; append-only audit enforcement; physical decimal/FX representation; provider-specific export/file handling. Preserve the $0 constraint and evaluate feasibility later. Non-invoice account conversion mechanics, future import commit and notification adapters remain technical/deferred work, without permitting V1 cross-currency invoice settlement.
 
 ## 11. Internal consistency
 
-The finalized capability set is internally consistent across the updated documents, with a clear V1/V2 boundary and provider-independent model. Complete business requirements are not yet certified complete because the material policies in section 8 remain unresolved. No Development Ready v1.0 or implemented/tested business capability claim is made.
+Yes: the business requirements and policies are internally consistent across the reviewed Markdown documentation. Financial/operational roles and dates, gross/net amounts, original/converted quantities, Order/Trip states, V1/V2 and requirement/implementation status remain distinct. No providers are finalized by this conclusion.
 
-## 12. Readiness and verification
+## 12. Finalization status
 
-| Next step | Readiness |
+| Area | Status |
 |---|---|
-| Final conceptual data-model review | Ready to begin; resolve material policy gates as part of the review before final approval |
-| Database/backend selection | Ready for evaluation against documented requirements; final choice must account for policy/model review, isolation, atomic ledgers, audit, FX, files and backups |
-| Deployment selection | Ready for feasibility evaluation alongside backend choices; final choice and launch remain gated by provider compatibility, $0 budget and secure tested recovery |
-| Business implementation / launch | Not declared ready; unresolved policies, provider choices and actual acceptance/security/recovery evidence remain |
+| Business Requirements | Finalized |
+| Business Policies | Finalized |
+| Conceptual Data Model | Next — final review not completed |
+| Technical Architecture Providers | Open |
+| Implementation | Not Started for business workflows / existing shell only |
+| Runtime acceptance/recovery tests | Planned, unexecuted by this task |
+| Development Ready v1.0 | Not declared |
 
-Documentation checks: repository-wide contextual searches for obsolete cardinality/billing/import/approval/currency/deletion/provider statements; local Markdown link validation; unique FR/AC/test/decision identifiers; permission coverage and absence of audit mutation grants; git diff --check and Markdown-only changed-file inspection. Validation passed: zero broken local Markdown links, no duplicate checked identifiers, all required sensitive-action keys present among 231 V1 catalog keys, audit grants limited to view/export, and git diff --check clean. Changed/new files are Markdown only. No runtime tests were needed or executed for this documentation-only change. Planned tests are not passing evidence.
+## 13. Final conceptual data model readiness
+
+Ready for FINAL CONCEPTUAL DATA MODEL REVIEW. Required sequence: FINAL CONCEPTUAL DATA MODEL REVIEW → DATABASE/BACKEND SELECTION → AUTH/STORAGE/HOSTING/BACKUP ARCHITECTURE → FINAL ARCHITECTURE AUDIT → DEVELOPMENT READY V1.0 → IMPLEMENTATION. Later provider/launch work must prove secure authorization, atomic financial/audit behavior, $0 feasibility and tested restore.
+
+## 14. Material model/workflow issues and verification
+
+No remaining unresolved business issue is identified that requires a different schema, financial model, authorization model or core workflow policy. The next conceptual review must validate party/consignee relationships, quantity/pricing/adjustment/allocation snapshots, exact rate conditions and ambiguity resolution, protected ownership, state/field locks and effective correction/rebilling balances against the finalized rules. Physical modeling, concurrency and provider feasibility remain open review work; this report does not approve a schema.
+
+Documentation verification: all 18 Markdown files checked for local links; zero broken local links. Unique requirement/acceptance/decision/test definitions and 245 permission keys checked; all required sensitive actions present, no duplicate semantic note/ledger grants, audit catalog limited to view/export. Repository-wide contextual searches covered every requested stale-policy pattern, including prior pending-policy phrasing. git diff --check passed, and changed-file inspection confirmed 14 Markdown files only. No application tests/builds/deployment/recovery exercise were run. Historical UI lint/type/build blockers and stale PDF/PPT snapshots are unaffected and remain documented.

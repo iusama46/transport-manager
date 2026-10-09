@@ -41,7 +41,7 @@ Validate inputs and allowlist sort/filter options. Use parameterized queries or 
 Return useful user errors without stack traces or secret values. Limit expensive reports/exports and repeated upload requests to protect free quotas.
 
 ## Logging and privacy
-Log action, record ID, actor and result with minimal personal data. Exclude credentials, session tokens, raw CNIC values and private signed URLs. Restrict audit access. Retention, deletion obligations and business record retention require a policy decision; no jurisdiction-specific compliance claim is made.
+Log action, record ID, actor and result with minimal personal data. Exclude credentials, session tokens, raw CNIC values and private signed URLs. Restrict audit access. V1 retention-by-default prohibits automatic historical business/financial/audit purging; archived/deactivated records remain. Documents may be explicitly removed only with permission and business/legal/historical-integrity checks. Formal jurisdiction-specific periods/deletion obligations remain compliance review; no legal compliance claim is made.
 
 ## Backups and incident handling
 V1 requires automated backups multiple times per day, encrypted/protected storage and transport, restricted backup/restore access, documented recovery and a responsible operator. Exact schedule/mechanism/retention follows database/hosting selection; no provider is chosen. Include database records and an attachment manifest/objects as needed. Test isolated restore and reconciliation before launch.
@@ -73,3 +73,13 @@ Issued invoices and invoiced/settled relevant Trip fields lock. Delivered sensit
 Exports require resource view plus export grant, company/field filters and audit events; mask unauthorized identity/financial data before generation. Neutralize formula-leading spreadsheet text without altering stored values. File metadata, preview, upload/download and archive/deletion require parent access and applicable document/identity permissions; expiry reminders reveal only permitted information.
 
 Backup security preserves tenant/access restrictions, audit redaction, financial snapshots and private attachment objects/manifests. Test isolated restore with relationship and account/ledger reconciliation. V1 auto-approval does not bypass permissions, lifecycle or posting integrity; no V1 import endpoint should exist. Provider protections and these business controls remain unimplemented.
+
+## Final business-policy safeguards
+
+Server checks enforce explicit Bill To debtor, original gross/calculated versus adjusted/net values, compatible quantity conversion with original units retained, agreement shortage/remaining basis and shared expense reconciliation. Rate selection recommends most specific valid conditions, rejects exact-condition interval overlaps and requires trips.override_rate for another valid match. Manual Total uses trips.manual_price plus ordinary resource authority, captures entered total/actor/time and respects financial locks; never fabricate a unit rate.
+
+V1 invoice payment/advance/reallocation currency must match invoice currency; historical FX/base conversion never bypasses this invariant. Controlled invoice correction/reissue and credit/debit notes require respective grants, reason, original history and consistent Trip/ledger/account/allocations without duplicate billing or revenue. Invoice-date revenue and cash collection remain separate in reporting.
+
+Manual Order completion requires orders.complete, unfinished-Trip warning and audit; remaining Trip statuses stay intact. Expired documents show warnings/status/reminders; V1 assignment remains possible if otherwise authorized and expiry alone cannot block it. Future blocking is not an active V1 safeguard.
+
+First Owner is established during company setup. Owner creation/transfer/removal/deactivation is audited; always preserve an active Owner with concurrency-safe checks, deny last-Owner self-removal/deactivation and custom-role bypass. owners.transfer requires protected Owner authority and an eligible recipient; provider provisioning remains open. Multiple automatic backups daily, restricted access and a documented restore tested before production remain launch requirements, not completed verification.

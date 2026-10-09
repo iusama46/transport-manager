@@ -38,7 +38,7 @@ IconButton requires an accessible label and adequate hit area; tooltip only supp
 | PasswordField | Visibility toggle with accessible label; appropriate autocomplete; never log value |
 | NumberField | Numeric text, bounds and precision; blank stays blank |
 | MoneyField | Decimal string plus explicit currency; no float money arithmetic or premature rounding |
-| QuantityField | Decimal string plus explicit unit; precision independent of currency |
+| QuantityField | Decimal string plus original unit; compatible converted quantity/unit and rule separate; never silently replace original input; precision independent of currency |
 | DateField | Calendar date or null; no timezone-induced day shift |
 | DateRangeField | Start/end and valid range order; document inclusive display boundaries |
 | SearchField | Clear action, optional debounce/submit, accessible name |
@@ -80,9 +80,10 @@ MoneyText and QuantityText show formatted values with currency/units and explici
 | Component | Separate responsibility |
 |---|---|
 | CustomerPicker | Select direct customer by stable ID |
-| ConsigneePicker | Filter by customer; clear/remap invalid selection when customer changes |
+| ConsigneePicker | Filter potential Order receivers by customer; support multiple potential Consignees and actual Trip receiver/destination; clear/remap incompatible selection without changing history |
+| BillToPicker | Explicit supported Factory/Client/Consignee/alternative debtor, independent of operational relationships |
 | VehiclePicker | Show availability and owner separately from subcontractor |
-| DriverPicker | Show availability/licence indicators according to agreed rules |
+| DriverPicker | Show availability/licence expiry warning/status; expiry alone does not block otherwise-authorized V1 assignment |
 | TransportPartnerPicker | Select external Trip fulfiller |
 | FuelSupplierPicker | Select supplier |
 | FuelBranchPicker | Require supplier; show only its branches; reject stale search results |
@@ -137,3 +138,15 @@ These composites and their integration remain unimplemented. Contracts follow PE
 | EntityActivityTimeline / AuditDetail | Existing read-only redacted history for every appropriate entity; no historical event mutation |
 
 ExpenseCategoryPicker and DocumentTypePicker support authorized custom management. TaxPreview and NumberingPreview display configured rules while internal IDs and external references remain separate. V1 auto-approval has no routine reviewer queue; bulk-import and manual-approval composites belong to V2. Backend checks are authoritative for all component actions.
+
+## Final business-policy composite contracts
+
+- TripPricingEditor/PricingSnapshot: CALCULATED_RATE recommended/selected valid references, quantity/unit/date basis, provisional/final gross snapshot; MANUAL_TOTAL amount/user/time with no synthetic unit rate. Additional permission and correction locks govern changes.
+- ChargeBreakdown/AdjustmentEditor: preserve gross, multiple extensible fixed/percentage commission/deduction categories/bases, fixed/percentage discount, tax, rounding and other adjustment snapshots, net/final amount and audit links. Server validates all arithmetic and grants.
+- QuantityConversion/ShortageSummary: original quantity/unit, normalized value/unit/conversion rule; loaded/delivered/difference, configurable shortage effect and Order Loaded/Delivered remaining basis.
+- ManualOrderCompletion: orders.complete, unfinished-Trip warning and unchanged Trip statuses; scoped audit and separate Order/Trip display.
+- ExpenseAllocationEditor: equal/compatible quantity/manual amount/manual percentage, target shares, explicit remainder and exact source-amount reconciliation; method/value history and expenses.allocate.
+- InvoiceCorrectionReview: legal/business-permitted correction/reissue with original versions or linked Credit/Debit Note; required reason, relevant grants, effective billing/ledger/allocations and no duplicate billing/revenue.
+- OwnerTransfer: protected authority plus owners.transfer, eligible user, always-active Owner constraint, concurrency feedback and audit; no custom-role shortcut.
+
+Ledger/PaymentAllocation uses selected Bill To receivables under existing customer_ledger namespace and only same-currency invoice targets in V1. DocumentExpiry warns without expiry-only assignment blocking; future blocking settings remain V2. SummaryMetric/ReportChart label invoice-date management revenue separately from operational dates and cash receipt dates; profitability consumes allocated expense shares, excluding unallocated company costs. No history-purge component exists. These contracts remain unimplemented.

@@ -1,7 +1,172 @@
 "use client";
-import {flexRender,getCoreRowModel,useReactTable,type ColumnDef,type SortingState,type VisibilityState,type RowSelectionState,type OnChangeFn} from "@tanstack/react-table";import {Button} from "../ui/button";import {Checkbox} from "../ui/checkbox";import {EmptyState} from "./empty-state";import {ErrorState} from "./error-state";import {LoadingState} from "./loading-state";
-export function DataTable<T>({columns,rows,getRowId,caption,sorting=[],onSortingChange,columnVisibility={},onColumnVisibilityChange,selection,onSelectionChange,loading,error,onRetry,filtered=false,compact=false}:{columns:ColumnDef<T>[];rows:T[];getRowId:(row:T)=>string;caption:string;sorting?:SortingState;onSortingChange?:OnChangeFn<SortingState>;columnVisibility?:VisibilityState;onColumnVisibilityChange?:OnChangeFn<VisibilityState>;selection?:RowSelectionState;onSelectionChange?:OnChangeFn<RowSelectionState>;loading?:boolean;error?:string;onRetry?:()=>void;filtered?:boolean;compact?:boolean}){
- const table=useReactTable({data:rows,columns,getRowId,getCoreRowModel:getCoreRowModel(),manualSorting:true,manualPagination:true,state:{sorting,columnVisibility,rowSelection:selection??{}},onSortingChange,onColumnVisibilityChange,onRowSelectionChange:onSelectionChange,enableRowSelection:!!onSelectionChange});
- if(loading)return <LoadingState/>;
- return <div className="stack">{error&&<ErrorState message={error} onRetry={onRetry} stale={!!rows.length}/>}<div className="table-scroll" role="region" aria-label={caption} tabIndex={0}><table data-compact={compact}><caption>{caption}</caption><thead>{table.getHeaderGroups().map(group=><tr key={group.id}>{onSelectionChange&&<th scope="col"><Checkbox aria-label="Select all rows on this page" checked={table.getIsAllPageRowsSelected()} indeterminate={table.getIsSomePageRowsSelected()} onChange={table.getToggleAllPageRowsSelectedHandler()} disabled={!rows.length}/></th>}{group.headers.map(header=><th key={header.id} scope="col" aria-sort={header.column.getIsSorted()==="asc"?"ascending":header.column.getIsSorted()==="desc"?"descending":undefined}>{header.isPlaceholder?null:header.column.getCanSort()&&onSortingChange?<Button variant="ghost" size="sm" onClick={header.column.getToggleSortingHandler()}>{flexRender(header.column.columnDef.header,header.getContext())} {header.column.getIsSorted()==="asc"?"↑":header.column.getIsSorted()==="desc"?"↓":"↕"}</Button>:flexRender(header.column.columnDef.header,header.getContext())}</th>)}</tr>)}</thead><tbody>{table.getRowModel().rows.map(row=><tr key={row.id}>{onSelectionChange&&<td><Checkbox aria-label={`Select row ${row.id}`} checked={row.getIsSelected()} onChange={row.getToggleSelectedHandler()}/></td>}{row.getVisibleCells().map(cell=><td key={cell.id}>{flexRender(cell.column.columnDef.cell,cell.getContext())}</td>)}</tr>)}</tbody></table></div>{!rows.length&&!error&&<EmptyState filtered={filtered}/>}</div>;
+import {
+  flexRender,
+  useTable,
+  tableFeatures,
+  columnVisibilityFeature,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  type ColumnDef,
+  type RowData,
+  type SortingState,
+  type ColumnVisibilityState,
+  type RowSelectionState,
+  type OnChangeFn,
+} from "@tanstack/react-table";
+import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
+import { EmptyState } from "./empty-state";
+import { ErrorState } from "./error-state";
+import { LoadingState } from "./loading-state";
+const features = tableFeatures({
+  columnVisibilityFeature,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+});
+export type DataTableColumn<T extends RowData> = ColumnDef<typeof features, T>;
+
+export function DataTable<T extends RowData>({
+  columns,
+  rows,
+  getRowId,
+  caption,
+  sorting = [],
+  onSortingChange,
+  columnVisibility = {},
+  onColumnVisibilityChange,
+  selection,
+  onSelectionChange,
+  loading,
+  error,
+  onRetry,
+  filtered = false,
+  compact = false,
+}: {
+  columns: DataTableColumn<T>[];
+  rows: T[];
+  getRowId: (row: T) => string;
+  caption: string;
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
+  columnVisibility?: ColumnVisibilityState;
+  onColumnVisibilityChange?: OnChangeFn<ColumnVisibilityState>;
+  selection?: RowSelectionState;
+  onSelectionChange?: OnChangeFn<RowSelectionState>;
+  loading?: boolean;
+  error?: string;
+  onRetry?: () => void;
+  filtered?: boolean;
+  compact?: boolean;
+}) {
+  const table = useTable({
+    features,
+    data: rows,
+    columns,
+    getRowId,
+    manualSorting: true,
+    manualPagination: true,
+    state: { sorting, columnVisibility, rowSelection: selection ?? {} },
+    onSortingChange,
+    onColumnVisibilityChange,
+    onRowSelectionChange: onSelectionChange,
+    enableRowSelection: !!onSelectionChange,
+  });
+  if (loading) return <LoadingState />;
+  return (
+    <div className="stack">
+      {error && (
+        <ErrorState message={error} onRetry={onRetry} stale={!!rows.length} />
+      )}
+      <div
+        className="table-scroll"
+        role="region"
+        aria-label={caption}
+        tabIndex={0}
+      >
+        <table data-compact={compact}>
+          <caption>{caption}</caption>
+          <thead>
+            {table.getHeaderGroups().map((group) => (
+              <tr key={group.id}>
+                {onSelectionChange && (
+                  <th scope="col">
+                    <Checkbox
+                      aria-label="Select all rows on this page"
+                      checked={table.getIsAllPageRowsSelected()}
+                      indeterminate={
+                        table.getIsSomePageRowsSelected() &&
+                        !table.getIsAllPageRowsSelected()
+                      }
+                      onChange={table.getToggleAllPageRowsSelectedHandler()}
+                      disabled={!rows.length}
+                    />
+                  </th>
+                )}
+                {group.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    scope="col"
+                    aria-sort={
+                      header.column.getIsSorted() === "asc"
+                        ? "ascending"
+                        : header.column.getIsSorted() === "desc"
+                          ? "descending"
+                          : undefined
+                    }
+                  >
+                    {header.isPlaceholder ? null : header.column.getCanSort() &&
+                      onSortingChange ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}{" "}
+                        {header.column.getIsSorted() === "asc"
+                          ? "↑"
+                          : header.column.getIsSorted() === "desc"
+                            ? "↓"
+                            : "↕"}
+                      </Button>
+                    ) : (
+                      flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id}>
+                {onSelectionChange && (
+                  <td>
+                    <Checkbox
+                      aria-label={`Select row ${row.id}`}
+                      checked={row.getIsSelected()}
+                      onChange={row.getToggleSelectedHandler()}
+                    />
+                  </td>
+                )}
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {!rows.length && !error && <EmptyState filtered={filtered} />}
+    </div>
+  );
 }

@@ -259,3 +259,15 @@ Earlier dated reviews/test evidence above are historical. Their references to un
 - [ ] Execute production-gate recovery evidence: multiple automatic backups/day, restricted access, documented restore tested with records/ledgers/audit/files.
 
 V2/Future additions: configurable document-type expiry assignment blocking and cross-currency invoice settlement/allocation if pursued. Existing controlled bulk import/manual approvals/mobile/dark mode and other future scope stay deferred. Earlier dated open-policy reviews are historical and superseded by D51–D69. Current documentation status does not complete implementation or certify providers/runtime tests.
+
+## Component compatibility verification — 9 October 2026
+
+- [x] Repair DataTable/showcase v8 API usage against installed TanStack Table 9.2.6; native useTable and explicit features/types, no version changes or legacy adapter.
+- [x] Move showcase failure-ref update out of render; retain failure simulation behavior.
+- [x] Correct header checkbox full/partial selection under v9 “some selected” semantics.
+- [x] Run npm run lint and npm run typecheck for web/shared; both passed.
+- [x] Run targeted Prettier checks and git diff --check; passed.
+- [x] Run npm run build in an isolated tracked-source copy with existing node_modules linked; passed. Not a clean dependency installation; live development build cache preserved.
+- [x] Verify /dev/components in Chrome: table renders, ascending/descending sorting, filtering and pagination, selection reset/full/partial header state, hiding/restoring columns, loading/empty/stale-error display; captured console errors/warnings absent.
+
+This supersedes the 6 October hook/table-library blockers. It does not complete broader shell/accessibility/browser review, business tests, authentication, provider architecture, recovery or deployment. The user subsequently requested commit/push of this repair; see the delivery response for commit and remote-verification evidence. Earlier documentation commits were already pushed separately.

@@ -1,70 +1,584 @@
 "use client";
-import {useCallback,useRef,useState} from "react";
-import {useForm} from "react-hook-form";
-import type {ColumnDef,SortingState,RowSelectionState,VisibilityState} from "@tanstack/react-table";
-import {Info} from "lucide-react";
-import {PageHeader} from "@/components/common/page-header";
-import {Breadcrumbs} from "@/components/common/breadcrumbs";
-import {Button} from "@/components/ui/button";
-import {ButtonGroup} from "@/components/ui/button-group";
-import {IconButton} from "@/components/ui/icon-button";
-import {LinkButton} from "@/components/ui/link-button";
-import {TextField} from "@/components/forms/text-field";
-import {PasswordField} from "@/components/forms/password-field";
-import {MoneyField} from "@/components/forms/money-field";
-import {QuantityField} from "@/components/forms/quantity-field";
-import {TextareaField} from "@/components/forms/textarea-field";
-import {DateRangeField} from "@/components/forms/date-range-field";
-import {FormSection} from "@/components/forms/form-section";
-import {FormActions} from "@/components/forms/form-actions";
-import {ControlledTextField} from "@/components/forms/controlled-text-field";
-import {FormField} from "@/components/forms/form-field";
-import {Select} from "@/components/ui/select";
-import {Checkbox} from "@/components/ui/checkbox";
-import {RadioGroup} from "@/components/ui/radio-group";
-import {Switch} from "@/components/ui/switch";
-import {Combobox,type Option,type OptionLoader} from "@/components/ui/combobox";
-import {MultiSelect} from "@/components/ui/multi-select";
-import {Alert} from "@/components/ui/alert";
-import {Toast} from "@/components/ui/toast";
-import {Tooltip} from "@/components/ui/tooltip";
-import {Dialog} from "@/components/ui/dialog";
-import {Drawer} from "@/components/ui/drawer";
-import {ConfirmDialog} from "@/components/common/confirm-dialog";
-import {StatusBadge} from "@/components/common/status-badge";
-import {EmptyState} from "@/components/common/empty-state";
-import {ErrorState} from "@/components/common/error-state";
-import {LoadingState} from "@/components/common/loading-state";
-import {DataTable} from "@/components/common/data-table";
-import {Pagination} from "@/components/common/pagination";
-import {FilterBar} from "@/components/common/filter-bar";
-import {SearchField} from "@/components/forms/search-field";
-import {ColumnVisibilityMenu} from "@/components/common/column-visibility-menu";
-import {RowActions} from "@/components/common/row-actions";
-import {BulkActionBar} from "@/components/common/bulk-action-bar";
+import { useCallback, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import type {
+  SortingState,
+  RowSelectionState,
+  ColumnVisibilityState,
+} from "@tanstack/react-table";
+import { Info } from "lucide-react";
+import { PageHeader } from "@/components/common/page-header";
+import { Breadcrumbs } from "@/components/common/breadcrumbs";
+import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { IconButton } from "@/components/ui/icon-button";
+import { LinkButton } from "@/components/ui/link-button";
+import { TextField } from "@/components/forms/text-field";
+import { PasswordField } from "@/components/forms/password-field";
+import { MoneyField } from "@/components/forms/money-field";
+import { QuantityField } from "@/components/forms/quantity-field";
+import { TextareaField } from "@/components/forms/textarea-field";
+import { DateRangeField } from "@/components/forms/date-range-field";
+import { FormSection } from "@/components/forms/form-section";
+import { FormActions } from "@/components/forms/form-actions";
+import { ControlledTextField } from "@/components/forms/controlled-text-field";
+import { FormField } from "@/components/forms/form-field";
+import { Select } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
+import {
+  Combobox,
+  type Option,
+  type OptionLoader,
+} from "@/components/ui/combobox";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { Alert } from "@/components/ui/alert";
+import { Toast } from "@/components/ui/toast";
+import { Tooltip } from "@/components/ui/tooltip";
+import { Dialog } from "@/components/ui/dialog";
+import { Drawer } from "@/components/ui/drawer";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { StatusBadge } from "@/components/common/status-badge";
+import { EmptyState } from "@/components/common/empty-state";
+import { ErrorState } from "@/components/common/error-state";
+import { LoadingState } from "@/components/common/loading-state";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "@/components/common/data-table";
+import { Pagination } from "@/components/common/pagination";
+import { FilterBar } from "@/components/common/filter-bar";
+import { SearchField } from "@/components/forms/search-field";
+import { ColumnVisibilityMenu } from "@/components/common/column-visibility-menu";
+import { RowActions } from "@/components/common/row-actions";
+import { BulkActionBar } from "@/components/common/bulk-action-bar";
 
-type DemoRow={id:string;name:string;status:string;quantity:string|null};
-const records:DemoRow[]=Array.from({length:7},(_,i)=>({id:`DEMO-${i+1}`,name:i===0?"Synthetic Northern Distribution Centre with a very long receiving department and destination description that must remain fully readable":"Synthetic location "+(i+1),status:i%2?"Draft":"Scheduled",quantity:i===0?null:i===1?"0":"12.50"}));
-const parentOptions=[{id:"alpha",label:"Synthetic supplier Alpha"},{id:"beta",label:"Synthetic supplier Beta"}];
-const loadParents:OptionLoader=async query=>({options:parentOptions.filter(o=>o.label.toLowerCase().includes(query.toLowerCase())),hasMore:false});
+type DemoRow = {
+  id: string;
+  name: string;
+  status: string;
+  quantity: string | null;
+};
+const records: DemoRow[] = Array.from({ length: 7 }, (_, i) => ({
+  id: `DEMO-${i + 1}`,
+  name:
+    i === 0
+      ? "Synthetic Northern Distribution Centre with a very long receiving department and destination description that must remain fully readable"
+      : "Synthetic location " + (i + 1),
+  status: i % 2 ? "Draft" : "Scheduled",
+  quantity: i === 0 ? null : i === 1 ? "0" : "12.50",
+}));
+const parentOptions = [
+  { id: "alpha", label: "Synthetic supplier Alpha" },
+  { id: "beta", label: "Synthetic supplier Beta" },
+];
+const loadParents: OptionLoader = async (query) => ({
+  options: parentOptions.filter((o) =>
+    o.label.toLowerCase().includes(query.toLowerCase()),
+  ),
+  hasMore: false,
+});
 
-export function ComponentShowcase(){
- const [toast,setToast]=useState(false);const [pending,setPending]=useState(false);const [amount,setAmount]=useState("");const [quantity,setQuantity]=useState("0");const [notes,setNotes]=useState("");const [range,setRange]=useState<{start:string|null;end:string|null}>({start:null,end:null});const [choice,setChoice]=useState("one");const [enabled,setEnabled]=useState(false);const [multi,setMulti]=useState<string[]>([]);const [confirm,setConfirm]=useState(false);
- const {control,handleSubmit,formState:{errors}}=useForm({defaultValues:{name:""}});const [failure,setFailure]=useState(false);
- const [parent,setParent]=useState<Option|null>(null);const [child,setChild]=useState<Option|null>(null);const [simulateFailure,setSimulateFailure]=useState(false);const failRef=useRef(false);failRef.current=simulateFailure;
- const loadChildren=useCallback<OptionLoader>((query,page,signal)=>new Promise((resolve,reject)=>{const timer=setTimeout(()=>{if(failRef.current){reject(new Error("Synthetic network failure"));return;}const all=Array.from({length:5},(_,i)=>({id:`${parent?.id}-${i}`,label:`Synthetic ${parent?.id} branch ${i+1}`})).filter(o=>o.label.toLowerCase().includes(query.toLowerCase()));resolve({options:all.slice(page*2,page*2+2),hasMore:all.length>(page+1)*2});},parent?.id==="alpha"?800:150);signal.addEventListener("abort",()=>{clearTimeout(timer);reject(new DOMException("Aborted","AbortError"));},{once:true});}),[parent]);
- const [query,setQuery]=useState("");const [sorting,setSorting]=useState<SortingState>([]);const [selection,setSelection]=useState<RowSelectionState>({});const [visibility,setVisibility]=useState<VisibilityState>({});const [page,setPage]=useState(0);const [tableState,setTableState]=useState("ready");
- const filtered=records.filter(row=>row.name.toLowerCase().includes(query.toLowerCase())||row.id.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>{const sort=sorting[0];if(!sort)return 0;const result=String(a[sort.id as keyof DemoRow]??"").localeCompare(String(b[sort.id as keyof DemoRow]??""));return sort.desc?-result:result;});
- const columns:ColumnDef<DemoRow>[]=[{accessorKey:"id",header:"Reference",cell:({row})=><a href="#table-details" className="underline" onClick={()=>setToast(true)}>{row.original.id}</a>},{accessorKey:"name",header:"Destination"},{accessorKey:"status",header:"Delivery status",cell:({row})=><StatusBadge>{row.original.status}</StatusBadge>},{accessorKey:"quantity",header:"Quantity (tonnes)",enableSorting:false,cell:({row})=><span className="numeric">{row.original.quantity??"Not available"}</span>},{id:"actions",header:"Actions",cell:({row})=><RowActions label={`Actions for ${row.original.id}`} items={[{label:"Preview synthetic record",onSelect:()=>setToast(true)}]}/>}];
- return <div className="stack">
- <Breadcrumbs items={[{label:"Overview",href:"/"},{label:"Development components"}]}/><PageHeader title="Component showcase" description="Development only · All names, quantities and records below are synthetic. Nothing is saved."/>
- <Alert title="Keyboard and responsive review">Use Tab and Shift+Tab to inspect the 2px focus ring; arrow keys select options and menu items. Escape closes overlays. Resize to 375px and test at 200% browser zoom. Long values wrap; tables scroll within their own region.</Alert>
- <section className="surface stack"><h2>Buttons and navigation</h2><p className="supporting">Hover, press, or tab to each control. Loading retains focus and width.</p><ButtonGroup>{(["primary","secondary","outline","ghost","destructive"] as const).map(variant=><Button key={variant} variant={variant} onClick={()=>setToast(true)}>{variant}</Button>)}</ButtonGroup><ButtonGroup><Button size="sm" variant="outline">Compact</Button><Button size="lg" variant="outline">Touch</Button><Button disabled>Disabled</Button><Button loading>Loading example</Button><Button loading={pending} onClick={()=>{setPending(true);setTimeout(()=>setPending(false),1200);}}>Simulate loading</Button><LinkButton href="/">Overview link</LinkButton><Tooltip text="Supplementary explanation"><IconButton variant="ghost" label="Show component information" onClick={()=>setToast(true)}><Info size={20}/></IconButton></Tooltip></ButtonGroup></section>
- <section className="surface stack"><h2>Fields and recoverable validation</h2><form className="stack" noValidate onSubmit={handleSubmit(()=>setFailure(true))}>{Object.keys(errors).length>0&&<Alert tone="error" title="Review the form">Enter the required synthetic name below.</Alert>}<FormSection title="Synthetic entry"><ControlledTextField control={control} name="name" label="Synthetic name" required rules={{required:"Enter a synthetic name."}} help="Submit empty to focus the invalid field; filled submits simulate a recoverable failure."/><TextField label="Read-only reference" value="DEMO-READONLY-001" readOnly/><TextField label="Disabled field" value="Unavailable" disabled/><TextField label="Validation error example" defaultValue="Unrecognized example" error="Choose an existing synthetic record."/><PasswordField label="Example password" autoComplete="new-password"/><MoneyField label="Example amount" currency="DEMO currency" value={amount} onChange={e=>setAmount(e.target.value)} help={`Raw string: ${JSON.stringify(amount)}. Blank is unknown, not zero.`}/><QuantityField label="Quantity" unit="tonnes" value={quantity} onChange={e=>setQuantity(e.target.value)}/><TextareaField label="Notes with a deliberately long descriptive label that wraps on narrow screens" value={notes} onChange={e=>setNotes(e.target.value)} showCount maxLength={500}/></FormSection><DateRangeField {...range} onChange={setRange}/><FormActions error={failure?"Synthetic network failure. Your entries are preserved; try Save again.":undefined}/></form></section>
- <section className="surface stack"><h2>Selectors</h2><div className="form-grid"><FormField label="Fixed choice">{field=><Select {...field}><option>Draft</option><option>Scheduled</option></Select>}</FormField><RadioGroup legend="Single choice" name="demo-choice" value={choice} onChange={e=>setChoice(e.target.value)} options={[{value:"one",label:"One"},{value:"two",label:"Two"}]}/><label className="choice"><Checkbox indeterminate/>Partial selection example</label><Switch label="Synthetic local setting" checked={enabled} onChange={e=>setEnabled(e.target.checked)}/><p role="status">Local setting {enabled?"on":"off"}; not persisted.</p><MultiSelect label="Multiple synthetic labels" options={parentOptions} value={multi} onChange={setMulti}/></div><h3>Dependent entity selector fixtures</h3><p className="supporting">Alpha responds slowly; Beta responds quickly. Changing supplier clears the branch. Search “missing” for empty results. These are fixtures, not fuel APIs.</p><Switch label="Simulate selector network failure" checked={simulateFailure} onChange={e=>setSimulateFailure(e.target.checked)}/><div className="form-grid"><Combobox label="Synthetic supplier" value={parent} onChange={value=>{setParent(value);setChild(null);}} loadOptions={loadParents}/><Combobox key={parent?.id??"none"} label="Synthetic branch" help={!parent?"Select a supplier first.":"Branches belong to the selected synthetic supplier."} value={child} onChange={setChild} loadOptions={loadChildren} disabled={!parent}/><Combobox label="Read-only selector" value={parentOptions[0]} onChange={()=>{}} loadOptions={loadParents} readOnly/></div><p role="status">Selected branch: {child?.id??"none"}</p></section>
- <section className="surface stack"><h2>Feedback</h2><div className="actions">{(["info","success","warning","error"] as const).map(tone=><StatusBadge key={tone} tone={tone}>{tone} example</StatusBadge>)}</div><Alert tone="warning" title="Permission denied example">You do not have access to this synthetic action.</Alert><Alert tone="error" title="Quota exceeded example">Synthetic capacity reached. Remove an unused draft or try again later.</Alert><ErrorState message="Synthetic service unavailable." onRetry={()=>setToast(true)}/><LoadingState/><EmptyState/><EmptyState filtered/></section>
- <section className="surface stack"><h2>Dialogs, drawers and menus</h2><div className="actions"><Dialog trigger={<Button variant="outline">Open dialog</Button>} title="Synthetic dialog" description="Focus stays inside; Escape closes and returns focus to the trigger."><TextField label="Dialog note"/><p>Long content remains readable inside the scrolling overlay.</p></Dialog><Drawer trigger={<Button variant="outline">Open drawer</Button>} title="Synthetic drawer" description="Keyboard-accessible side panel with scroll containment."><TextField label="Drawer note"/></Drawer><Button variant="destructive" onClick={()=>setConfirm(true)}>Review synthetic removal</Button></div><ConfirmDialog open={confirm} onOpenChange={setConfirm} title="Remove synthetic draft DEMO-001?" description="This demonstration only closes the dialog. No record or payment is changed." actionLabel="Remove synthetic draft" onConfirm={()=>{setConfirm(false);setToast(true);}}/></section>
- <section className="surface stack" id="table-details"><h2>Controlled table</h2><p className="supporting">Selection applies to this page only and clears when filtering, sorting or changing page. References are explicit links; row actions do not navigate.</p><FilterBar onClear={()=>{setQuery("");setPage(0);setSelection({});}}><SearchField label="Filter synthetic records" value={query} onChange={value=>{setQuery(value);setPage(0);setSelection({});}}/><FormField label="Table state">{field=><Select {...field} value={tableState} onChange={e=>setTableState(e.target.value)}><option value="ready">Ready</option><option value="loading">Loading</option><option value="error">Network error with stale data</option><option value="empty">Empty</option></Select>}</FormField><ColumnVisibilityMenu columns={[{id:"name",label:"Destination",visible:visibility.name!==false},{id:"quantity",label:"Quantity",visible:visibility.quantity!==false}]} onToggle={id=>setVisibility(v=>({...v,[id]:v[id]===false}))}/></FilterBar><BulkActionBar count={Object.values(selection).filter(Boolean).length} onClear={()=>setSelection({})}/><DataTable columns={columns} rows={tableState==="empty"?[]:filtered.slice(page*3,page*3+3)} getRowId={row=>row.id} caption="Synthetic destinations · Quantity in tonnes" sorting={sorting} onSortingChange={update=>{setSorting(update);setPage(0);setSelection({});}} selection={selection} onSelectionChange={setSelection} columnVisibility={visibility} onColumnVisibilityChange={setVisibility} loading={tableState==="loading"} error={tableState==="error"?"Synthetic request failed.":undefined} onRetry={()=>setTableState("ready")} filtered={!!query}/><Pagination pageIndex={page} pageSize={3} total={tableState==="empty"?0:filtered.length} disabled={tableState==="loading"} onPageChange={value=>{setPage(value);setSelection({});}}/></section>
- {toast&&<Toast onDismiss={()=>setToast(false)}>Synthetic interaction completed locally.</Toast>}
- </div>;
+export function ComponentShowcase() {
+  const [toast, setToast] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [quantity, setQuantity] = useState("0");
+  const [notes, setNotes] = useState("");
+  const [range, setRange] = useState<{
+    start: string | null;
+    end: string | null;
+  }>({ start: null, end: null });
+  const [choice, setChoice] = useState("one");
+  const [enabled, setEnabled] = useState(false);
+  const [multi, setMulti] = useState<string[]>([]);
+  const [confirm, setConfirm] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ defaultValues: { name: "" } });
+  const [failure, setFailure] = useState(false);
+  const [parent, setParent] = useState<Option | null>(null);
+  const [child, setChild] = useState<Option | null>(null);
+  const [simulateFailure, setSimulateFailure] = useState(false);
+  const failRef = useRef(false);
+  const loadChildren = useCallback<OptionLoader>(
+    (query, page, signal) =>
+      new Promise((resolve, reject) => {
+        const timer = setTimeout(
+          () => {
+            if (failRef.current) {
+              reject(new Error("Synthetic network failure"));
+              return;
+            }
+            const all = Array.from({ length: 5 }, (_, i) => ({
+              id: `${parent?.id}-${i}`,
+              label: `Synthetic ${parent?.id} branch ${i + 1}`,
+            })).filter((o) =>
+              o.label.toLowerCase().includes(query.toLowerCase()),
+            );
+            resolve({
+              options: all.slice(page * 2, page * 2 + 2),
+              hasMore: all.length > (page + 1) * 2,
+            });
+          },
+          parent?.id === "alpha" ? 800 : 150,
+        );
+        signal.addEventListener(
+          "abort",
+          () => {
+            clearTimeout(timer);
+            reject(new DOMException("Aborted", "AbortError"));
+          },
+          { once: true },
+        );
+      }),
+    [parent],
+  );
+  const [query, setQuery] = useState("");
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [selection, setSelection] = useState<RowSelectionState>({});
+  const [visibility, setVisibility] = useState<ColumnVisibilityState>({});
+  const [page, setPage] = useState(0);
+  const [tableState, setTableState] = useState("ready");
+  const filtered = records
+    .filter(
+      (row) =>
+        row.name.toLowerCase().includes(query.toLowerCase()) ||
+        row.id.toLowerCase().includes(query.toLowerCase()),
+    )
+    .sort((a, b) => {
+      const sort = sorting[0];
+      if (!sort) return 0;
+      const result = String(a[sort.id as keyof DemoRow] ?? "").localeCompare(
+        String(b[sort.id as keyof DemoRow] ?? ""),
+      );
+      return sort.desc ? -result : result;
+    });
+  const columns: DataTableColumn<DemoRow>[] = [
+    {
+      accessorKey: "id",
+      header: "Reference",
+      cell: ({ row }) => (
+        <a
+          href="#table-details"
+          className="underline"
+          onClick={() => setToast(true)}
+        >
+          {row.original.id}
+        </a>
+      ),
+    },
+    { accessorKey: "name", header: "Destination" },
+    {
+      accessorKey: "status",
+      header: "Delivery status",
+      cell: ({ row }) => <StatusBadge>{row.original.status}</StatusBadge>,
+    },
+    {
+      accessorKey: "quantity",
+      header: "Quantity (tonnes)",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <span className="numeric">
+          {row.original.quantity ?? "Not available"}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <RowActions
+          label={`Actions for ${row.original.id}`}
+          items={[
+            {
+              label: "Preview synthetic record",
+              onSelect: () => setToast(true),
+            },
+          ]}
+        />
+      ),
+    },
+  ];
+  return (
+    <div className="stack">
+      <Breadcrumbs
+        items={[
+          { label: "Overview", href: "/" },
+          { label: "Development components" },
+        ]}
+      />
+      <PageHeader
+        title="Component showcase"
+        description="Development only · All names, quantities and records below are synthetic. Nothing is saved."
+      />
+      <Alert title="Keyboard and responsive review">
+        Use Tab and Shift+Tab to inspect the 2px focus ring; arrow keys select
+        options and menu items. Escape closes overlays. Resize to 375px and test
+        at 200% browser zoom. Long values wrap; tables scroll within their own
+        region.
+      </Alert>
+      <section className="surface stack">
+        <h2>Buttons and navigation</h2>
+        <p className="supporting">
+          Hover, press, or tab to each control. Loading retains focus and width.
+        </p>
+        <ButtonGroup>
+          {(
+            ["primary", "secondary", "outline", "ghost", "destructive"] as const
+          ).map((variant) => (
+            <Button
+              key={variant}
+              variant={variant}
+              onClick={() => setToast(true)}
+            >
+              {variant}
+            </Button>
+          ))}
+        </ButtonGroup>
+        <ButtonGroup>
+          <Button size="sm" variant="outline">
+            Compact
+          </Button>
+          <Button size="lg" variant="outline">
+            Touch
+          </Button>
+          <Button disabled>Disabled</Button>
+          <Button loading>Loading example</Button>
+          <Button
+            loading={pending}
+            onClick={() => {
+              setPending(true);
+              setTimeout(() => setPending(false), 1200);
+            }}
+          >
+            Simulate loading
+          </Button>
+          <LinkButton href="/">Overview link</LinkButton>
+          <Tooltip text="Supplementary explanation">
+            <IconButton
+              variant="ghost"
+              label="Show component information"
+              onClick={() => setToast(true)}
+            >
+              <Info size={20} />
+            </IconButton>
+          </Tooltip>
+        </ButtonGroup>
+      </section>
+      <section className="surface stack">
+        <h2>Fields and recoverable validation</h2>
+        <form
+          className="stack"
+          noValidate
+          onSubmit={handleSubmit(() => setFailure(true))}
+        >
+          {Object.keys(errors).length > 0 && (
+            <Alert tone="error" title="Review the form">
+              Enter the required synthetic name below.
+            </Alert>
+          )}
+          <FormSection title="Synthetic entry">
+            <ControlledTextField
+              control={control}
+              name="name"
+              label="Synthetic name"
+              required
+              rules={{ required: "Enter a synthetic name." }}
+              help="Submit empty to focus the invalid field; filled submits simulate a recoverable failure."
+            />
+            <TextField
+              label="Read-only reference"
+              value="DEMO-READONLY-001"
+              readOnly
+            />
+            <TextField label="Disabled field" value="Unavailable" disabled />
+            <TextField
+              label="Validation error example"
+              defaultValue="Unrecognized example"
+              error="Choose an existing synthetic record."
+            />
+            <PasswordField
+              label="Example password"
+              autoComplete="new-password"
+            />
+            <MoneyField
+              label="Example amount"
+              currency="DEMO currency"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              help={`Raw string: ${JSON.stringify(amount)}. Blank is unknown, not zero.`}
+            />
+            <QuantityField
+              label="Quantity"
+              unit="tonnes"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+            />
+            <TextareaField
+              label="Notes with a deliberately long descriptive label that wraps on narrow screens"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              showCount
+              maxLength={500}
+            />
+          </FormSection>
+          <DateRangeField {...range} onChange={setRange} />
+          <FormActions
+            error={
+              failure
+                ? "Synthetic network failure. Your entries are preserved; try Save again."
+                : undefined
+            }
+          />
+        </form>
+      </section>
+      <section className="surface stack">
+        <h2>Selectors</h2>
+        <div className="form-grid">
+          <FormField label="Fixed choice">
+            {(field) => (
+              <Select {...field}>
+                <option>Draft</option>
+                <option>Scheduled</option>
+              </Select>
+            )}
+          </FormField>
+          <RadioGroup
+            legend="Single choice"
+            name="demo-choice"
+            value={choice}
+            onChange={(e) => setChoice(e.target.value)}
+            options={[
+              { value: "one", label: "One" },
+              { value: "two", label: "Two" },
+            ]}
+          />
+          <label className="choice">
+            <Checkbox indeterminate />
+            Partial selection example
+          </label>
+          <Switch
+            label="Synthetic local setting"
+            checked={enabled}
+            onChange={(e) => setEnabled(e.target.checked)}
+          />
+          <p role="status">
+            Local setting {enabled ? "on" : "off"}; not persisted.
+          </p>
+          <MultiSelect
+            label="Multiple synthetic labels"
+            options={parentOptions}
+            value={multi}
+            onChange={setMulti}
+          />
+        </div>
+        <h3>Dependent entity selector fixtures</h3>
+        <p className="supporting">
+          Alpha responds slowly; Beta responds quickly. Changing supplier clears
+          the branch. Search “missing” for empty results. These are fixtures,
+          not fuel APIs.
+        </p>
+        <Switch
+          label="Simulate selector network failure"
+          checked={simulateFailure}
+          onChange={(e) => {
+            failRef.current = e.target.checked;
+            setSimulateFailure(e.target.checked);
+          }}
+        />
+        <div className="form-grid">
+          <Combobox
+            label="Synthetic supplier"
+            value={parent}
+            onChange={(value) => {
+              setParent(value);
+              setChild(null);
+            }}
+            loadOptions={loadParents}
+          />
+          <Combobox
+            key={parent?.id ?? "none"}
+            label="Synthetic branch"
+            help={
+              !parent
+                ? "Select a supplier first."
+                : "Branches belong to the selected synthetic supplier."
+            }
+            value={child}
+            onChange={setChild}
+            loadOptions={loadChildren}
+            disabled={!parent}
+          />
+          <Combobox
+            label="Read-only selector"
+            value={parentOptions[0]}
+            onChange={() => {}}
+            loadOptions={loadParents}
+            readOnly
+          />
+        </div>
+        <p role="status">Selected branch: {child?.id ?? "none"}</p>
+      </section>
+      <section className="surface stack">
+        <h2>Feedback</h2>
+        <div className="actions">
+          {(["info", "success", "warning", "error"] as const).map((tone) => (
+            <StatusBadge key={tone} tone={tone}>
+              {tone} example
+            </StatusBadge>
+          ))}
+        </div>
+        <Alert tone="warning" title="Permission denied example">
+          You do not have access to this synthetic action.
+        </Alert>
+        <Alert tone="error" title="Quota exceeded example">
+          Synthetic capacity reached. Remove an unused draft or try again later.
+        </Alert>
+        <ErrorState
+          message="Synthetic service unavailable."
+          onRetry={() => setToast(true)}
+        />
+        <LoadingState />
+        <EmptyState />
+        <EmptyState filtered />
+      </section>
+      <section className="surface stack">
+        <h2>Dialogs, drawers and menus</h2>
+        <div className="actions">
+          <Dialog
+            trigger={<Button variant="outline">Open dialog</Button>}
+            title="Synthetic dialog"
+            description="Focus stays inside; Escape closes and returns focus to the trigger."
+          >
+            <TextField label="Dialog note" />
+            <p>Long content remains readable inside the scrolling overlay.</p>
+          </Dialog>
+          <Drawer
+            trigger={<Button variant="outline">Open drawer</Button>}
+            title="Synthetic drawer"
+            description="Keyboard-accessible side panel with scroll containment."
+          >
+            <TextField label="Drawer note" />
+          </Drawer>
+          <Button variant="destructive" onClick={() => setConfirm(true)}>
+            Review synthetic removal
+          </Button>
+        </div>
+        <ConfirmDialog
+          open={confirm}
+          onOpenChange={setConfirm}
+          title="Remove synthetic draft DEMO-001?"
+          description="This demonstration only closes the dialog. No record or payment is changed."
+          actionLabel="Remove synthetic draft"
+          onConfirm={() => {
+            setConfirm(false);
+            setToast(true);
+          }}
+        />
+      </section>
+      <section className="surface stack" id="table-details">
+        <h2>Controlled table</h2>
+        <p className="supporting">
+          Selection applies to this page only and clears when filtering, sorting
+          or changing page. References are explicit links; row actions do not
+          navigate.
+        </p>
+        <FilterBar
+          onClear={() => {
+            setQuery("");
+            setPage(0);
+            setSelection({});
+          }}
+        >
+          <SearchField
+            label="Filter synthetic records"
+            value={query}
+            onChange={(value) => {
+              setQuery(value);
+              setPage(0);
+              setSelection({});
+            }}
+          />
+          <FormField label="Table state">
+            {(field) => (
+              <Select
+                {...field}
+                value={tableState}
+                onChange={(e) => setTableState(e.target.value)}
+              >
+                <option value="ready">Ready</option>
+                <option value="loading">Loading</option>
+                <option value="error">Network error with stale data</option>
+                <option value="empty">Empty</option>
+              </Select>
+            )}
+          </FormField>
+          <ColumnVisibilityMenu
+            columns={[
+              {
+                id: "name",
+                label: "Destination",
+                visible: visibility.name !== false,
+              },
+              {
+                id: "quantity",
+                label: "Quantity",
+                visible: visibility.quantity !== false,
+              },
+            ]}
+            onToggle={(id) =>
+              setVisibility((v) => ({ ...v, [id]: v[id] === false }))
+            }
+          />
+        </FilterBar>
+        <BulkActionBar
+          count={Object.values(selection).filter(Boolean).length}
+          onClear={() => setSelection({})}
+        />
+        <DataTable
+          columns={columns}
+          rows={
+            tableState === "empty" ? [] : filtered.slice(page * 3, page * 3 + 3)
+          }
+          getRowId={(row) => row.id}
+          caption="Synthetic destinations · Quantity in tonnes"
+          sorting={sorting}
+          onSortingChange={(update) => {
+            setSorting(update);
+            setPage(0);
+            setSelection({});
+          }}
+          selection={selection}
+          onSelectionChange={setSelection}
+          columnVisibility={visibility}
+          onColumnVisibilityChange={setVisibility}
+          loading={tableState === "loading"}
+          error={
+            tableState === "error" ? "Synthetic request failed." : undefined
+          }
+          onRetry={() => setTableState("ready")}
+          filtered={!!query}
+        />
+        <Pagination
+          pageIndex={page}
+          pageSize={3}
+          total={tableState === "empty" ? 0 : filtered.length}
+          disabled={tableState === "loading"}
+          onPageChange={(value) => {
+            setPage(value);
+            setSelection({});
+          }}
+        />
+      </section>
+      {toast && (
+        <Toast onDismiss={() => setToast(false)}>
+          Synthetic interaction completed locally.
+        </Toast>
+      )}
+    </div>
+  );
 }

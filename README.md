@@ -56,7 +56,7 @@ Do not commit `.refact`, credentials, environment files, private customer spread
 
 ## Verification notes
 
-The 5 October clean source copy passed installation, linting, type checking and the production build. Latest 6 October checks fail on existing UI hook lint errors and table-library API/type incompatibilities; do not infer a passing current build from the historical result. All 21 placeholder routes passed HTTP smoke checks. Scripts use Webpack because Turbopack's CSS worker could not bind a port in the setup environment. Browser visual/keyboard review remains pending due to an unavailable browser connector. See [Tasks](docs/TASKS.md) for full evidence.
+The 5 October clean source copy passed installation, linting, type checking and the production build. The 6 October UI hook lint and table-library API/type failures were fixed on 9 October: current lint/type checks and an isolated production build pass. Chrome verification covers the component showcase table; see Tasks for scope and evidence. All 21 placeholder routes passed HTTP smoke checks. Scripts use Webpack because Turbopack's CSS worker could not bind a port in the setup environment. Browser visual/keyboard review remains pending due to an unavailable browser connector. See [Tasks](docs/TASKS.md) for full evidence.
 
 Production dependency audit reported no vulnerabilities. The full audit reported five high-severity findings in the development lint dependency chain; automatic remediation would downgrade the Next.js lint configuration to 14.x and was not applied. ESLint 9 also emits a deprecation notice. These tooling limitations are recorded for follow-up.
 

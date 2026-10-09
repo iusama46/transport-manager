@@ -19,7 +19,7 @@ Start with [PRD](docs/PRD.md), [Decisions](docs/DECISIONS.md) and [Tasks](docs/T
 
 ## Client overview
 
-The [client overview Markdown](docs/CLIENT_OVERVIEW.md) is the main editable source. The [PDF overview](docs/client/CLIENT_OVERVIEW.pdf) and [PowerPoint presentation](docs/client/Transport_Manager_Client_Presentation.pptx) are shareable snapshots; refresh them when the source changes. The Markdown includes the 6 October custom-RBAC/audit requirements; the PDF and PowerPoint remain historical 5 October snapshots pending regeneration. These documents describe planned scope, not implemented application functionality.
+The [client overview Markdown](docs/CLIENT_OVERVIEW.md) is the main editable source. The [PDF overview](docs/client/CLIENT_OVERVIEW.pdf) and [PowerPoint presentation](docs/client/Transport_Manager_Client_Presentation.pptx) are shareable snapshots; refresh them when the source changes. The Markdown includes the finalized 9 October business capabilities and earlier custom-RBAC/audit requirements; the PDF and PowerPoint remain historical 5 October snapshots pending regeneration. These documents describe planned scope, not implemented application functionality.
 
 ## Local setup
 
@@ -63,3 +63,7 @@ Production dependency audit reported no vulnerabilities. The full audit reported
 ## Finalized access and audit requirements
 
 Dynamic custom roles with a protected Owner/Super Admin and company-scoped granular permissions are specified in the [master permission catalog](docs/PERMISSIONS.md). The [Activity Log contract](docs/AUDIT.md) defines immutable, redacted global and record history. These requirements are finalized; implementation remains pending. Existing navigation is the original 16-section shell, while the updated design adds Activity Log and Roles & Permissions workflows.
+
+## Business scope reconciliation — 9 October 2026
+
+[PRD](docs/PRD.md) and [Decisions](docs/DECISIONS.md) now specify finalized V1 capabilities, including flexible Orders/Trips, historical rates and currencies, three ledgers, controlled financial corrections, custom expenses/documents, accounts, auto-approval, full export and multiple daily automatic backups. Bulk import and configurable/manual approvals are V2. Business implementation remains not started; the existing shell/environment foundations are unchanged. Material policy gates, unselected database/backend/hosting and current readiness are recorded in the [documentation review](docs/DOCUMENTATION_REVIEW.md). Client PDF/PPT snapshots remain historical.

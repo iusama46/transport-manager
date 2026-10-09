@@ -1,6 +1,6 @@
 # Implementation Tasks
 
-Updated: 7 October 2026
+Updated: 9 October 2026
 
 Use this checklist in build order. [x] means the stated deliverable is completed; unchecked means not completed. Implementation and verification are separate tasks. The setup shell is implemented and verified as recorded below; operational functionality remains unimplemented.
 
@@ -76,7 +76,8 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 
 ## 8. Orders and deliveries
 
-- [ ] Confirm multiple-vehicle/consignee rules (O05).
+- [x] Finalize Order → 1..N Trips and separate movement Orders (D26).
+- [ ] Review remaining multi-consignee rules (O05), quantity policy (O14) and lifecycle transitions (O15).
 - [ ] Build order entry, filters, pagination and detail view.
 - [ ] Add assignments, unlimited ordered stops, status history and delivery proof.
 - [ ] Verify six-stop orders, reassignment, conflicts and delivery/payment independence.
@@ -92,7 +93,7 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 
 - [ ] Create multiple supplier profiles and branch records with contacts/locations.
 - [ ] Filter branch selection by supplier and validate ownership server-side.
-- [ ] Add vehicle fuel purchases, litres, rates, receipts and totals.
+- [ ] Add vehicle fuel purchases, liters, rates, receipts and totals.
 - [ ] Support branch payments and supplier-wide payments across branches.
 - [ ] Allocate payments to purchases; track unallocated supplier credit explicitly.
 - [ ] Add branch statements, consolidated supplier statements and vehicle rankings.
@@ -107,7 +108,7 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 ## 12. Billing and invoices
 
 - [ ] Confirm billing account, fare basis, tax/discount and rounding rules (O02/O06).
-- [ ] Add draft invoices and eligible order selection.
+- [ ] Add draft invoices and eligible Trip selection with default full/authorized partial billing.
 - [ ] Implement atomic, idempotent finalization and correction workflow.
 - [ ] Implement A4 printing and browser PDF output.
 - [ ] Verify concurrent finalization and 1/14/15/35-line printing, including Urdu.
@@ -124,18 +125,22 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 - [ ] Add customer/partner statements, branch/supplier fuel statements and cost reports.
 - [ ] Verify every total reconciles and no unvalidated net-profit claim appears.
 
-## 15. Import and export
+## 15. V1 export; V2 import
 
-- [ ] Implement mapping, validation, preview and reviewed commit.
-- [ ] Handle mixed dates, registrations, missing amounts and Paid in legacy Party.
-- [ ] Add provenance and duplicate/retry protection.
-- [ ] Verify exports and spreadsheet-formula injection protection.
+- [ ] Implement full authorized PDF/XLSX/CSV exports of relevant records/reports.
+- [ ] Verify resource/field/RBAC/company scope, export audit and spreadsheet-formula injection protection.
+- [ ] Verify bulk-import UI/API is absent from V1.
+
+V2 backlog (not V1):
+- [ ] Excel/CSV upload/mapping, preview, validation, duplicate detection, errors and confirmed commit.
+- [ ] Resolve mixed dates/registrations, missing money and Paid in legacy Party with provenance/retry protection.
+- [ ] Add configurable/manual approval rules beyond V1 auto-approval.
 
 ## 16. Release verification and deployment
 
 - [ ] Execute TEST_PLAN.md and record actual results.
 - [ ] Complete access, accessibility, print and representative performance checks.
-- [ ] Define backup owner/schedule and demonstrate restoration.
+- [ ] Define provider-dependent multiple-daily automatic backup schedule/mechanism/retention and owner; demonstrate documented restricted secure restoration.
 - [ ] Confirm free-plan compatibility, quotas and absence of paid add-ons.
 - [ ] Deploy dashboard and perform smoke checks.
 
@@ -209,3 +214,30 @@ The repeated RBAC/audit request is already incorporated in commit `3d3150a`. Rev
 Verification: all 56 requested permission keys match the master catalog; no audit edit/delete keys are present. Local Markdown links resolve. Searches and contextual review found no active fixed-business-role requirement or normal application audit mutation allowance. Database/provider choices remain open. Existing one-operating-business/multiple-counterparty scope and explicit denial of implicit Owner cross-tenant access remain consistent. `git diff --check` passed; this follow-up changes Markdown only and does not execute or certify application tests.
 
 Ready for the next requirements review. Outstanding decisions remain provider/hosting selection, financial/order rules, locale/print details, staff grants, Owner provisioning/transfer and backup/audit retention operations. Client PDF/PPT snapshots still need regeneration before being shared as current scope.
+
+## 19. Finalized business-capability reconciliation — 9 October 2026
+
+| Deliverable | Status |
+|---|---|
+| Supplied finalized capability decisions D26–D50 | Requirements: Finalized |
+| Conceptual model, screens, security, permission/audit catalogs and planned tests | Design specification: Updated |
+| New business capabilities | Implementation: Not Started |
+| Full business-policy completion | Pending DECISIONS.md gates; no Development Ready v1.0 claim |
+
+- [x] Reconcile V1 flexible Orders/Trips/rates/quantities, three ledgers, billing/corrections, accounts/tax/multi-currency, ownership/documents/expiry and lifecycle rules.
+- [x] Move bulk import to V2; record V1 auto-approval, full export and multiple-daily automatic backup requirements.
+- [ ] Perform final conceptual data-model/policy review of O02–O06 and O13–O18 before affected implementation.
+- [ ] Select database/backend/auth/storage, then deployment, verifying $0 feasibility and financial/audit/backup capabilities.
+- [ ] Implement effective-dated transport rates/date configuration/Trip snapshots and permissioned overrides.
+- [ ] Implement optional planned, loaded/delivered/custom billable quantity and shortage handling.
+- [ ] Implement partial Trip invoicing, credit/debit notes and locked-record correction rules.
+- [ ] Implement receipt/partner/supplier ledgers, advance allocation, unallocation/reallocation/reversal/bounce/refund/partial refund.
+- [ ] Implement company accounts/methods/transfers, tax/FX snapshots and historical multi-currency reporting.
+- [ ] Implement ownership/affiliation/assignment histories and actual Trip snapshots.
+- [ ] Implement fuel price history, calculated/final overrides, custom expense categories and attributable Trip margin.
+- [ ] Implement reusable documents/types/multi-file history, expiry and configurable dashboard reminders.
+- [ ] Implement cancellation/reopening, dependency-aware delete/archive/reactivation and granular audit coverage.
+- [ ] Execute T37–T60 plus existing applicable V1 tests; preserve unexecuted/policy-blocked status until evidence exists.
+- [ ] Refresh historical client PDF/PPT before sharing them as current scope (outside this Markdown-only task).
+
+Earlier dated reviews/test evidence above are historical. Their references to unresolved capability cardinality, V1 import or unspecified backup frequency are superseded by D26–D50. Setup/UI foundations already exist; no business feature completion is implied. See DOCUMENTATION_REVIEW.md for the current readiness report.

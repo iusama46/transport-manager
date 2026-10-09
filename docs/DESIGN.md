@@ -1,5 +1,5 @@
 # Product and Interface Design
-Updated: 6 October 2026
+Updated: 9 October 2026
 Status: Proposed UX specification grounded in [PRD.md](PRD.md).
 
 ## Design goals
@@ -8,12 +8,12 @@ Make daily order entry, cost recording and balance lookup fast. Prefer readable 
 ## Navigation
 Group the PRD’s 17 planned sections without removing any (the existing shell still has 16):
 - Overview.
-- Operations: Orders & Deliveries, Outsourced Orders.
+- Operations: Orders & Trips, Trip Details, Outsourced Orders, Rates / Rate History.
 - Directory: Companies & Transport Partners, Factories, Customers & Consignees, Vehicles, Drivers.
 - Costs: Fuel Management, Maintenance & Expenses.
-- Finance: Billing & Invoices, Payments & Settlements.
+- Finance: Invoices, Credit/Debit Notes, Customer/Partner/Supplier Ledgers, Payments & Settlements, Financial Accounts and Account Transfers.
 - Reports.
-- Administration: Data Import & Export, Users & Permissions (Users; Roles & Permissions), Activity Log, Business Settings.
+- Administration: Data Export (bulk import V2), Documents & Expiry, Users & Permissions (Users; Roles & Permissions), Activity Log, Business Settings.
 
 Outsourced Orders filters the same order records and uses the same details page.
 
@@ -26,9 +26,9 @@ Search, date range, relevant entity/status filters, sortable columns, pagination
 Support loading, empty, filtered-empty, unauthorized, validation-error, network-error and quota-exceeded states. An empty report says no matching records, not a misleading zero balance.
 
 ## Orders
-Default columns: order number/date, factory, customer, consignee, cargo, vehicle or partner, delivery status and billing state. Financial columns appear only to authorized users.
-Create form sections: customer relationships; cargo/quantity/unit; route and ordered stops; fulfilment; dates and notes. Selecting a new customer clears or asks to remap an incompatible consignee. Provide lookup/create shortcuts only where permission allows.
-Fulfilment choice: business-managed assignment or outsourced partner. Vehicle owner is displayed independently from partner.
+Default columns: order number/date, factory, customer, consignee, cargo, Trip count/summary, operational status and billing state. Financial columns appear only to authorized users.
+Create form sections: customer relationships; cargo/optional planned quantity/unit; route and ordered stops; fulfilment; dates and notes. Selecting a new customer clears or asks to remap an incompatible consignee. Provide lookup/create shortcuts only where permission allows.
+Each Trip chooses business-managed execution or outsourced partner. Vehicle owner is displayed independently from partner; an Order shows its Trip assignments.
 Detail tabs: Overview, Stops & Delivery, Assignments, Expenses, Billing/Payments and Activity. Show unavailable tabs according to permission without leaking totals.
 Reordering stops must work with keyboard controls as well as drag-and-drop.
 
@@ -36,11 +36,11 @@ Reordering stops must work with keyboard controls as well as drag-and-drop.
 Show partner, fare, commission, agreed payable, advances/other payments and outstanding amount. Present customer collection separately. Calculation controls remain subject to settlement decisions. Show a breakdown rather than a single unexplained net figure. A payment dialog names its recipient and obligation before posting.
 
 ## Fuel and maintenance
-Fuel form: vehicle, date, source, fuel type, litres, rate, calculated amount, optional odometer/receipt. Show adjustments and their reasons separately.
+Fuel form: supplier, its branch/pump, vehicle, optional Trip, date, fuel type, liters, historical rate, calculated and final amount, payment information, optional odometer/receipt. Show permitted overrides and their actor/time/reason separately.
 Maintenance form: vehicle, workshop, repair details, parts/labour/other costs, service due date/KM. Offer a total-only legacy mode when breakdown is unknown. Do not imply next-service mileage is overdue if current mileage is unknown.
 
 ## Billing and payments
-Invoice flow: select billing account → select eligible orders → review charges → save draft → finalize → print. Show excluded/already-billed orders with reasons. Finalization shows the billing account and total and explains that later corrections are recorded.
+Invoice flow: select billing account → select eligible Trips → review charges → save draft → finalize → print. Show excluded/fully-invoiced Trips with reasons. Finalization shows the billing account and total and explains that later corrections are recorded.
 Payment flow: choose receipt/outgoing payment → select account → enter amount/date/method → allocate → review → post. Label unallocated credit explicitly. Disable repeat submission during requests while backend idempotency provides actual protection.
 Issued invoices distinguish invoiced amount, received amount and outstanding balance.
 
@@ -48,7 +48,7 @@ Issued invoices distinguish invoiced amount, received amount and outstanding bal
 A4, minimal colour, company header, invoice/account information, order lines, total, payment summary and page numbering where supported. Repeat table headers and prevent clipped lines. Validate 1, 14, 15 and 35 rows, long descriptions and Unicode/Urdu text. Exact branding must come from the approved template.
 Use browser print/Save as PDF initially. Test pagination in the target browser; do not assume CSS alone guarantees correct repeated headers or page numbers.
 
-## Import review
+## V2/Future import review
 Upload → map columns → preview → resolve issues → commit → results. Show source row, raw value, suggested mapping and validation reason. Separate errors from warnings. Never silently map Paid to a consignee. Report committed/skipped/failed counts and provide a retry path that does not duplicate rows.
 
 ## Terminology and accessibility
@@ -140,3 +140,28 @@ Save validates catalog keys, delegation scope and concurrency on the server, the
 Add an Activity Log navigation entry gated by `activity_logs.view`. Filters: date/date range, user, module, action, company where applicable, record/reference ID and text search; provide sortable columns, stable pagination and clear filters. Company selection lists only authorized contexts; current single-business scope does not show an all-tenants option. Columns include time, actor snapshot, action, module, reference and safe description. Expand an event for permitted previous/new values and changed fields. Export requires `activity_logs.export` as well as view and uses the same scoped filters on the server.
 
 Use a reusable read-only ActivityHistory/AuditTimeline in record Activity tabs for Orders, Vehicles, Drivers, Clients, Fuel transactions, Expenses, Invoices, Payments, Settlements, Users and Roles. An order can expose Details | Documents | Payments | Activity alongside its operational tabs. Record history is chronological, paginated and restricted to both audit and parent-record access. Show unavailable/redacted fields explicitly without fetching hidden values. Include loading, empty, denied and failure states. No event edit/delete controls exist, even for Owner. Use configured timezone and label missing actor/device information without inventing it. See AUDIT.md for the full event contract.
+
+## Finalized V1 screen and interaction specification — 9 October 2026
+
+| Screen / component group | Required interaction |
+|---|---|
+| Orders / Order Details | Optional planned quantity; Trip list with loaded/delivered/remaining where applicable; add one/multiple Trips or create separate movement Orders; reasoned cancel/reopen and dependency feedback |
+| Trips / Trip Details | Actual vehicle/driver/owner/affiliation, execution partner, quantities/difference, billing basis and historical billable quantity; stops/proof, Documents, Expenses, Billing and Activity tabs |
+| Rates / Rate History | Agreement dimensions, effective versions, configurable rate date; default/final snapshot and permitted exceptional override, optional reason |
+| Clients / Factories / Consignees | Preserve direct Customer and linked receiver hierarchy, scoped selectors and history |
+| Vehicles / Drivers / Partners | Owner type/history, driver affiliation/assignment history, execution partner separate from owner; archive/reactivate with historical visibility |
+| Fuel Suppliers / Branches-Pumps / Fuel Transactions / Fuel Rate History | Supplier-dependent branch picker, transaction-date price, liters × rate preview, actual total override with actor/reason/time, cash/credit payment information |
+| Expenses / Expense Categories | Custom category management, explicit Trip/Order/Vehicle/Driver/company context, receipts/payment information; attribution and auto-approved lifecycle visible |
+| Invoices / Credit-Debit Notes | Eligible Trip picker with billable/invoiced/remaining amounts; default full remaining selection, partial amount only with permission; issued lock, reasoned cancel and linked notes |
+| Customer / Partner / Supplier Ledger | Invoice/payable totals, effective allocations, outstanding, separate unallocated/advance credit; original currency and base totals distinctly labelled |
+| Payments / Settlements | One or many eligible targets, partial/bulk allocations, later advance allocation; reasoned unallocate/reallocate/reverse/bounce/refund/partial refund, original history visible |
+| Financial Accounts / Account Transfers | Cash/bank/custom account balances, configurable methods, source/destination and reviewed currency/amount; transfer is not income/expense |
+| Documents / Document Expiry | Multiple private files, predefined/custom types, reference/date/notes/uploader/time; optional expiry, configurable reminder periods, expired/expiring-soon dashboard alerts |
+| Activity Log / Roles / Permission Matrix / Users | Existing immutable safe audit detail, custom grants and protected Owner design; additions follow the master catalog |
+| Reports / Export / Settings | Scoped PDF/XLSX/CSV, explicit date basis and transaction/base currency, historical FX/tax; numbering and external references distinct |
+
+Draft/In Progress Trip forms permit authorized edits. Delivered sensitive controls require additional permission; invoiced/settled fields display locked snapshots and a controlled correction action. Deletion is offered only for unused dependency-free records, otherwise archive/deactivate. Confirmation explains historical retention. Cancellation/reopening and financial correction dialogs show reason, affected dependencies and ledger effect. Permission-aware UI never fetches unauthorized fields to hide them later.
+
+V1 auto-approval shows permitted operations completed at the normal workflow stage without a pending-review queue. Draft save and invoice issue/payment post remain distinct user intentions. Do not include V1 bulk-import UI/API; V2 import and manual approvals remain visibly deferred. Future notification channels do not imply V1 external messages.
+
+Reuse Entity Activity Timeline, Documents/Attachments, Ledger, Payment Allocation, Status Badge, Money/Currency, Quantity, Rate History, Audit Detail, Archive/Deactivate Confirmation and Correction/Reason Dialog from COMPONENTS.md. All screens above are specifications, not claims about the current placeholder shell.

@@ -1,6 +1,6 @@
 # Activity Log / Audit Trail
 
-Updated: 6 October 2026
+Updated: 9 October 2026
 Status: Finalized core requirement and design; implementation and validation pending.
 
 ## Event contract
@@ -25,7 +25,7 @@ Failed authentication may have no verified user or company. Store explicit unkno
 
 ## Required coverage
 
-Record login, logout and failed authentication; user creation/activation/deactivation and role assignments; role creation/update/deletion/deactivation and permission changes; order creation/edit/delete/cancel/approval; vehicle/driver and client/company changes; outsourcing; fuel and expense transactions; invoice creation/edit/approval/cancellation; payments, settlements and reversals; import and export operations; important settings changes; and other sensitive financial, operational or security actions. Log denied sensitive operations safely without recording an unauthorized target's private contents. Export events describe scope, actor and outcome, not full exported payloads.
+Record login, logout and failed authentication; user creation/activation/deactivation and role assignments; role creation/update/deletion/deactivation and permission changes; order creation/edit/delete/cancel/approval; vehicle/driver and client/company changes; outsourcing; fuel and expense transactions; invoice creation/edit/approval/cancellation; payments, settlements and reversals; V1 export and V2 import operations; important settings changes; and other sensitive financial, operational or security actions. Log denied sensitive operations safely without recording an unauthorized target's private contents. Export events describe scope, actor and outcome, not full exported payloads.
 
 ## Trusted capture and durability
 
@@ -44,3 +44,9 @@ Retention duration, archival schedule, responsible operator and any exceptional 
 ## Presentation
 
 Use the global Activity Log and reusable record Activity tab specified in DESIGN.md. Display actor snapshot, action, resource reference, timestamp and permitted before/after fields chronologically. Illustrative only: Usama Iftikhar updated ORD-1024, vehicle LEA-1234 → LEA-5678 and rate AED 1,500 → AED 1,650 at 06 Oct 2026, 8:52 PM. This example does not finalize the business currency or timezone.
+
+## Finalized V1 sensitive-operation coverage — 9 October 2026
+
+Extend required events to Trip create/edit/delivered correction and snapshot changes; transport rate agreement/version changes and exceptional default/final overrides; fuel price changes and rate/amount override (calculated/final, actor, timestamp, safe reason); partial billing; payment allocation/unallocation/reallocation, reversal, bounce/failed correction, refund/partial refund; partner/fuel settlement and later advance allocation; account transfers/reversals; invoice issue/void/cancel and linked credit/debit note lifecycle; Order cancellation/reopening with reason; delete/archive/deactivate/reactivate; custom expense/document types; document upload/metadata/download/archive/delete/expiry/reminder configuration; tax/FX/numbering changes; financial corrections; scoped exports; role/grant changes.
+
+Every sensitive action retains original links and permitted before/after values with outcome. For denied attempts, do not expose foreign record contents. V1 auto-approved operations still audit performer/finalization; no second reviewer is invented. Import events are V2 only. Normal audit edit/delete remain unavailable, including for Owner; never store credentials, secrets, tokens or API keys in any audit payload.

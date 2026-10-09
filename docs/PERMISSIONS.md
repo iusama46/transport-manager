@@ -1,6 +1,6 @@
 # Master Permission Catalog
 
-Updated: 6 October 2026
+Updated: 9 October 2026
 Status: Finalized permission architecture; documentation only, not runtime enforcement.
 
 ## Authority and naming
@@ -9,29 +9,56 @@ This is the centralized master catalog referenced by PRD, architecture, UI and s
 
 Customer (Client) means the direct customer; Consignee means that customer's receiver. `clients.*` covers direct customer records, not an automatic grant over factories, consignees or every company. Add separate catalog entries for those resources when their workflows are specified.
 
-## Initial catalog
+## Master catalog — V1
 
-Each action below expands to a separate key: for example orders + view means `orders.view`.
+Each comma-separated action expands to a separate module.action key. These keys are conceptual authorization contracts; runtime implementation is pending.
 
 | Module | Actions |
 |---|---|
-| orders | view, create, edit, delete, approve, export |
-| vehicles | view, create, edit, delete, export |
-| drivers | view, create, edit, delete |
-| clients | view, create, edit, delete |
-| fuel | view, create, edit, delete, approve, export |
-| expenses | view, create, edit, delete, approve, export |
-| invoices | view, create, edit, cancel, approve, export |
-| payments | view, create, edit, approve, export |
+| orders | view, create, edit, delete, cancel, reopen, approve, archive, deactivate, reactivate, export |
+| trips | view, create, edit, delete, edit_delivered, correct, override_rate, archive, export |
+| rates | view, create, edit, delete, archive, export |
+| companies, factories, consignees, partners | view, create, edit, delete, archive, deactivate, reactivate, export |
+| vehicles, drivers, clients | view, create, edit, delete, archive, deactivate, reactivate, export |
+| vehicles | manage_ownership |
+| drivers | manage_assignments, manage_affiliation |
+| fuel_suppliers, fuel_branches | view, create, edit, delete, archive, deactivate, reactivate, export |
+| fuel_rates | view, create, edit, delete, archive, export |
+| fuel | view, create, edit, delete, approve, override_rate, override_amount, correct, export |
+| expenses | view, create, edit, delete, approve, correct, archive, export |
+| expense_categories | view, create, edit, delete, archive, reactivate |
+| invoices | view, create, edit, delete, issue, cancel, approve, partial_bill, export |
+| credit_notes, debit_notes | view, create, edit, delete, approve, issue, cancel, export |
+| payments | view, create, edit, approve, allocate, unallocate, reallocate, reverse, refund, correct_failed, export |
+| customer_ledger, partner_ledger, supplier_ledger | view, export |
+| settlements | view, create, correct, export |
+| financial_accounts | view, create, edit, delete, archive, reactivate, export |
+| account_transfers | view, create, reverse, export |
+| taxes, currencies | view, create, edit, archive |
+| exchange_rates | view, create, edit, override |
+| documents | view, upload, edit, delete, archive, download, export |
+| document_types | view, create, edit, delete, archive, reactivate |
+| document_reminders | view, configure |
+| identity_documents | view, upload, download |
 | reports | view, export |
 | users | view, create, edit, deactivate |
 | roles | view, create, edit, delete |
 | settings | view, edit |
 | activity_logs | view, export |
 
-`view` permits scoped reads; `create` creates eligible records; `edit` changes eligible mutable fields; `approve` permits the defined approval/finalization action; `export` permits an export only with the corresponding view permission. `delete` applies only where business history rules allow it: archive referenced master records, and never erase posted financial history. `cancel` preserves the original and requires the applicable correction workflow. Permissions never override financial invariants, company scope or record lifecycle rules.
+Grouped module cells expand independently (e.g. credit_notes.create and debit_notes.create). Grants do not propagate between namespaces. factories/consignees/partners are distinct from clients. Private identity documents require parent access plus identity_documents grants and the relevant documents action.
 
-User activation and role assignment require `users.edit`; deactivation requires `users.deactivate`. Creating a user with a role requires `users.create` plus authority to assign that role. Role deactivation requires `roles.edit`; deletion requires `roles.delete`. Assignment and role editing must obey the delegation restrictions below. Dedicated permissions for reversals, settlements, private identity files, imports, factories/consignees, partners and other future actions must be explicitly cataloged before implementing them; never infer them from a job title or unrelated edit permission. Detailed business approval/correction rules remain open.
+view permits scoped reads; create performs eligible operations; edit changes only mutable fields. delete applies only to unused dependency-free records/drafts and never ledger-impacting payments or referenced history. archive/deactivate/reactivate preserve history and record audit events. Export requires resource view plus export; ledger visibility does not automatically grant raw payment/identity access.
+
+orders.cancel/reopen require reasons and dependency/lifecycle checks. trips.edit_delivered covers permitted sensitive delivered edits; trips.correct covers linked correction of locked relevant fields, never silent unlock. trips.override_rate, fuel.override_rate and fuel.override_amount retain original/default/final snapshots and audited actor/time. invoices.partial_bill is additional to invoice create/issue authority. Payment allocation operations require payment and target ledger/resource access, not just payments.edit; payments.edit affects only eligible mutable data, never posted amounts. Reversal/bounce/refund preserve originals and reasons. account_transfers.create/reverse require access to both own accounts and the reviewed currency policy.
+
+Note create/approve/issue keys control authoring/finalization/correction according to lifecycle. V1 AUTO APPROVAL means an authorized performer does not wait for another reviewer: applicable finalization authority is checked when issuing/posting; no routine manual approval queue. Future separate reviewers/rules are V2. Issued invoice/note corrections cannot use ordinary edit/delete grants. Permissions never override company scope, financial invariants, historical snapshots or dependency rules.
+
+User activation/role assignment require users.edit (new user also users.create) plus delegation authority; deactivation uses users.deactivate. Role deactivation uses roles.edit, deletion roles.delete, subject to protected Owner/reassignment/history safeguards.
+
+## V2/Future catalog additions
+
+imports.view, imports.upload, imports.validate, imports.commit and imports.export_errors are planned only for controlled V2 bulk import, with target-module permissions and audit. Configurable manual-approval rule administration and separate reviewer permissions will be specified for V2; existing approve keys do not make these active V1 workflows. No activity_logs.edit/delete permissions exist in any scope.
 
 ## Roles and delegation
 

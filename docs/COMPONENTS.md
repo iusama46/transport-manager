@@ -1,5 +1,5 @@
 # Reusable Components
-Updated: 6 October 2026
+Updated: 9 October 2026
 Status: Implementation specification; components are not yet claimed as implemented.
 
 ## Ownership and file structure
@@ -83,13 +83,13 @@ MoneyText and QuantityText show formatted values with currency/units and explici
 | ConsigneePicker | Filter by customer; clear/remap invalid selection when customer changes |
 | VehiclePicker | Show availability and owner separately from subcontractor |
 | DriverPicker | Show availability/licence indicators according to agreed rules |
-| TransportPartnerPicker | Select external order fulfiller |
+| TransportPartnerPicker | Select external Trip fulfiller |
 | FuelSupplierPicker | Select supplier |
 | FuelBranchPicker | Require supplier; show only its branches; reject stale search results |
 | OrderStopsEditor | Add/remove/reorder beyond four stops, with keyboard move controls |
-| FuelPurchaseForm | Supplier, branch, vehicle, litres/rate and cost preview; one transaction across entry screens |
+| FuelPurchaseForm | Supplier, branch, vehicle, liters/rate and cost preview; one transaction across entry screens |
 | PaymentAllocationForm | Branch or central payment, purchase allocations, remaining amount and explicit unallocated credit |
-| InvoiceOrderPicker | Billing account and eligible orders, with exclusion reasons |
+| InvoiceTripPicker | Billing account and eligible Trips with remaining billable amounts, with exclusion reasons |
 | InvoicePreview | Draft or issued snapshot with dedicated print layout |
 | PermissionGate | Presentational access wrapper with optional fallback; server checks still required |
 
@@ -120,3 +120,20 @@ Add this sequence to TASKS.md before individual screens. Record implementation a
 - ActivityHistory/AuditTimeline: read-only, chronological, paginated safe event details for global/record views, including actor snapshot and permitted before/after changes. No edit/delete affordances; no hidden secrets in component props.
 
 These composites and their integration remain unimplemented. Contracts follow PERMISSIONS.md, AUDIT.md and DESIGN.md; test stale permissions, denied views/exports and sensitive-field masking as well as accessibility.
+
+## Finalized reusable V1 contracts — 9 October 2026
+
+| Component | Contract |
+|---|---|
+| OrderTripList / TripEditor | One/multiple Trips, add subject to lifecycle, optional target and loaded/delivered/shortage/billable quantity with units |
+| RateHistory / RateSnapshot | Effective agreement/price versions and date basis; default/final historical rates and permission-aware overrides |
+| InvoiceTripPicker / PartialBillingEditor | Eligible Trips, billable/invoiced/remaining; full remaining default; explicit permitted partial amount, no overbilling |
+| Ledger / PaymentAllocation | Separate receivable/partner/supplier targets, partial/multiple allocations, advances/credit; correction links and historical currency/FX |
+| Documents/Attachments / DocumentExpiry | Multiple files, predefined/custom type and metadata, private authorized access, optional expiry/configurable reminder periods |
+| OwnershipHistory / DriverAssignmentHistory | Effective relationships and actual historical Trip identities; no permanent driver-vehicle assumption |
+| AccountPicker / InternalTransferReview | Company-scoped cash/bank/custom accounts and methods, both balances, currency effects; no revenue/expense transfer |
+| CorrectionReasonDialog / ArchiveDeactivateConfirmation | Specific action, reason when required, dependencies, ledger effects and traceable original; lifecycle governs availability |
+| Money/Currency / Quantity / StatusBadge | Transaction/base currencies and historical FX distinguished; quantity units/missing target explicit; operational/billing/payment/approval states separate |
+| EntityActivityTimeline / AuditDetail | Existing read-only redacted history for every appropriate entity; no historical event mutation |
+
+ExpenseCategoryPicker and DocumentTypePicker support authorized custom management. TaxPreview and NumberingPreview display configured rules while internal IDs and external references remain separate. V1 auto-approval has no routine reviewer queue; bulk-import and manual-approval composites belong to V2. Backend checks are authoritative for all component actions.

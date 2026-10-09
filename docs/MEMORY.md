@@ -1,5 +1,5 @@
 # Project Memory
-Updated: 7 October 2026
+Updated: 9 October 2026
 Purpose: Project continuity only; no personal biography or credentials.
 
 ## Current state
@@ -23,7 +23,7 @@ Setup phase completed locally. npm workspaces contain the Next.js dashboard shel
 - Bills must support more than 14 rows and multipage printing.
 - $0 recurring service budget; no paid plan or add-on approval.
 - Database choice remains open. MongoDB was raised later; no migration is authorized.
-- Do not infer payer, tax, commission type, vehicle owner or missing payment amount from ambiguous source cells.
+- Do not infer payer, an actual tax configuration, commission type, vehicle owner or missing payment amount from ambiguous source cells.
 
 ## Data references
 Existing business sources: Drivers List - Drivers.csv; Fleet Operations Tracker - Vehicle Tracking.csv; Orders 2026 - August.csv; Petroleum_2026 (2).xlsx; Munir_Orders.xlsx.
@@ -38,7 +38,7 @@ Munir sample: fare 100,000, commission 3,000, net 97,000, advance 30,000 and bal
 - Added proposed technical/UX/security design and test cases, clearly distinguished from implemented features.
 
 ## Next work
-Resolve O01 database/provider choice before persistence code. Resolve O02–O06 before their financial/order rules. Confirm identity/locale and users. Validate a no-cost deployable vertical slice and backup plan. Then implement master records, orders/outsourcing, costs, billing/settlements and reports in phases.
+Resolve O01 database/provider choice before persistence code. Review remaining O02–O06 policies and O13–O18 before their affected financial/operational rules; capability decisions D26–D50 are finalized. Confirm identity/locale and users. Validate a no-cost deployable vertical slice and backup plan. Then implement master records, orders/outsourcing, costs, billing/settlements and reports in phases.
 Offline sync, GPS, external portals, payroll and full accounting remain outside the initial PRD unless explicitly added.
 
 ## Maintenance rules
@@ -75,3 +75,13 @@ Dynamic custom roles, protected Owner/Super Admin, extensible `module.action` pe
 Preserve one operating business with multiple external company records. Customer (Client) is the direct customer; Consignee remains their receiver. Independent tenant onboarding is outside current scope. Authorization includes company context and rejects foreign records; Owner has no implicit cross-tenant access. Staff-specific grants, financial correction rules, Owner provisioning and audit retention/archival operations still need decisions. Database/auth/storage/hosting remain open; offline synchronization remains outside initial scope.
 
 Environment work is locally committed as `d0c714f`; push was rejected by automatic approval review pending explicit destination approval. Do not treat it as published. The RBAC/audit documentation was subsequently committed as `3d3150a`, verified locally on 7 October 2026; remote publication was not checked. Client PDF/PowerPoint snapshots have not been refreshed and must not be represented as the updated scope. Next step is requirements review of remaining operational/business/provider choices, followed by authorized implementation and actual test execution.
+
+## Business reconciliation milestone — 9 October 2026
+
+Supplied decisions D26–D50: Requirements Finalized; Design specification Updated; Business implementation Not Started. Earlier open-capability summaries are historical and superseded where explicitly resolved; existing shell/environment foundations remain implemented.
+
+Preserve flexible Order → 1..N Trips (including separate movement Orders), optional planned quantity, loaded/delivered/custom billable snapshots, versioned rates with agreement-specific effective date, full/authorized partial Trip invoices and three separate allocation/advance ledgers. V1 includes financial corrections/notes/refunds, company accounts/transfers, full historical multi-currency/tax, custom expenses/documents/expiry reminders, ownership/affiliation/assignment history, controlled lifecycle/locks, dynamic RBAC and immutable redacted audit.
+
+V1 AUTO APPROVAL is default; routine transactions do not wait for manual review. Multiple automated backups per day and full authorized PDF/XLSX/CSV export are required. Bulk Excel/CSV import and configurable/manual approvals are V2; preserve mobile and other future scope. Company boundary and Factory → Customer (Client) → Consignee remain unchanged.
+
+No database/backend or hosting was selected. Remaining material policy gaps are payer/settlement, multi-consignee linkage, rate matching/date availability, quantity/remaining units, FX/rounding, note/rebilling effects, lifecycle/correction rules, revenue/cost attribution and expiry assignment policy (DECISIONS.md). Staff/Owner provisioning, print/locale and backup/audit retention/recovery also remain gates. Proceed to final conceptual review and provider evaluation, not business implementation or a Development Ready v1.0 claim. No runtime tests were executed; historical build blockers and stale client PDF/PPT remain. Current report: DOCUMENTATION_REVIEW.md.

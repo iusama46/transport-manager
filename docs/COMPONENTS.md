@@ -1,6 +1,6 @@
 # Reusable Components
 Updated: 9 October 2026
-Status: Implementation specification; components are not yet claimed as implemented.
+Status: Implementation specification; existing shell prototypes are identified where relevant. Specified behavior is not a claim of complete implementation.
 
 ## Ownership and file structure
 
@@ -8,7 +8,7 @@ Follow DESIGN.md for tokens and sizing. Use shadcn/ui as the primitive foundatio
 
 | Folder | Separate component files |
 |---|---|
-| apps/web/src/components/ui | button.tsx, input.tsx, textarea.tsx, select.tsx, checkbox.tsx, radio-group.tsx, switch.tsx, dialog.tsx, drawer.tsx, tooltip.tsx |
+| apps/web/src/components/ui | button.tsx, input.tsx, textarea.tsx, select.tsx, checkbox.tsx, radio-group.tsx, switch.tsx, dialog.tsx, drawer.tsx, tooltip.tsx, searchable-select.tsx, combobox.tsx (compatibility exports), multi-select.tsx |
 | apps/web/src/components/forms | form-field.tsx, text-field.tsx, password-field.tsx, number-field.tsx, money-field.tsx, quantity-field.tsx, date-field.tsx, date-range-field.tsx |
 | apps/web/src/components/common | page-header.tsx, breadcrumbs.tsx, data-table.tsx, filter-bar.tsx, pagination.tsx, empty-state.tsx, error-state.tsx, confirm-dialog.tsx, status-badge.tsx |
 | apps/web/src/features/<module>/components | Business-specific selectors, editors and forms |
@@ -49,7 +49,48 @@ Preserve input on failures and focus the first invalid field after submit. Do no
 
 ## Selection components
 
-Select handles short fixed options. Combobox handles searchable entities, ID values, pagination, loading/error/retry and keyboard selection. MultiSelect is only used where multiple choices are explicitly supported. Checkbox supports indeterminate state for partial table selection. RadioGroup gives a labelled single choice. Switch represents a binary setting with visible persistence feedback.
+Select handles small fixed sets such as Yes/No or status/mode choices; RadioGroup and Switch remain appropriate for visible single choices and binary settings. SearchableSelect is the canonical searchable business-record control, extending the existing Combobox specification below. Its multi-selection mode is explicit, only for workflows allowing multiple records. Existing MultiSelect remains a labelled checkbox group for small loaded sets, not a competing searchable entity picker. Checkbox supports indeterminate partial table selection.
+
+### SearchableSelect
+
+**Reuse and implementation status.** `apps/web/src/components/ui/searchable-select.tsx` now provides the canonical control using React Select 5.10.2. `combobox.tsx` re-exports the same implementation and compatible option/loader types; there is one control implementation. It supports controlled single/multi selection, rich labels/status/disabled reasons, local filtering, external results or the existing query/page/AbortSignal loader, debounce/minimum-character settings, cancellation, scope resets, retry, load more, bounded result windows, required/validation associations and disabled/read-only display. The synthetic `/dev/components` showcase exercises these configurations, including supplier/branch dependencies. FormField/form adapters stay in `components/forms` and feature eligibility/loaders belong in `features/<module>`. The contract below remains the acceptance target; full browser, screen-reader and trusted-service acceptance has not been executed.
+
+**Identity and options.** Required conceptual fields are stable `id`/value and primary `label`; optional `secondaryLabel`/metadata, status text and icon/avatar are display aids. For example: Vehicle `LEA-1234` / `Hino • Rana Transport`; Driver `Muhammad Ali` / `Driver ID 018 • Rana Transport`; Client `ABC Traders` / `Lahore • Active`. A feature may supply an unavailable/disabled reason. No option must supply all metadata. Compare, deduplicate and submit by stable ID, never by label or result index. Labels and authorized metadata disambiguate names; icons/status colors supplement text. Templates cannot change selection semantics, introduce nested interactive controls in options or expose unauthorized fields.
+
+**Controlled API contract.** `SearchableSelectProps` implements the following responsibilities; feature adapters and acceptance checks remain necessary. Keep the existing `help` naming and FormField conventions rather than adding a separate `helperText` convention.
+
+| Input / callback | Contract |
+|---|---|
+| `label`, `id`, `name`, ref/form adapter | Visible accessible label, stable associations and form integration; submit selected IDs, not typed search text |
+| `value`, `onChange`, `multiple` | Default `multiple=false`: option or null; explicit multi mode: option collection (empty collection for none). Callback reports committed selection; shape is consistent with the chosen mode |
+| `options` / existing `loadOptions` adapter | Small loaded dataset or current bounded result page; retain the existing query/page/AbortSignal loader as an adapter. Choose one authoritative loading path per instance, not competing internal and external fetches |
+| `searchValue`, `onSearch` | Optional controlled query and query-change callback, separate from selection; otherwise managed internally. Query changes never fabricate an entity value |
+| `loading`, search error, `onRetry`, `hasMore`, `onLoadMore` | Async state and recovery supplied through the chosen loading path; distinguish initial versus next-page requests and reject duplicate load-more requests |
+| `disabled`, `readOnly`, `required`, `clearable` | Disable interaction; preserve inspectable read-only selection; required validation; explicit clear policy. Clearing reports null/empty collection only when allowed |
+| `placeholder`, `help`, `error` | Placeholder supplements label; help and validation error use FormField associations. Search/network error is distinct from field validation and must offer meaningful retry |
+| `getOptionLabel`, `getOptionValue`, `renderOption` | Optional domain adapters and non-interactive rich display; default to label/id. Accessible primary/secondary text and stable semantics remain mandatory |
+
+Keep selected display data independently of the result page. A form with stored IDs resolves only those selected records through authorized feature reads or an allowed historical snapshot; it does not scan all pages to find them. A missing/unavailable reference is explicitly labelled and validated, never replaced with the first result. Single selection closes the popup and restores input focus. Multi mode keeps it open for deliberate toggles, deduplicates IDs, shows selected labels/count and individually labelled remove controls. Removing one item preserves the others. Normal Vehicle/Driver references remain single; multi mode is suitable for eligible invoice Trips, potential Order Consignees and expressly supported categories. PermissionMatrix remains the permission editor and initial User role assignment remains one Role; this control does not change business cardinality. No implicit select-all across unloaded results.
+
+Required fields may be temporarily empty while editing; required validation blocks submission and focuses the field. A feature decides whether a clear action is offered. Disabled and read-only controls never search, clear or change value; read-only remains legible, focusable/inspectable and copyable, with no editable popup. Form submission explicitly retains unchanged values as appropriate rather than relying on disabled native controls to serialize them.
+
+**Local and server search.** Local mode filters an already-loaded, small authorized dataset (e.g. 10 or 100 options); a local adapter may satisfy the existing loader contract without network access. The feature defines searchable fields and matching/normalization, including which displayed identifiers/metadata are useful. SearchableSelect need not be used if a tiny fixed Select/radio group is clearer. Server mode is required for potentially large entity sets such as thousands of Vehicles, Clients or Trips: query bounded pages, never fetch the entire collection merely to fill the dropdown. No API route, database or provider is prescribed.
+
+The consuming feature owns debounce duration, optional minimum characters, page size, allowed filters and paging/cursor adaptation. Below the threshold, show an instruction such as “Type at least 2 characters”; do not claim no records exist. A new query or dependency scope resets page/active option, cancels obsolete work and ignores late responses. Scope includes verified company context, parent IDs and relevant eligibility/permission changes; cached pages and selected-record resolution must not leak across scopes. Losing access removes unavailable choices and shows a permitted unavailable-reference message without leaking forbidden labels.
+
+Initial loading has a stable busy indicator; next-page loading preserves already-valid current-query results. Append pages in stable order, deduplicate IDs and prevent overlapping requests. Pagination may use explicit Load more or accessible infinite loading with an equivalent keyboard action. Retry repeats the failed query/page under the current scope, not a stale parent. Failed searches preserve valid committed selections and input but cannot make obsolete results selectable. Keep rendered collections bounded through feature-chosen page limits, an accessible result window or virtualization where justified; scrolling thousands of DOM options is not the default. Active descendants must remain mounted and scrolled into view. Multi selections use a readable wrapping/bounded summary with access to the full selection rather than an enormous popup list.
+
+**Dependencies and lifecycle.** Feature wrappers apply approved Factory → Client → Consignee relationships; Fuel Supplier → Branch/Pump; Order → eligible Trips; Partner → associated Vehicles where the workflow calls for that association. These filters do not redefine relationships: Bill To is independent, invoice Trips may span compatible Orders, and ownership is separate from the execution partner. A parent change clears or explicitly remaps only incompatible selected children and resets their query/pages. While compatibility is unresolved, mark the child pending/invalid and prevent submission; never silently keep a stale child. Compatible selections remain. Missing prerequisite shows a disabled field with help. Cancel/ignore old-scope responses and revalidate on submit to cover races and relationship changes.
+
+Ordinary new-entry results exclude archived/deactivated records by default. Historical edit/detail values still resolve by their stored ID and allowed snapshot, displaying e.g. `ABC Transport — Archived` with text status; the selected historical record need not appear as a selectable new result. Preserve it unchanged where lifecycle policy permits, or require an explicit permitted correction if changing it. Never blank it or silently substitute an active entity. Expired vehicle/driver documents show the V1 warning and do not cause expiry-only assignment blocking.
+
+**Trust boundary.** UI filtering is presentation, not authorization. Trusted operations independently verify authenticated active user, company/tenant, action permission, resource access/relationships and active/allowed lifecycle status for lookup, selected-ID resolution and save, including every multi-selected ID. Counts and metadata are scoped too. Guessed IDs, foreign-company records, revoked grants and invalid children must fail even with direct requests; client company/role flags are not authority. Historical read access is not permission to make a new archived assignment. No backend logic is implemented by this specification; preserve ARCHITECTURE.md, PERMISSIONS.md and SECURITY.md safeguards.
+
+**Interaction and accessibility.** Associate the visible label with the searchable input through FormField; connect help/errors via `aria-describedby` and expose `aria-required`/`aria-invalid` with native attributes where appropriate. Use combobox + listbox semantics, `aria-expanded`, `aria-controls`, appropriate autocomplete and a valid `aria-activedescendant` for the mounted active option. Options expose `aria-selected`, `aria-disabled`/reason and accessible text; multi listboxes expose `aria-multiselectable`. Keep keyboard focus on the input during option navigation, arrows open/navigate eligible options, Enter commits/toggles the active option and Escape closes without changing committed values. Space selects on a dedicated selection trigger where appropriate; in the editable search input it remains text. Tab follows normal form order and closes without committing unselected query text. Do not trap focus.
+
+Mouse/touch selection matches keyboard behavior and must not be lost to premature blur. Clear/remove/retry/load-more controls have explicit names and work by keyboard/touch. Announce searching/loading, result/no-result counts and selection changes through a polite status region; associate validation and announce actionable failures without repeated noisy alerts on every keystroke. Restore input focus after selection/clear/removal where appropriate, keep it stable across requests, and participate in dialog focus containment/restoration and first-error form focus. Disabled/read-only semantics and visible focus must match DESIGN.md; screen-reader checks are required, not implied by adding ARIA attributes.
+
+**States and verification.** DESIGN.md defines the visual state mapping; [TEST_PLAN.md](TEST_PLAN.md#searchableselect-acceptance--t82t101-planned-and-unexecuted) owns T82–T101 acceptance scenarios. Cover Default, Focused, Searching, Loading, Results, Empty, No Results, Selected, Disabled, Read Only, Error, Required and Archived historical selection. These states can coexist (e.g. required + selected, selected + next-page error); querying never erases a committed value. Extend the synthetic `/dev/components` showcase during implementation, then verify these cases before feature rollout.
 
 ## Shared layout and feedback
 
@@ -77,10 +118,12 @@ MoneyText and QuantityText show formatted values with currency/units and explici
 
 ## Business-specific components
 
+Entity pickers below compose SearchableSelect for searchable record references; each wrapper owns eligibility, dependencies and permitted metadata. Reuse that contract instead of separate dropdown implementations. Detailed allocation/pricing editors retain their own business controls.
+
 | Component | Separate responsibility |
 |---|---|
-| CustomerPicker | Select direct customer by stable ID |
-| ConsigneePicker | Filter potential Order receivers by customer; support multiple potential Consignees and actual Trip receiver/destination; clear/remap incompatible selection without changing history |
+| CustomerPicker | SearchableSelect wrapper for direct Customer (Client), scoped by the applicable Factory relationship; stable ID |
+| ConsigneePicker | SearchableSelect wrapper; filter potential Order receivers by customer; support multiple potential Consignees and actual Trip receiver/destination; clear/remap incompatible selection without changing history |
 | BillToPicker | Explicit supported Factory/Client/Consignee/alternative debtor, independent of operational relationships |
 | VehiclePicker | Show availability and owner separately from subcontractor |
 | DriverPicker | Show availability/licence expiry warning/status; expiry alone does not block otherwise-authorized V1 assignment |
@@ -120,7 +163,7 @@ Add this sequence to TASKS.md before individual screens. Record implementation a
 - ActivityLogFilters: date/range, actor, module, action, permitted company, reference and text, composed with server sorting/pagination.
 - ActivityHistory/AuditTimeline: read-only, chronological, paginated safe event details for global/record views, including actor snapshot and permitted before/after changes. No edit/delete affordances; no hidden secrets in component props.
 
-These composites and their integration remain unimplemented. Contracts follow PERMISSIONS.md, AUDIT.md and DESIGN.md; test stale permissions, denied views/exports and sensitive-field masking as well as accessibility.
+RolePicker and applicable actor filters compose SearchableSelect under its canonical contract; PermissionMatrix retains its dedicated grouped checkbox UI. These composites and their integration remain unimplemented. Contracts follow PERMISSIONS.md, AUDIT.md and DESIGN.md; test stale permissions, denied views/exports and sensitive-field masking as well as accessibility.
 
 ## Finalized reusable V1 contracts — 9 October 2026
 

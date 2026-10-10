@@ -28,10 +28,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import {
-  Combobox,
-  type Option,
+  SearchableSelect,
+  type SearchableSelectOption as Option,
   type OptionLoader,
-} from "@/components/ui/combobox";
+} from "@/components/ui/searchable-select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Alert } from "@/components/ui/alert";
 import { Toast } from "@/components/ui/toast";
@@ -80,6 +80,42 @@ const loadParents: OptionLoader = async (query) => ({
   hasMore: false,
 });
 
+const vehicleOptions: Option[] = [
+  {
+    id: "vehicle-1",
+    label: "LEA-1234",
+    secondaryLabel: "Synthetic Hino • Northern Transport",
+    status: "Active",
+  },
+  {
+    id: "vehicle-2",
+    label: "LEA-5678",
+    secondaryLabel: "Synthetic Isuzu • Southern Transport",
+    status: "Active",
+  },
+  {
+    id: "vehicle-3",
+    label: "LEA-9012",
+    secondaryLabel: "Synthetic historic vehicle",
+    status: "Archived",
+    disabled: true,
+    disabledReason: "Unavailable for new assignments",
+  },
+  {
+    id: "vehicle-4",
+    label:
+      "Synthetic vehicle with a long registration and operator description that wraps across multiple lines",
+    secondaryLabel: "Long labels remain readable on narrow screens",
+    status: "Active",
+  },
+];
+const tripOptions: Option[] = Array.from({ length: 10 }, (_, index) => ({
+  id: `trip-${index + 1}`,
+  label: `Synthetic Trip ${String(index + 1).padStart(3, "0")}`,
+  secondaryLabel: `Northern depot → Destination ${index + 1}`,
+  status: "Delivered",
+}));
+
 export function ComponentShowcase() {
   const [toast, setToast] = useState(false);
   const [pending, setPending] = useState(false);
@@ -100,6 +136,10 @@ export function ComponentShowcase() {
     formState: { errors },
   } = useForm({ defaultValues: { name: "" } });
   const [failure, setFailure] = useState(false);
+  const [vehicle, setVehicle] = useState<Option | null>(null);
+  const [selectedTrips, setSelectedTrips] = useState<Option[]>([]);
+  const [requiredVehicle, setRequiredVehicle] = useState<Option | null>(null);
+  const [selectorSubmitted, setSelectorSubmitted] = useState(false);
   const [parent, setParent] = useState<Option | null>(null);
   const [child, setChild] = useState<Option | null>(null);
   const [simulateFailure, setSimulateFailure] = useState(false);
@@ -376,6 +416,88 @@ export function ComponentShowcase() {
             onChange={setMulti}
           />
         </div>
+      </section>
+      <section id="searchable-select" className="surface stack">
+        <h2>SearchableSelect (React Select)</h2>
+        <p className="supporting">
+          Search local records, select multiple eligible Trips, and inspect
+          disabled or archived values. All examples use synthetic data.
+        </p>
+        <div className="form-grid">
+          <SearchableSelect
+            label="Vehicle"
+            options={vehicleOptions}
+            value={vehicle}
+            onChange={setVehicle}
+            help="Search registration, operator or status; archived vehicles cannot be assigned."
+          />
+          <SearchableSelect
+            label="Eligible invoice Trips"
+            multiple
+            options={tripOptions}
+            value={selectedTrips}
+            onChange={setSelectedTrips}
+            help="Select several Trips; remove an individual selection using its × button."
+          />
+          <SearchableSelect
+            label="Archived vehicle history"
+            options={vehicleOptions}
+            value={vehicleOptions[2]}
+            onChange={() => {}}
+            readOnly
+            help="The original selected ID and archived status stay visible."
+          />
+          <SearchableSelect
+            label="Disabled vehicle selector"
+            options={vehicleOptions}
+            value={vehicleOptions[0]}
+            onChange={() => {}}
+            disabled
+            help="This selection is unavailable for editing."
+          />
+          <SearchableSelect
+            label="Vehicle with validation error"
+            options={vehicleOptions}
+            value={vehicle}
+            onChange={setVehicle}
+            required
+            error="Select an eligible vehicle before saving."
+          />
+          <SearchableSelect
+            label="Non-clearable vehicle"
+            options={vehicleOptions}
+            value={vehicleOptions[0]}
+            onChange={() => {}}
+            clearable={false}
+            help="This fixture retains its controlled value."
+          />
+        </div>
+        <form
+          className="stack"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setSelectorSubmitted(true);
+          }}
+        >
+          <SearchableSelect
+            label="Required vehicle"
+            name="vehicleId"
+            options={vehicleOptions}
+            value={requiredVehicle}
+            onChange={(value) => {
+              setRequiredVehicle(value);
+              setSelectorSubmitted(false);
+            }}
+            required
+            help="Typing a search alone does not satisfy the required selection."
+          />
+          <div className="actions">
+            <Button type="submit">Validate selection</Button>
+          </div>
+          {selectorSubmitted && (
+            <p role="status">Selected vehicle ID: {requiredVehicle?.id}</p>
+          )}
+        </form>
         <h3>Dependent entity selector fixtures</h3>
         <p className="supporting">
           Alpha responds slowly; Beta responds quickly. Changing supplier clears
@@ -391,7 +513,7 @@ export function ComponentShowcase() {
           }}
         />
         <div className="form-grid">
-          <Combobox
+          <SearchableSelect
             label="Synthetic supplier"
             value={parent}
             onChange={(value) => {
@@ -400,8 +522,8 @@ export function ComponentShowcase() {
             }}
             loadOptions={loadParents}
           />
-          <Combobox
-            key={parent?.id ?? "none"}
+          <SearchableSelect
+            resetKey={parent?.id ?? "none"}
             label="Synthetic branch"
             help={
               !parent
@@ -413,7 +535,7 @@ export function ComponentShowcase() {
             loadOptions={loadChildren}
             disabled={!parent}
           />
-          <Combobox
+          <SearchableSelect
             label="Read-only selector"
             value={parentOptions[0]}
             onChange={() => {}}

@@ -129,6 +129,45 @@ Base UI: apps/web/src/components/ui. Reusable composites: components/common. For
 
 Create a development-only /dev/components showcase with synthetic fixtures. Demonstrate controls, overlays, tables, feedback, long text, narrow screens and dependent entity pickers. Verify contrast, keyboard focus, zoom, async races and recovery before rollout. Components are specified separately in COMPONENTS.md. Exact branding, language and invoice template remain open.
 
+## SearchableSelect presentation and screen mapping
+
+Use the canonical [SearchableSelect contract](COMPONENTS.md#searchableselect), extending the current Combobox foundation. This section maps that contract to the existing visual system and planned screens; it does not introduce a second selector specification or claim those screens are implemented. Small fixed Yes/No, status, pricing-mode or payment-direction sets retain Select, radio or switch controls.
+
+Use existing semantic CSS variables and light-mode surfaces: input-border for the control/popup boundary, foreground for the primary label, muted-foreground for secondary metadata, info/primary tokens for active/selected affordances, error tokens for validation and warning tokens plus text for archived/expiry status. Selected and keyboard-active options are distinguishable by text/check indication as well as fill. Keep Inter input text 16/24px, labels 14/20px and supporting text at least 12/18px; metadata is optional. Inherit the 8px control radius, spacing scale, 40px default/32px compact desktop/48px large control sizes and 2px focus ring with 2px offset. Preserve the baseline contrast requirements; do not add component-specific colors, fonts or a new UI package.
+
+The popup aligns with the field, uses the existing overlay shadow and a bounded scrolling results area, and stays inside the viewport and enclosing dialog/drawer focus boundary. Long primary/secondary labels wrap and expand rows; selected text can wrap or offer an accessible full-value view without hover. Truncation must never make similar records impossible to distinguish. Multi labels wrap with named removal actions and a full-selection view. Below 768px use full-width fields in single-column forms; avoid horizontal overflow and keep clear/retry/load-more/options at least 44px touch targets. Ensure the onscreen keyboard does not hide the active result/action. Verify at narrow widths and 200% zoom.
+
+| State | Presentation |
+|---|---|
+| Default | Label and placeholder/help; no implied selected record |
+| Focused | Existing visible focus ring; popup only when interaction permits |
+| Searching | Entered query; polite progress/threshold instruction during debounce, distinct from committed selection |
+| Loading | Stable field width and busy status; preserve selected label and valid current-query results during page loading |
+| Results | Primary label, optional metadata/status and visible active/selected/disabled distinctions |
+| Empty | No available records under the current allowed scope; a permitted create shortcut only when the feature supplies it |
+| No Results | No matches for the query; offer query revision/clear, not a misleading empty dataset message |
+| Selected | Resolved label independent of result page; clear/removal action only when allowed |
+| Disabled | Existing secondary fill/muted text and disabled semantics; prerequisite help where relevant |
+| Read Only | Legible historical/current value, inspectable focus, no search/clear/edit affordance |
+| Error | Associated field error for validation; separate actionable search/page failure with retry, preserving input/selection |
+| Required | Text required indicator and validation on submit/after interaction; placeholder does not replace label |
+| Archived historical selection | Stored label plus “Archived”/“Inactive” text; retained historical ID, not a new selectable active record |
+
+| Planned screen/form | SearchableSelect use and constraints |
+|---|---|
+| Orders; Customer/Consignee directory | Factory, direct Customer (Client), linked Consignee; potential Order Consignees may explicitly be multiple, actual Trip receiver is single; dependency invalidation preserves compatible children |
+| Orders/agreements; invoices/receipts | Explicit Bill To identity within supported party types, separate from Factory/Client/Consignee operational roles; tiny party-type choice may remain Select/radio |
+| Trips/assignments; Vehicles/Drivers; outsourcing | Single Vehicle, Driver, owner identity and Partner/Transporter; associated-vehicle filtering only where appropriate, availability and expiry warning visible, ownership never inferred from partner |
+| Fuel purchases/payments; Supplier/Branch management | Fuel Supplier, its Branch/Pump, Vehicle and optional Trip/Driver; branch prerequisite and relationship enforced |
+| Invoices; payment/expense allocation | Explicit multi eligible Trips for invoicing or supported allocation targets; compatible Bill To/currency/remaining balance rules still apply. Order filter is optional where cross-Order billing is valid; retain the detailed allocation/table UI for amounts |
+| Financial Accounts; Payments; Internal Transfers | Single FinancialAccount per reference and Currency per transaction; distinct source/destination accounts. Currency search never enables V1 cross-currency invoice settlement |
+| Expenses/Maintenance; category settings | ExpenseCategory and relevant Order/Trip/Vehicle/Driver context; multiple categories only if an explicit workflow supports them, not automatically for one Expense |
+| Documents/Attachments; document settings | Predefined/custom DocumentType and applicable parent entity; permission-aware custom management, historical type label retained |
+| Rates/Rate History; Trip pricing | Rate/Agreement and supported match dimensions; most-specific recommendation, authorized valid alternative, date/currency/unit eligibility and locked snapshots remain visible |
+| Users/Roles; Activity Log; reports/list filters | User/actor, single company-scoped Role for initial assignment, and searchable entity filters; custom role grants/delegation/Owner safeguards unchanged. PermissionMatrix remains grouped checkboxes; tiny module/action/status sets need not be searchable |
+
+Search strategy and allowed metadata belong to each feature; local versus bounded server search follows COMPONENTS.md. Business-specific pickers are thin compositions of this one control, not separately styled dropdown implementations. Introduce them as their modules are implemented, without refactoring every placeholder form. Planned component and server-boundary acceptance is recorded in TEST_PLAN.md T82–T101; existing shell demos do not establish full contract compliance.
+
 ## Roles & Permissions dashboard
 
 Roles list shows custom name, description, active/system status and assigned-user count with permission-aware create/edit/deactivate/delete actions. Create/Edit Role uses a custom name and description, then a reusable PermissionMatrix grouped by catalog module and action. Support labelled checkboxes, keyboard use, module selection and indeterminate partial selection. Show action descriptions and unavailable/non-delegable grants. Do not hardcode Accountant/Dispatcher screens or infer grants from a role name. New catalog actions appear without redesigning the matrix.

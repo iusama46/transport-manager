@@ -69,3 +69,8 @@
 @media(max-width:767px){.form-grid{grid-template-columns:minmax(0,1fr);}.surface{padding:var(--space-4);}}
 @media(pointer:coarse){.button,.control{min-height:2.75rem;}.button[data-size=sm]{min-height:2.75rem;}nav a{min-height:2.75rem;}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;}}
+
+.searchable-select {min-width:0;display:grid;gap:var(--space-2);}
+.select-option-content {display:flex;align-items:start;gap:var(--space-2);min-width:0;}
+.select-option-text {display:grid;gap:.125rem;min-width:0;overflow-wrap:anywhere;}
+.select-option-content .supporting {color:inherit;}

@@ -271,3 +271,25 @@ V2/Future additions: configurable document-type expiry assignment blocking and c
 - [x] Verify /dev/components in Chrome: table renders, ascending/descending sorting, filtering and pagination, selection reset/full/partial header state, hiding/restoring columns, loading/empty/stale-error display; captured console errors/warnings absent.
 
 This supersedes the 6 October hook/table-library blockers. It does not complete broader shell/accessibility/browser review, business tests, authentication, provider architecture, recovery or deployment. The user subsequently requested commit/push of this repair; see the delivery response for commit and remote-verification evidence. Earlier documentation commits were already pushed separately.
+
+## SearchableSelect design-system contract — 9 October 2026
+
+- [x] Inspect COMPONENTS, DESIGN, PRD, ARCHITECTURE, frontend/package structure, existing Combobox/MultiSelect/Select/FormField, CSS tokens and synthetic selector fixtures.
+- [x] Extend the existing Combobox specification under canonical SearchableSelect naming; document controlled identity/options, local/server search, explicit multi mode, dependencies, archives, permission boundaries, visual states and accessibility, with screen mapping.
+- [x] Add planned T82–T101 component/browser and future trusted-service acceptance scenarios; writing them does not execute them.
+- [x] Check the five-file Markdown-only diff, local links/anchors, table column consistency, unique test IDs (20 new scenarios) and git diff --check; passed. No runtime component/service tests executed.
+- [x] Normalize the existing Combobox foundation and showcase imports into SearchableSelect; Combobox is a compatibility export of the React Select implementation.
+- [ ] Complete the specified gaps (rich options, explicit searchable multi mode, full validation/state/accessibility behavior) and extend synthetic /dev/components fixtures, then execute component cases.
+- [ ] Integrate thin feature pickers as modules are built; configure bounded loaders/thresholds/filters and execute server tenant/permission/relationship/lifecycle cases when trusted services exist.
+
+This milestone is Markdown only: no component/form refactor, backend/schema logic, dependency/provider choice or runtime test execution. Business policies, initial single Role assignment, independent Bill To/ownership roles and architecture gates remain unchanged. COMPONENTS.md owns the contract; DESIGN.md maps presentation/screens; TEST_PLAN.md owns acceptance evidence.
+
+## React Select implementation — 10 October 2026
+
+- [x] Implement SearchableSelect using React Select, keeping Combobox as compatibility exports of one implementation.
+- [x] Extend synthetic showcase fixtures for local/rich single selection, explicit multi selection, disabled/read-only/archive display, required/error/clear policy and dependent async loading.
+- [x] Pass web/shared lint and type checking, targeted source formatting, git diff --check and four existing environment tests.
+- [x] Pass an isolated production build using existing installed dependencies; no fresh npm ci was performed.
+- [ ] Execute T82–T101 component/browser/screen-reader acceptance and feature/trusted-service integration as applicable. Added test dependencies alone are not acceptance evidence.
+
+This supersedes the implementation status of the earlier documentation-only milestone. It does not mark business pickers, backend authorization or full accessibility acceptance complete.

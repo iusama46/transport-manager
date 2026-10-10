@@ -88,7 +88,7 @@ The initial target is no monthly software-service subscription cost. Free servic
 
 ### Remaining configuration and technical work
 
-Business requirements and policies are finalized; no material business-policy gaps remain. Final conceptual data model review is next. Company identity/base currency/timezone/languages, staff-specific grants, invoice branding and backup operator/targets remain configuration work. Database/backend, auth/private storage/hosting and exact backup arrangements remain open technical decisions. Formal jurisdiction-specific invoice/retention obligations require compliance review; this overview does not certify statutory compliance.
+Business requirements and policies are finalized; no material business-policy gaps remain. The [conceptual data model](DATA_MODEL.md) was finalized on 10 October 2026; database/backend selection is next. Company identity/base currency/timezone/languages, staff-specific grants, invoice branding and backup operator/targets remain configuration work. Database/backend, auth/private storage/hosting and exact backup arrangements remain open technical decisions. Formal jurisdiction-specific invoice/retention obligations require compliance review; this overview does not certify statutory compliance.
 
 ### How the first release will be accepted
 

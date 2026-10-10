@@ -1,6 +1,6 @@
 # Implementation Tasks
 
-Updated: 9 October 2026
+Updated: 10 October 2026
 
 Use this checklist in build order. [x] means the stated deliverable is completed; unchecked means not completed. Implementation and verification are separate tasks. The setup shell is implemented and verified as recorded below; operational functionality remains unimplemented.
 
@@ -12,7 +12,8 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 - [x] Document multiple fuel suppliers, their branches and both payment methods.
 - [x] Add the [client overview](CLIENT_OVERVIEW.md) as the main editable source, with shareable [PDF](client/CLIENT_OVERVIEW.pdf) and [PowerPoint](client/Transport_Manager_Client_Presentation.pptx) snapshots linked from README.md. Documentation only; no application functionality is marked implemented.
 - [x] Close final business-policy review gates through D51–D69; business requirements/policies finalized, no material policy gaps remain.
-- [ ] Complete final conceptual data model review, then resolve open technical decisions and company/launch configuration.
+- [x] Complete final conceptual data model review; DATA_MODEL.md is the authoritative provider-independent model (D70–D78).
+- [ ] Resolve database/backend and subsequent infrastructure decisions, plus company/launch configuration.
 
 ## 1. Project setup
 
@@ -79,7 +80,8 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 
 - [x] Finalize Order → 1..N Trips and separate movement Orders (D26).
 - [x] Finalize multi-consignee, quantity/shortage/remaining and manual Order completion policies (D53/D56–D58/D62).
-- [ ] Map finalized relationships/snapshots and lifecycle/correction fields in final conceptual model review; implement warning-preserving manual completion/reopen.
+- [x] Map finalized relationships/snapshots and lifecycle/correction responsibilities in DATA_MODEL.md.
+- [ ] Implement warning-preserving manual completion/reopen under the finalized model.
 - [ ] Build order entry, filters, pagination and detail view.
 - [ ] Add assignments, unlimited ordered stops, status history and delivery proof.
 - [ ] Verify six-stop orders, reassignment, conflicts and delivery/payment independence.
@@ -231,7 +233,7 @@ Historical 7 October status: ready for the next requirements review; provider/ho
 - [x] Reconcile V1 flexible Orders/Trips/rates/quantities, three ledgers, billing/corrections, accounts/tax/multi-currency, ownership/documents/expiry and lifecycle rules.
 - [x] Move bulk import to V2; record V1 auto-approval, full export and multiple-daily automatic backup requirements.
 - [x] Close O02–O06/O13–O18 business-policy gates and finalize Owner/retention/recovery minimums; retain unrelated technical/configuration/compliance entries.
-- [ ] Perform FINAL CONCEPTUAL DATA MODEL REVIEW before database/backend selection; verify final policy-to-model and workflow mapping.
+- [x] Perform FINAL CONCEPTUAL DATA MODEL REVIEW before database/backend selection; policy/model/workflow mapping and conceptual invariants are recorded in DATA_MODEL.md.
 - [ ] Select database/backend/auth/storage, then deployment, verifying $0 feasibility and financial/audit/backup capabilities.
 - [ ] Implement effective-dated transport rates/date configuration/Trip snapshots and permissioned overrides.
 - [ ] Implement optional planned, loaded/delivered/custom billable quantity and shortage handling.
@@ -255,7 +257,8 @@ Earlier dated reviews/test evidence above are historical. Their references to un
 - [ ] Implement extensible fixed/percentage commission/deductions, discounts/rounding, original/normalized quantity conversion, configurable shortage/remaining basis and specific-rate/exact-condition overlap validation.
 - [ ] Enforce same-currency invoice settlement, controlled correction/reissue/notes, invoice-date revenue and shared expense allocation with exact reconciliation.
 - [ ] Implement warning-only document expiry, manual Order completion with unchanged unfinished Trips, protected Owner setup/transfer/last-active safeguards and retention-by-default.
-- [ ] Complete final conceptual model review → database/backend selection → auth/storage/hosting/backup architecture → final architecture audit. Only then assess Development Ready v1.0 and begin implementation.
+- [x] Complete final conceptual model review (10 October; D70–D78).
+- [ ] Complete database/backend selection → auth/storage/hosting/backup architecture → final architecture audit. Only then assess Development Ready v1.0 and begin authorized implementation.
 - [ ] Execute production-gate recovery evidence: multiple automatic backups/day, restricted access, documented restore tested with records/ledgers/audit/files.
 
 V2/Future additions: configurable document-type expiry assignment blocking and cross-currency invoice settlement/allocation if pursued. Existing controlled bulk import/manual approvals/mobile/dark mode and other future scope stay deferred. Earlier dated open-policy reviews are historical and superseded by D51–D69. Current documentation status does not complete implementation or certify providers/runtime tests.
@@ -293,3 +296,15 @@ This milestone is Markdown only: no component/form refactor, backend/schema logi
 - [ ] Execute T82–T101 component/browser/screen-reader acceptance and feature/trusted-service integration as applicable. Added test dependencies alone are not acceptance evidence.
 
 This supersedes the implementation status of the earlier documentation-only milestone. It does not mark business pickers, backend authorization or full accessibility acceptance complete.
+
+## Final conceptual data model review — 10 October 2026
+
+- [x] Inspect the 13 required repository documents and relevant existing UI/shared contracts on feat/project-setup; cross-check finalized V1 policies rather than accepting the old model inventory unchanged.
+- [x] Create DATA_MODEL.md: 63 named concepts (44 entity/association/history, 15 values/configuration/catalogs, 4 derived views), relationships/cardinalities, responsibilities/tenant ownership, snapshot matrix and domain-specific lifecycle/retention.
+- [x] Review parties/Bill To, flexible receivers, quantities/rates/pricing, adjustments/coverage/corrections, three ledgers/payments/accounts/FX, fuel/expenses/history/documents, protected Owner and immutable audit.
+- [x] Record 44 invariants, 17 logical strong-consistency/atomic boundaries, reporting/query pressure, simplification decisions and provider-selection requirements.
+- [x] Finalize conceptual model with no remaining material conceptual/business-policy question; synchronize architecture/decisions/current phase references and preserve historical milestone evidence.
+- [ ] Evaluate DATABASE / BACKEND SELECTION against DATA_MODEL.md section 24 without assuming any historical candidate is selected.
+- [ ] Prove provider-specific constraints/atomicity/authorization/audit/backup restore and execute application acceptance after architecture/implementation; documentation walkthroughs are not runtime tests.
+
+No physical schema, provider selection, repository/API or business feature was added. Development Ready v1.0 remains unassessed. Documentation validation evidence is recorded in DOCUMENTATION_REVIEW.md.

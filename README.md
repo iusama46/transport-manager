@@ -4,7 +4,7 @@ Transport management system for orders, fleet operations, fuel, maintenance, bil
 
 ## Project status
 
-Setup phase: npm workspaces and a Next.js App Router dashboard shell with TypeScript, Tailwind CSS and ESLint. All 16 navigation sections and five Fuel Management subsections are clearly labelled placeholders. No operational records, authentication, persistence or financial functionality is implemented. Database and hosting selections remain open. Initial recurring service budget: $0.
+Setup phase: npm workspaces and a Next.js App Router dashboard shell with TypeScript, Tailwind CSS and ESLint. All 16 navigation sections and five Fuel Management subsections are clearly labelled placeholders. No operational records, authentication, persistence or financial functionality is implemented. Business requirements, business policies and the [conceptual data model](docs/DATA_MODEL.md) are finalized. Database/backend selection is next; hosting and other provider choices remain open. Initial recurring service budget: $0.
 
 ## Structure
 
@@ -15,7 +15,7 @@ Setup phase: npm workspaces and a Next.js App Router dashboard shell with TypeSc
 | packages/shared | Provider-independent TypeScript types and Zod validation |
 | docs | Requirements, design, architecture and implementation checklist |
 
-Start with [PRD](docs/PRD.md), [Decisions](docs/DECISIONS.md) and [Tasks](docs/TASKS.md). Other references: [Architecture](docs/ARCHITECTURE.md), [Design](docs/DESIGN.md), [Security](docs/SECURITY.md), [Test Plan](docs/TEST_PLAN.md) and [Memory](docs/MEMORY.md).
+Start with [PRD](docs/PRD.md), [Decisions](docs/DECISIONS.md) and [Tasks](docs/TASKS.md). Other references: [Data Model](docs/DATA_MODEL.md), [Architecture](docs/ARCHITECTURE.md), [Design](docs/DESIGN.md), [Security](docs/SECURITY.md), [Test Plan](docs/TEST_PLAN.md) and [Memory](docs/MEMORY.md).
 
 ## Client overview
 
@@ -68,8 +68,12 @@ Dynamic custom roles with a protected Owner/Super Admin and company-scoped granu
 
 [PRD](docs/PRD.md) and [Decisions](docs/DECISIONS.md) now specify finalized V1 capabilities, including flexible Orders/Trips, historical rates and currencies, three ledgers, controlled financial corrections, custom expenses/documents, accounts, auto-approval, full export and multiple daily automatic backups. Bulk import and configurable/manual approvals are V2. Business implementation remains not started; the existing shell/environment foundations are unchanged. Business Requirements and Business Policies are Finalized; no material business-policy gaps remain. Final Conceptual Data Model Review is next. Unselected technical providers and current readiness are recorded in the [documentation review](docs/DOCUMENTATION_REVIEW.md). Client PDF/PPT snapshots remain historical.
 
-## Final business-policy review status
+## Final business-policy review status — 9 October 2026
 
 V1 now explicitly covers configurable Bill To, commissions/deductions, multi-consignee Orders, discounts/rounding, same-currency invoice settlement, quantity conversion, configurable shortage/remaining basis, rate specificity/overlap validation, calculated-rate/manual-total pricing, manual Order completion, controlled correction/rebilling, invoice-date management revenue, shared expense allocation, expiry warnings, Owner safeguards and retention-by-default. Multiple daily automatic backups and a documented restore tested before production remain mandatory.
 
 V2/Future defers configurable document-expiry assignment blocking and cross-currency invoice settlement/allocation if pursued, alongside controlled bulk import/manual approvals and existing deferred items. Next: Final Conceptual Data Model Review → Database/Backend Selection → Auth/Storage/Hosting/Backup Architecture → Final Architecture Audit → Development Ready v1.0 → Implementation. The project has not reached Development Ready v1.0; no code/providers/runtime tests were changed by this review.
+
+## Conceptual model review — 10 October 2026
+
+Conceptual Data Model: FINALIZED. [DATA_MODEL.md](docs/DATA_MODEL.md) now owns the provider-independent entities, relationships/cardinalities, historical snapshots, financial/tenant invariants, atomic boundaries and database-selection requirements. This supersedes the dated “conceptual review next” milestones above. Next: DATABASE / BACKEND SELECTION, then auth/storage/hosting/backup architecture and final architecture audit before assessing Development Ready v1.0. No database/provider, physical schema or business implementation was selected/added by this documentation review.

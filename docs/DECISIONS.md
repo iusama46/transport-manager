@@ -1,6 +1,6 @@
 # Decision Log
-Updated: 9 October 2026
-Status key: Confirmed = explicit user direction; FINALIZED = final business-policy decision; Closed = answered/superseded with traceability; Proposed = design recommendation; Open = unresolved technical/configuration/compliance item. Business Requirements: Finalized; Business Policies: Finalized; Conceptual Data Model: Next; Technical Architecture Providers: Open; Business Implementation: Not Started / existing shell only.
+Updated: 10 October 2026
+Status key: Confirmed = explicit user direction; FINALIZED = final business-policy or explicitly labelled conceptual-model decision; Closed = answered/superseded with traceability; Proposed = design recommendation; Open = unresolved technical/configuration/compliance item. Business Requirements: Finalized; Business Policies: Finalized; Conceptual Data Model: FINALIZED; Technical Architecture Providers: Open; Business Implementation: Not Started / existing shell only.
 
 ## Recorded decisions
 | ID | Status | Decision | Reason / consequence |
@@ -139,7 +139,7 @@ Final user direction closes the business-policy gates above. Rationale: preserve
 | D68 | FINALIZED | V1 retention-by-default, no automatic historical operational/financial/audit purge; documents retained unless explicit permitted removal, no invented jurisdiction periods | O12; T79/T81 |
 | D69 | FINALIZED | Multiple automatic backups/day, restricted access, documented restore tested before production; infrastructure details remain open | O10; T80 |
 
-V1/V2 scope, permission additions and audit events reflect these decisions in the companion documents. No material business-policy gaps remain. Business Requirements: Finalized; Business Policies: Finalized. Ready for FINAL CONCEPTUAL DATA MODEL REVIEW, not yet Development Ready v1.0. That review must validate relationships/snapshots, calculation configuration, rate ambiguity/state mapping, effective correction balances and concurrency safeguards against these finalized rules; it is not a new policy-approval gate.
+V1/V2 scope, permission additions and audit events reflect these decisions in the companion documents. No material business-policy gaps remain. Business Requirements: Finalized; Business Policies: Finalized. At this 9 October milestone, ready for FINAL CONCEPTUAL DATA MODEL REVIEW, not yet Development Ready v1.0; the completed 10 October outcome is D70–D78 below. The then-next review was to validate relationships/snapshots, calculation configuration, rate ambiguity/state mapping, effective correction balances and concurrency safeguards against these finalized rules; it is not a new policy-approval gate.
 
 ## Remaining technical choices and operational configuration
 
@@ -147,4 +147,22 @@ Remain OPEN: database/backend technology; authentication provider/implementation
 
 Company identity/base currency/timezone/languages, actual staff grants, bill branding/template, backup operator/targets and formal jurisdiction-specific compliance/retention obligations remain configuration, operations or compliance work. They do not reopen configurable Bill To, discounts/rounding, Owner safeguards or retention defaults. No current material business gap is identified that requires a different schema, financial, authorization or core workflow policy; detailed conceptual mapping and technical feasibility are still to be reviewed.
 
-Required sequence: FINAL CONCEPTUAL DATA MODEL REVIEW → DATABASE/BACKEND SELECTION → AUTH/STORAGE/HOSTING/BACKUP ARCHITECTURE → FINAL ARCHITECTURE AUDIT → DEVELOPMENT READY V1.0 → IMPLEMENTATION.
+Current sequence after the 10 October conceptual review: DATABASE/BACKEND SELECTION → AUTH/STORAGE/HOSTING/BACKUP ARCHITECTURE → FINAL ARCHITECTURE AUDIT → assessment of DEVELOPMENT READY V1.0 → authorized IMPLEMENTATION.
+
+## Final conceptual data model review — 10 October 2026
+
+These are provider-independent model decisions derived by cross-checking finalized requirements, not new business policies or physical schema choices. They supersede the earlier dated “conceptual review next” status. [DATA_MODEL.md](DATA_MODEL.md) is authoritative; business policies D51–D69 and the permission/audit catalogs remain unchanged. Alternatives were reviewed for lifecycle/history, actual relationships and unnecessary abstractions.
+
+| ID | Status | Model decision | Rationale / traceability |
+|---|---|---|---|
+| D70 | FINALIZED conceptual | Tenant-local BusinessParty identity with narrow role profiles, FactoryClientEligibility and Client-specific ConsigneeRelationship; explicit independent Bill To | Avoid duplicate identity per role and unstated exclusive Factory ownership; no generic arbitrary-party/resource framework. DATA_MODEL sections 2–4; D02/D04/D24/D50/D51/D53 |
+| D71 | FINALIZED conceptual | OrderConsignee eligibility, actual Trip receiver and original/normalized measurement/pricing/shortage snapshots; one assignment timeline plus owner/affiliation histories | Preserve flexible Orders and event truth without a singular receiver/quantity/rate or permanent driver/vehicle link. Sections 4–8/17; D26/D27/D36/D53/D56–D58/D61/D62 |
+| D72 | FINALIZED conceptual | Owned InvoiceVersion/InvoiceLine with charge coverage distinct from receivable, original-linked note/replacement effects and one effective financial position | Prevent discounted phantom remainder, destructive issued edits and duplicate correction/rebilling/revenue. Sections 9–10; D30/D41/D54/D63/D64 |
+| D73 | FINALIZED conceptual | Transaction/allocation evidence is authoritative; ledgers/SupplierPayable derived, independently agreed PartnerPayable explicit, one source per account movement | Avoid editable duplicate balances, mixed obligation families and cash/advance/transfer double counting. Sections 11–14; D31/D32/D34/D42–D44/D55/D65 |
+| D74 | FINALIZED conceptual | Protected system Owner Role classification with protected single-role Membership assignments, not custom grant/name or editable parallel flag | Preserve existing protected-role policy, delegation and at least one active Owner under concurrent user/membership/role changes. Section 16; D19/D24/D67 |
+| D75 | FINALIZED conceptual | Expense-owned MaintenanceDetail; one typed supported parent per Document with owned AttachmentFiles and retained evidence | Independent metadata/history without duplicate costs or arbitrary unsafe attachment links; warning-only expiry/hybrid retention unchanged. Sections 14–15; D33/D37/D39/D66/D68 |
+| D76 | FINALIZED conceptual | Exact-condition rate conflict scope spans same-company agreements; specificity is constraint dominance, maximal incomparable candidates explicitly resolved | No duplicate agreement bypass or arbitrary tie-break. Sections 7–8; D28/D29/D59/D60/D61 |
+| D77 | FINALIZED conceptual | 44 entity/association/history + 15 value/configuration/catalog + 4 derived concepts; 44 invariants and 17 logical atomic boundaries | Count responsibilities, not physical objects; enforce tenant, financial, history, audit and Owner integrity in later provider evaluation. Sections 2/19–24 |
+| D78 | FINALIZED conceptual | Conceptual Data Model: FINALIZED; next DATABASE / BACKEND SELECTION | No remaining material ownership/cardinality/finance/snapshot/authorization/workflow issue identified; no provider/schema/readiness approval. Sections 23–24 |
+
+No database/backend/auth/storage/hosting selection, physical schema or business implementation was performed. Physical precision/index/transaction/outbox/audit/Owner bootstrap/object/backup mechanisms, non-invoice transfer enablement and launch/compliance configuration remain open under the documented invariants. No Development Ready v1.0 claim is made.

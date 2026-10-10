@@ -1,5 +1,5 @@
 # Project Memory
-Updated: 9 October 2026
+Updated: 10 October 2026
 Purpose: Project continuity only; no personal biography or credentials.
 
 ## Current state
@@ -8,10 +8,11 @@ Setup phase completed locally. npm workspaces contain the Next.js dashboard shel
 ## Read order
 1. [PRD.md](PRD.md): business scope, requirements and acceptance criteria.
 2. [DECISIONS.md](DECISIONS.md): confirmed/proposed/open choices.
-3. [ARCHITECTURE.md](ARCHITECTURE.md): implementation boundaries and logical data model.
-4. [DESIGN.md](DESIGN.md): navigation and interaction specifications.
-5. [SECURITY.md](SECURITY.md): access and integrity requirements.
-6. [TEST_PLAN.md](TEST_PLAN.md): planned validation and release gates.
+3. [DATA_MODEL.md](DATA_MODEL.md): finalized conceptual model, snapshots/invariants and database-selection input.
+4. [ARCHITECTURE.md](ARCHITECTURE.md): implementation boundaries.
+5. [DESIGN.md](DESIGN.md): navigation and interaction specifications.
+6. [SECURITY.md](SECURITY.md): access and integrity requirements.
+7. [TEST_PLAN.md](TEST_PLAN.md): planned validation and release gates.
 
 ## Facts to preserve
 - One transport business; track vehicles owned by other companies.
@@ -38,7 +39,7 @@ Munir sample: fare 100,000, commission 3,000, net 97,000, advance 30,000 and bal
 - Added proposed technical/UX/security design and test cases, clearly distinguished from implemented features.
 
 ## Next work
-Business Requirements and Business Policies are Finalized (D26–D69); no material business-policy gaps remain. Next: FINAL CONCEPTUAL DATA MODEL REVIEW → DATABASE/BACKEND SELECTION → AUTH/STORAGE/HOSTING/BACKUP ARCHITECTURE → FINAL ARCHITECTURE AUDIT → DEVELOPMENT READY V1.0 → IMPLEMENTATION. Confirm company configuration and actual staff grants before launch; validate $0 feasibility and required secure multiple-daily backups/tested restore. No providers or physical model are finalized.
+Business Requirements, Business Policies and Conceptual Data Model are FINALIZED (D26–D78; DATA_MODEL.md); no material conceptual/business-policy gaps remain. Next: DATABASE/BACKEND SELECTION → AUTH/STORAGE/HOSTING/BACKUP ARCHITECTURE → FINAL ARCHITECTURE AUDIT → assessment of DEVELOPMENT READY V1.0 → authorized IMPLEMENTATION. Confirm company configuration and actual staff grants before launch; validate $0 feasibility and required secure multiple-daily backups/tested restore. No providers or physical model are finalized.
 Offline sync, GPS, external portals, payroll and full accounting remain outside the initial PRD unless explicitly added.
 
 ## Maintenance rules
@@ -115,3 +116,11 @@ Documentation checks passed: five Markdown-only files, local links/anchors, tabl
 SearchableSelect now wraps React Select 5.10.2; Combobox is a compatibility export of the same implementation. The component exposes rich options, explicit multi selection, local/external/loader search, debounce/minimum characters, scope resets/cancellation, retry/paging, bounded rendered results, required/error associations, disabled/read-only display and stable selected IDs. The synthetic showcase includes vehicle, invoice-Trip, validation, archived-history and dependent supplier/branch fixtures. Existing testing-library/Vitest/jsdom dependencies are present, but no component test suite is configured or claimed executed.
 
 Web/shared lint and type checks, targeted Prettier checks, git diff --check and all four existing environment tests passed. Production build passed in an isolated source copy using the current installed node_modules; this was not a fresh npm ci. T82–T101 browser/screen-reader and trusted-service acceptance remains unexecuted, and business integration remains pending. User authorized committing and pushing these changes to the configured GitHub branch.
+
+## Final conceptual data model milestone — 10 October 2026
+
+Conceptual Data Model: FINALIZED. DATA_MODEL.md is authoritative and supersedes architecture's former capability inventory. Preserve one operating tenant and tenant-local BusinessParty with narrow business-role profiles/Client-specific receiver links; external parties never confer membership. OrderConsignee supports potential receivers and Trip actual receiver snapshots, with explicitly unresolved draft/outsourced facts rather than fabricated values.
+
+Original/normalized loaded/delivered/custom billable/shortage measures, compatible conversion, effective rates and calculated-rate/manual-total snapshots remain distinct. InvoiceVersion/InvoiceLine separates charge coverage from receivable; notes/reissues/corrections reconcile one effective financial position. Ledgers derive from obligations/allocations, PartnerPayable holds explicit agreed cost, SupplierPayable projects fuel/Expense source, and allocation moves no cash. Expense owns maintenance details; one assignment history preserves vehicle/driver/event truth separately from owner/affiliation histories. Documents have a validated typed parent and private files. Protected system Owner Role classification and protected Membership assignment enforce last-active-Owner independently of custom grants; safe actor/resource audit snapshots survive renaming.
+
+Inventory: 44 entity/association/history + 15 values/configuration/catalogs + 4 derived views = 63 named concepts, not physical storage objects. Recorded 44 invariants, 17 atomic boundaries, query pressure and database-selection requirements. No material conceptual/business-policy questions remain; no unresolved issue currently requires changes to core ownership/cardinality/financial/history/authorization/workflows. Physical representation/provider feasibility and launch/compliance configuration remain open; no Development Ready v1.0 claim. No schema/provider/API/business-feature implementation or runtime test was performed. Documentation validation evidence and reviewed/changed files are recorded in DOCUMENTATION_REVIEW.md. Next formal phase: DATABASE / BACKEND SELECTION.

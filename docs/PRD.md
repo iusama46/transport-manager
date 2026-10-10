@@ -1,8 +1,8 @@
 # Transport Management Dashboard
 ## Product Requirements Document — v0.6
 
-Updated: 9 October 2026
-Status: Business Requirements: Finalized. Business Policies: Finalized. Conceptual Data Model: Next. Technical Architecture Providers: Open. Business Implementation: Not Started / existing shell only.
+Updated: 10 October 2026
+Status: Business Requirements: Finalized. Business Policies: Finalized. Conceptual Data Model: FINALIZED (DATA_MODEL.md). Technical Architecture Providers: Open. Business Implementation: Not Started / existing shell only.
 Phase 1: Web dashboard. Phase 2: Expo mobile app.  
 Budget constraint: $0 recurring service cost. No paid plans or add-ons without explicit approval.
 
@@ -224,7 +224,7 @@ Compress attachments, enforce upload limits and monitor quotas. If limits preven
 
 ## 10. Delivery phases
 
-1. Final conceptual data model review → database/backend selection → auth/storage/hosting/backup architecture → final architecture audit → Development Ready v1.0 → implementation; agree source mapping before later import.
+1. Conceptual review completed (DATA_MODEL.md); next database/backend selection → auth/storage/hosting/backup architecture → final architecture audit → assessment of Development Ready v1.0 → authorized implementation; agree source mapping before later import.
 2. Build access control and master records.
 3. Build orders, stops, assignments and outsourcing.
 4. Add fuel, maintenance and expense tracking.
@@ -237,11 +237,11 @@ GPS tracking, offline sync, automated dispatch, customer/partner portals, multip
 
 ## 11. Finalized business status and remaining technical work
 
-Business Requirements and Business Policies are Finalized; no material business-policy gaps remain after this review. Final Conceptual Data Model Review is next, before provider selection and implementation. [DECISIONS.md](DECISIONS.md) retains technical choices, company-specific configuration (identity/base currency/timezone/languages, staff assignments and print branding), and jurisdiction-specific compliance review. These do not reopen the finalized configurable policies. Database/backend, auth implementation, private storage, hosting, backup details, Owner provisioning mechanism, transaction/outbox, append-only audit enforcement, physical decimal/FX representation and export/file handling remain open. The application is not yet Development Ready v1.0.
+Business Requirements and Business Policies are Finalized; no material business-policy gaps remain after this review. Conceptual Data Model is FINALIZED in [DATA_MODEL.md](DATA_MODEL.md); database/backend selection is next, before infrastructure review and implementation. [DECISIONS.md](DECISIONS.md) retains technical choices, company-specific configuration (identity/base currency/timezone/languages, staff assignments and print branding), and jurisdiction-specific compliance review. These do not reopen the finalized configurable policies. Database/backend, auth implementation, private storage, hosting, backup details, Owner provisioning mechanism, transaction/outbox, append-only audit enforcement, physical decimal/FX representation and export/file handling remain open. The application is not yet Development Ready v1.0.
 
 ## 12. Companion documents
 
-[ARCHITECTURE.md](ARCHITECTURE.md), [DESIGN.md](DESIGN.md), [TEST_PLAN.md](TEST_PLAN.md), [SECURITY.md](SECURITY.md), [DECISIONS.md](DECISIONS.md) and [MEMORY.md](MEMORY.md) contain proposed implementation guidance and project continuity. No application implementation or testing is claimed by this documentation release.
+[DATA_MODEL.md](DATA_MODEL.md), [ARCHITECTURE.md](ARCHITECTURE.md), [DESIGN.md](DESIGN.md), [TEST_PLAN.md](TEST_PLAN.md), [SECURITY.md](SECURITY.md), [DECISIONS.md](DECISIONS.md) and [MEMORY.md](MEMORY.md) contain proposed implementation guidance and project continuity. No application implementation or testing is claimed by this documentation release.
 
 ## 13. Confirmed fuel supplier and branch extension — 5 October 2026
 

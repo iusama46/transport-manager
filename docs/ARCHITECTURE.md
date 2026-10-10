@@ -1,6 +1,6 @@
 # Architecture
-Updated: 9 October 2026
-Status: Business Requirements/Policies Finalized; final conceptual data model review next. Proposed implementation design; technical providers remain open.
+Updated: 10 October 2026
+Status: Business Requirements/Policies Finalized; Conceptual Data Model: FINALIZED. Database/backend selection is next; implementation architecture/providers remain open.
 
 ## Scope and references
 Implement [PRD.md](PRD.md). See [DECISIONS.md](DECISIONS.md) for status and [SECURITY.md](SECURITY.md) for trust boundaries. No application has been implemented or deployed by this documentation task.
@@ -29,41 +29,18 @@ Proposed dependency direction: UI and HTTP handlers call application services; s
 
 Use a modular application initially. No separate microservices are required by the PRD.
 
-## Logical data model — finalized conceptual capabilities
+## Authoritative conceptual data model
 
-Provider-independent entities and relationships, not SQL tables or database collections. Every business resource carries verified Company/Tenant context; all relationship traversals enforce it. External counterparties remain distinct from operating tenants.
+[DATA_MODEL.md](DATA_MODEL.md) is the finalized provider-independent V1 model, replacing the earlier capability inventory in this section. It owns the entity/association/value inventory, cardinalities, snapshot matrix, invariant catalog, strong-consistency boundaries and database-selection requirements. PRD remains the business scope authority; no physical schema is approved.
 
-| Concept | Relationships / responsibility |
-|---|---|
-| Company/Tenant | Settings, base Currency, timezone, numbering, reminder periods; one operating business currently, isolation mandatory |
-| User; UserMembership/UserRole | Verified identity, active company membership, one assigned Role initially |
-| Role; Permission; RolePermission | Protected Owner or custom company-scoped Role, granular catalog grants; delegation and last-Owner guards |
-| Factory; Client; Consignee/ClientCustomer | Preserve Factory → direct Customer (Client) → that Client's Consignee; filtered receiver linkage |
-| ContactEntity; Partner/Transporter | Reusable person/company identity, explicit business roles; counterparties never confer membership |
-| Order; OrderStop | Factory/Client, one or multiple potential Consignees, explicit Bill To debtor, optional planned quantity/unit, Loaded/Delivered remaining basis, ordered stops, external references, lifecycle; active Orders may receive Trips |
-| Trip | Belongs to one Order; Order has 1..N Trips operationally (Draft may precede first Trip); actual Consignee/destination, original and normalized quantities/units/conversion rule, shortage rule/effect, billing basis, pricing method, execution, dates/stops and snapshots |
-| Assignment; DriverVehicleAssignmentHistory | Operational reassignment periods at Trip level; drivers not permanently attached to vehicles |
-| Vehicle; VehicleOwnershipHistory | Own-company, partner-company or individual owner with effective history; registration/category/capacity |
-| Driver | Company/partner/external affiliation, identity/licence, availability; Trip preserves historical affiliation |
-| RateAgreement; RateHistory | Effective-dated versions, optional match conditions, rate type/currency/unit, configurable rate date; specificity recommendation and exact-condition overlap rejection |
-| TripPricingSnapshot; ChargeAdjustment; DeductionCategory | Calculated-rate or manual-total snapshot; preserved gross, extensible fixed/percentage commissions/deductions, discounts, tax/rounding/other results and historical rules |
-| QuantityUnit; ConversionRule | Compatible units/factors; original quantity/unit preserved separately from normalized values and historical conversion rule |
-| FuelSupplier; FuelSupplierBranch | Supplier has multiple branches/pumps; historical branch associations retained |
-| FuelPriceHistory; FuelTransaction | Effective supplier/branch prices; actual rate snapshot, liters, calculated/final total, overrides, vehicle and optional Trip |
-| ExpenseAllocation | Expense → multiple Trips; equal/quantity/manual amount/manual percentage method, basis, historical values and exact reconciliation |
-| ExpenseCategory; Expense; MaintenanceExpense | Configurable categories; Trip/Order/Vehicle/Driver/general context, payment data and receipts; maintenance breakdown/reminders preserved |
-| Invoice; InvoiceLine | One/multiple selected Trips; explicit Bill To snapshot, partial amount allocations, pricing method/gross/adjustment snapshots, issued financial versions and unique number |
-| CreditNote; DebitNote | Original Invoice reference, issued adjustments and automatic receivable effect; preserve source snapshots |
-| PartnerPayable; SupplierPayable | Trip partner obligations and fuel supplier obligations; workshop obligations retained; independent of selected Bill To receivables |
-| Payment; PaymentAllocation | Receipt/outgoing type, counterparty/account/currency, posted original and correction links; one-to-many targets with partial/unallocated credit and history |
-| FinancialAccount; AccountTransaction; InternalTransfer | Company-scoped cash/bank/custom accounts, valid balance movements and paired own-account transfers |
-| Currency; ExchangeRateSnapshot | Transaction/base currencies, historical rate/date/source and base equivalent; no current-rate rewriting |
-| TaxConfiguration | Configurable rules/rates and tax-free handling; finalized transaction tax snapshot |
-| DocumentType; Document/Attachment | Predefined/custom type, multiple private files, parent entity, references/dates/expiry, uploader/time and history |
-| AuditLog | Immutable redacted event contract from AUDIT.md, actor/company/resource/time and safe diffs |
-| ImportBatch; ImportRow — V2 only | Preview, validation, duplicate/provenance tracking and confirmed commit; no V1 import API/UI |
+- Company is the operating tenant. Tenant-local BusinessParty (the former ContactEntity identity responsibility) has narrow Factory/Client/Partner/FuelSupplier profiles and Client-specific Consignee relationships; external counterparties never confer membership. Bill To is independent of source/customer/receiver and vehicle owner is independent of executor.
+- OrderConsignee captures potential receivers; Trip records one actual receiver when resolved. Draft/unknown fields remain explicit. Order has 0..N recorded Trips, with 1..N for fulfilled movement; manual completion leaves unfinished Trip states unchanged.
+- Original/normalized loaded, delivered, billable and shortage measures, conversion/rate/tax/FX/adjustment inputs, ownership/affiliation and assignments retain historical evidence. Calculated-rate and Manual Total pricing have distinct snapshots.
+- InvoiceVersion/InvoiceLine and original-linked notes/corrections separate covered Trip charges from final receivable amounts. Posted obligation/allocation/account evidence is authoritative; three ledgers and SupplierPayable are derived views, while PartnerPayable holds the independently agreed cost source.
+- MaintenanceDetail belongs to Expense; one Assignment timeline also serves DriverVehicleAssignmentHistory. Document has a validated typed parent and multiple private AttachmentFiles. No unsafe arbitrary resource association is introduced.
+- Protected system Owner Role classification and protected Membership lifecycle enforce always-active Owner authority independently of custom grants. Audit retains safe actor/resource snapshots and immutable successful-change evidence.
 
-Trip snapshots preserve actual Consignee/destination, vehicle, driver, owner/affiliation, original and converted quantities/units/rule, shortage rule/effect, billable basis/quantity and pricing method. CALCULATED_RATE retains recommended/selected valid rate references/values, date basis/resolved date and calculated gross. MANUAL_TOTAL retains entered gross total, creator and timestamp without a fabricated unit rate. Commission/deduction, discount/tax/rounding and shared expense allocations retain historical inputs/results. Provisional rate estimates remain distinct until the configured date event permits final snapshot. Finalized documents/payments retain currency, historical FX, tax and billed-to details. Updating master records or rate/tax/FX configuration never rewrites history. Names are conceptual, not mandated storage names.
+The inventory contains 44 entity/association/owned-history concepts, 15 values/configuration/catalog concepts and 4 derived views. These 63 named responsibilities are not 63 proposed persistence objects. ImportBatch/ImportRow remain V2 and are outside that inventory. See the [relationship map](DATA_MODEL.md#18-relationship-and-cardinality-map), [snapshots](DATA_MODEL.md#17-historical-snapshot-matrix), [invariants](DATA_MODEL.md#19-invariant-catalog) and [atomic operations](DATA_MODEL.md#20-strong-consistency-and-atomic-operations).
 
 Stable internal IDs are system controlled. Display numbering is company configurable (e.g. ORD-000123, TRIP-000456, INV-000078, RB-ORD-2026-000123), collision-safe and distinct from Factory/PO/Bilty/DO/consignment references. Registration matching remains separate from display values.
 
@@ -103,7 +80,7 @@ Cloudflare is only a hosting candidate. No payment plan is authorized. V1 requir
 Offline edits and synchronization are not approved scope. Browser draft recovery may be considered separately, but must never suggest a financial post succeeded while offline.
 
 ## Implementation gates
-Business requirements and policies are finalized (DECISIONS.md D51–D69); no material business-policy gaps remain. Sequence: Final Conceptual Data Model Review → Database/Backend Selection → Auth/Storage/Hosting/Backup Architecture → Final Architecture Audit → Development Ready v1.0 → Implementation. Provider choices, protected Owner provisioning mechanism, transaction/outbox, append-only audit enforcement, physical decimal/FX and export/file handling remain open. The conceptual entities above are inputs to review, not an approved physical schema. A thin vertical slice should prove login → create order → persist → reload before building all modules.
+Business requirements/policies and the conceptual model are finalized (DECISIONS.md D51–D78; DATA_MODEL.md). No material business-policy or conceptual-model gap remains. Next sequence: Database/Backend Selection → Auth/Storage/Hosting/Backup Architecture → Final Architecture Audit → assessment of Development Ready v1.0 → authorized Implementation. Provider choices, protected Owner provisioning mechanism, transaction/outbox, append-only audit enforcement, physical decimal/FX and export/file handling remain open. The finalized conceptual model constrains that review; it is not an approved physical schema. Provider evaluation must prove DATA_MODEL.md A01–A17 and the Database Selection Requirements. A thin vertical slice should prove login → create order → persist → reload before building all modules.
 
 ## Fuel supplier/branch model — confirmed extension
 

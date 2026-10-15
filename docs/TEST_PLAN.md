@@ -2,6 +2,27 @@
 Updated: 16 October 2026
 Status: Architecture/test-plan review completed; runtime acceptance below is planned, not executed by this audit. Existing shell/environment verification is dated evidence in TASKS.md; old table/build blockers were resolved. No runtime feature test is required to exist before its feature is implemented.
 
+## AI Change Verification Gate
+
+For each implementation change, run the actual applicable checks below on the final relevant diff and retain command, date/commit/environment, result/counts, failures/skips and tests **not run and why**. An AI saying “tests passed” without executing them is NOT verification. A zero-test run, installed runner or mocked provider assertion is not acceptance evidence. Tests must verify meaningful behavior/invariants, not mirror implementation details. This gate does not require runtime feature tests before a feature exists.
+
+| Check | Current command / required applicability |
+|---|---|
+| Formatter | `npm run format:check`, or scoped installed Prettier for changed supported files; existing docs/README Markdown is ignored, while root AGENTS.md is included. For documentation-only work, run any included-file formatter check plus Markdown structure/link/table/whitespace checks and report ignored-file non-applicability honestly |
+| Lint | `npm run lint` for implementation/configuration changes, or justified affected-workspace checks; no unrelated lint cleanup |
+| Typecheck | `npm run typecheck` for TypeScript/contracts/configuration changes; includes Next route types and shared package |
+| Existing environment tests | `node --test scripts/environment.test.mjs` when environment/config/ignore/server-boundary behavior changes |
+| Unit / component tests | Run actual configured targeted suites for changed behavior/calculations once implemented. Vitest/Testing Library are installed, but no feature-suite command is configured yet; do not invent `npm test` success |
+| Integration / API / concurrency | Run actual isolated synthetic PostgreSQL/Auth/file/API tests appropriate to the boundary; target allow/deny, Company scope, Owner, history/audit and A01–A17 as applicable. Configure missing harnesses in an authorized implementation slice, do not claim planned T-IDs ran |
+| Build | `npm run build` when routing, rendering, package, runtime composition or build/deployment changes warrant it; inspect scripts/environment first and keep live caches isolated when needed |
+| Targeted security / regression | Direct requests and changed behavior/negative tests, secret-safe diffs/bundles and relevant THREAT/FAILURE cases; synthetic fixtures, never implicit production access |
+| Customer path / manual | At least one meaningful manual or end-to-end customer-path check for customer-facing feature work where practical; record actual inputs/steps/outcome. If unavailable, explain why and retain any material no-ship gap |
+| Diff / documentation | Review full tracked and untracked diff; `git diff --check`, local link/anchor/structure checks where docs change; update only affected authorities/trace/session state |
+
+Choose checks by changed behavior, not file count. A failed check remains failed; a justified inapplicable check is N/A, not PASS. Separate pre-existing failures from new regressions with evidence; never disable tests/security or rewrite unrelated files to get green output. Material correctness/security/financial failures or unverified assumptions block shipping. Do not skip relevant unit/integration tests merely because a build succeeds; when the change itself introduces a behavior needing those tests, establish/execute the meaningful applicable coverage before acceptance.
+
+For documentation-only governance, runtime formatter/lint/typecheck/build/feature suites may be N/A with the concrete reason recorded; do not manufacture fake runtime tests. [PRE_SHIP_CHECKLIST.md](PRE_SHIP_CHECKLIST.md) adds the human/system-understanding gate before meaningful implemented subsystems ship. Explicit production restore/security/operational validation remains required by OPERATIONS/FINAL_ARCHITECTURE_AUDIT, not by the act of starting development.
+
 ## Scope and strategy
 Validate [PRD.md](PRD.md) using domain unit tests, data/service integration tests, browser workflows and targeted manual print/accessibility checks. Vitest and Playwright are proposed. Provider-specific tests now follow the selected Supabase/Auth/Cloudinary and recovery contracts. Use synthetic fixtures; do not copy private identity documents into test repositories.
 

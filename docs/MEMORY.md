@@ -6,14 +6,15 @@ Purpose: Project continuity only; no personal biography or credentials.
 Existing Next.js UI/environment shell remains implemented; no business/auth/persistence module or deployment exists. Business requirements/policies and conceptual model are finalized. Current V1 stack: Next.js/TypeScript thin REST handlers/services/repositories → Supabase PostgreSQL; Supabase Auth for identity, application RBAC for permission, Cloudinary private documents for development/production, Vercel with paid production acceptable. Drizzle remains a recommendation. **Development Ready v1.0: YES. B1: CLOSED. Production Ready: NO.** Recovery is selected in OPERATIONS_ARCHITECTURE.md; actual integration/operational/restore tests remain pending. The 16 October audit preserves existing working-tree changes and modifies Markdown only; see FINAL_ARCHITECTURE_AUDIT.md for findings/checks and production gates.
 
 ## Read order
-1. [PRD.md](PRD.md): business scope, requirements and acceptance criteria.
-2. [DECISIONS.md](DECISIONS.md): confirmed/proposed/open choices.
-3. [DATA_MODEL.md](DATA_MODEL.md): finalized conceptual model, snapshots/invariants and database-selection input.
-4. [FINAL_ARCHITECTURE_AUDIT.md](FINAL_ARCHITECTURE_AUDIT.md) and [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md): current selections, security boundaries, recovery blocker and readiness verdict. DATABASE_BACKEND_SELECTION.md retains technical evaluation and dated Free limits.
-5. [ARCHITECTURE.md](ARCHITECTURE.md): implementation boundaries.
-6. [DESIGN.md](DESIGN.md): navigation and interaction specifications.
-7. [SECURITY.md](SECURITY.md): access and integrity requirements.
-8. [TEST_PLAN.md](TEST_PLAN.md): planned validation and release gates.
+
+[AGENTS.md](../AGENTS.md) is the main operating manual; its required reading is:
+
+1. [HANDOVER.md](HANDOVER.md): current operational session state, active assumptions and next task.
+2. [CONSTRAINTS.md](CONSTRAINTS.md): hard engineering rules and linked action/verification gates.
+3. [ARCHITECTURE.md](ARCHITECTURE.md): implementation boundaries.
+4. Task-relevant [PRD](PRD.md), [DECISIONS](DECISIONS.md), [DATA_MODEL](DATA_MODEL.md), [PERMISSIONS](PERMISSIONS.md), [AUDIT](AUDIT.md), [SECURITY](SECURITY.md), [OPERATIONS](OPERATIONS_ARCHITECTURE.md), [ENVIRONMENT](ENVIRONMENT.md), [TEST_PLAN](TEST_PLAN.md), [DESIGN](DESIGN.md), [COMPONENTS](COMPONENTS.md), [TASKS](TASKS.md) and [final audit](FINAL_ARCHITECTURE_AUDIT.md).
+
+This file retains durable context/history; HANDOVER owns active session state and assumptions. DECISIONS owns rationale/alternatives, DATA_MODEL is the DATA.md equivalent, TEST_PLAN owns testing and OPERATIONS owns recovery. Historical read-order/next-phase notes below are superseded.
 
 ## Facts to preserve
 - One transport business; track vehicles owned by other companies.
@@ -51,6 +52,10 @@ Actual production plans/domain/secrets, security/load/accessibility acceptance a
 
 ## Maintenance rules
 Treat PRD as scope authority and DECISIONS as decision history. Update this file after completed milestones, recording actual validation and limitations. Never report planned tests as passing. Keep secrets, production data dumps and private document contents out of these documents. New user requirements supersede prior proposals when explicitly stated.
+
+## Governance continuity — 16 October 2026
+
+D97/D98 establish the consolidated operating workflow in AGENTS: scoped action review, dependency/secret rules, proportional trace/Defense requirements and actual verification/rollback evidence. HANDOVER stays current and lightweight; no manual dependency ledger or separate action-policy/Defense instruction file. Normal work updates HANDOVER only if state changed and DECISIONS only for a meaningful decision; traces depend on risk/complexity/session scope, and Defense/pre-ship gates apply before meaningful subsystem release. Detailed architecture/data/security/testing/recovery authorities stay unchanged. Development Ready remains YES; Production Ready remains NO. Next is separately requested Phase 1 — Trusted Access Foundations; no implementation/commit/push in consolidation.
 
 ## Historical milestones — superseded by the 16 October audit
 

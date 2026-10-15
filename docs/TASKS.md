@@ -21,6 +21,16 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 - [x] Close recovery architecture B1: select runner/store, schedule/retention/encryption/custody, RPO/RTO, operator/monitoring, DB/Auth/Cloudinary consistency, approved restore and drills; reassess Development Ready v1.0: YES.
 - [ ] Production integration/capacity/company configuration and later runtime security/restore acceptance; keep separate from architecture readiness.
 
+## AI engineering governance — 16 October 2026
+
+- [x] Consolidate action/dependency/secret and working rules in root AGENTS; keep HANDOVER lightweight and CONSTRAINTS focused on hard rules.
+- [x] Reuse DECISIONS for alternatives, DATA_MODEL as DATA.md equivalent, TEST_PLAN for actual verification and SECURITY/OPERATIONS for detailed controls.
+- [x] Retain specialized flow/threat/failure/rollback/pre-ship maps and lightweight optional feature/bug traces; keep one Defense template for meaningful subsystems before release. Package manifests/lockfile own dependency inventory; no completed runtime defenses invented.
+- [x] Keep only live material assumptions/current state in HANDOVER; normal work needs no fixed set of documentation edits. Verification/consolidation evidence is in DOCUMENTATION_REVIEW.
+- [ ] **Phase 1 — Trusted Access Foundations**, after authorization: first implement nonproduction server-only configuration/composition and environment isolation as one coherent reviewed slice, then separately scope provisioning/Owner/Auth/authorization/audit and a protected-read proof.
+
+Writing these rules does not complete runtime controls or authorize Phase 1, commit/push, deployment or production access. Pre-ship checks apply before release, not before development begins.
+
 ## 1. Project setup
 
 - [x] Resolve development database/backend (O01; D79/D84); ORM remains recommendation only.

@@ -49,7 +49,7 @@ A short yes following several alternatives does not establish which financial ru
 The current saved PRD remains the terminology baseline. Unverified summaries mentioning other labels or database options must not override explicit decisions; obtain the actual decision before changing these files.
 
 ## Decision process
-When resolved, preserve the original question, record date, decision, rationale, alternatives and affected requirements/tests. Update PRD and relevant design documents in the same change. Do not erase old decisions; mark superseded entries and link their replacement. Do not claim that a proposed option is implemented.
+When resolved, preserve the original question, date, Context, Options, Chosen, Why, Trade-off, Revisit if, affected requirements/tests and approval scope. Record agent/tool/model when known for significant AI-assisted architecture work; do not invent exact model identity. Update PRD/design only if actually affected; do not churn unrelated documents. Retain superseded decisions with their replacements and distinguish proposed/implemented/verified. Review actual diff and evidence, not just an AI summary. [HANDOVER.md](HANDOVER.md) owns active session assumptions; this log owns accepted decisions and their alternatives.
 
 ## Decisions added 5 October 2026
 
@@ -214,3 +214,73 @@ No finalized business policy or conceptual responsibility is redesigned. No sche
 | D94 | Selected retention/security/custody | Seven-day frequent, 35-day daily and 400-day monthly self-contained encrypted generations, tier locks, separate prune/verification access; age decryption identities in independent vault/offline custody | No keys with backup objects or capture-runner decrypt keys. R2 admin can remove locks; separate administration/MFA/dual approval and external alerts mitigate residual risk |
 | D95 | Selected operations/recovery | System Owner / Designated Technical Administrator owns alerts/investigation/execution/evidence; Owner approves production restore and traffic cutover; Better Stack external freshness monitoring; explicit DB/Auth/Cloudinary runbook and drills | Four-hour stale warning, six-hour RPO breach; pre-production full isolated restore, monthly integrity drills, quarterly/full-on-change restores. No test has been executed |
 | D96 | Final readiness reassessment; supersedes D91 | B1: CLOSED. Development Ready v1.0: YES. Production Ready: NO | All B1 decisions selected; no new material architecture/business blocker identified. Runtime security, operational configuration/capacity and measured restore remain production gates; next implementation phase needs separate authorization |
+
+## Architecture alternatives and revisit triggers
+
+This is the canonical alternatives record; no competing ALTERNATIVES.md is needed. Entries consolidate documented choices, not a new provider selection/benchmark. SECURITY/DATA_MODEL/OPERATIONS remain the detailed authorities. Where no comparison exists, that limitation is explicit. Historical source for the earlier hosting candidate: `d01b3ae`, `docs/ARCHITECTURE.md`, “Free deployment and offline boundary”. No newly invented alternative is attributed to past review.
+
+### Backend
+
+- **Context:** V1 has an existing Next.js UI and needs reusable trusted REST workflows for web/future Expo.
+- **Options:** Existing full-stack Next.js; earlier separate NestJS deployment (D80), subsequently superseded; handler-embedded business logic rejected in DATABASE_BACKEND_SELECTION.
+- **Chosen:** Next.js full-stack thin `/api/v1/*` adapters, authorized modular services/repositories (D84/D86).
+- **Why:** One V1 application/deployment preserves the existing stack while portable contracts retain the ability to extract business services.
+- **Trade-off:** Function/pool/job boundaries must be respected; a separate backend offers independent execution/scaling at the cost of another deployment boundary.
+- **Revisit if:** Sustained independent runtime/scaling/team/extraction requirements materially change the architecture; new reviewed decision required before NestJS adoption.
+
+### Database
+
+- **Context:** Finalized relational/financial/history invariants and multi-record atomic operations in DATA_MODEL.
+- **Options:** PostgreSQL on Supabase; PostgreSQL on another/self-managed host; earlier MongoDB/Firebase suggestions. DATABASE_BACKEND_SELECTION §2 explicitly does not claim document-store benchmarks or full suitability studies.
+- **Chosen:** Supabase PostgreSQL; development Free and selected production recovery plan are distinct (D79/D87/D92).
+- **Why:** Explicit user choice; documented native relational/transaction/numeric mechanisms fit the conceptual invariants when application controls are implemented.
+- **Trade-off:** Managed service quotas/configuration and Auth/export adapters need operational care; portability is a verified migration/reconciliation process, not just a connection-string swap.
+- **Revisit if:** Verified capacity, operational/security/recovery needs no longer fit; preserve business invariants and review evidence before changing engine/host.
+
+### Storage
+
+- **Context:** Private documents need metadata/history/Company authorization while bytes stay outside PostgreSQL.
+- **Options:** Cloudinary selected; Supabase Storage was mentioned as a possible later choice/quota input in the historical database selection. No formal comparative storage evaluation was recorded.
+- **Chosen:** Cloudinary in development AND production (D89), PostgreSQL metadata/manifests.
+- **Why:** Explicit user direction; private original/derivative, version and independent recovery requirements are defined through the provider adapter.
+- **Trade-off:** Separate DB/object consistency requires stages/reconciliation; delivery/privacy/version/export settings and quotas must be proven. No undocumented price/security superiority is claimed.
+- **Revisit if:** Verified private delivery, required formats, limits, recovery or economics cannot meet finalized needs; new decision, not an automatic Supabase Storage substitution.
+
+### Authentication
+
+- **Context:** Invite-only identity/session recovery must be separate from domain Membership/RBAC/Owner authority.
+- **Options:** Supabase Auth is the documented selection; repository history records no named competing authentication-provider evaluation. Bespoke password cryptography is prohibited by SECURITY, not a historically evaluated provider.
+- **Chosen:** Supabase Auth (D88), with application authorization remaining independent.
+- **Why:** Explicit user direction and maintained provider boundary; OPERATIONS defines identity/session/reset/revocation/provisioning contracts.
+- **Trade-off:** Provider session/cookie/configuration and Auth export/recovery details require testing; a valid token never proves domain permission.
+- **Revisit if:** Identity/security/recovery/mobile requirements cannot be met by the verified integration; document an actual comparison and new decision first.
+
+### Hosting
+
+- **Context:** Full-stack Next.js production must meet runtime/security/isolation/recovery needs; paid production is acceptable.
+- **Options:** Vercel selected; Cloudflare was an earlier hosting candidate in `d01b3ae`. The earlier mandatory $0/Hobby premise was superseded, not proven commercially adequate.
+- **Chosen:** Vercel with appropriate production plan (D85/D90).
+- **Why:** Explicit selected direction fits the existing full-stack deployment boundary; no present material conflict was found in the final audit.
+- **Trade-off:** Body/deadline/pool limits and durable background execution need appropriate architecture/testing; selection does not imply unlimited capacity or launch approval.
+- **Revisit if:** Measured finalized workload or operational requirements materially conflict with available deployment capabilities; review evidence and alternatives before changing host.
+
+### Recovery
+
+- **Context:** Loss/corruption of DB/Auth/private originals must be recoverable beyond a primary provider/account.
+- **Options:** Provider-only backup, independent logical/file recovery, proposed six-hour GitHub starts, and the documented operator/CI/off-site candidates in historical selection inputs.
+- **Chosen:** D92–D95 and the single OPERATIONS recovery specification: managed Supabase recovery plus independent private GitHub/R2 complete generations with three-hour capture.
+- **Why:** Provider-only DB recovery omits Cloudinary bytes/configuration and shares a failure domain. Three-hour capture provides headroom for the six-hour RPO objective; no schedule SLA is invented.
+- **Trade-off:** More storage/credentials/verification/custody and restore work; scheduler delays, admin-removable locks and poisoned source data remain modeled risks with mitigations.
+- **Revisit if:** Measured capacity, recovery objectives, failure domains or repeated objective breaches require a changed runner/store/cadence; preserve tested complete recovery and deliberate human restore approval.
+
+## AI development governance — 16 October 2026
+
+| ID | Status | Decision | Consequence |
+|---|---|---|---|
+| D97 | Confirmed governance scope; documented, not runtime enforcement | Adopt HANDOVER-first workflow, CONSTRAINTS/AI action policy, meaningful trace/Defense/pre-ship requirements and actual verification evidence; retain existing authorities for decisions/data/tests/security/recovery | No business policy/provider change or reversal of Development Ready YES. Agent/tool: Codex; exact model version not recorded. Governance task does not authorize implementation, commit/push, production access or deployment |
+
+## Governance consolidation — 16 October 2026
+
+| ID | Status | Decision | Consequence |
+|---|---|---|---|
+| D98 | Confirmed documentation refinement | AGENTS owns action/dependency/secret/workflow rules; HANDOVER keeps current state/live assumptions; traces depend on risk/complexity/session scope; one Defense template before meaningful subsystem release | Refines D97's organization without changing business/architecture/security/data/recovery/production requirements. Manifests/lockfile own dependencies; normal work does not update a document set. Agent/tool: Codex; no Phase 1 execution or commit/push |

@@ -8,6 +8,12 @@ Final V1 selections: Next.js/TypeScript full-stack REST `/api/v1/*`, modular aut
 
 Recovery selection: Supabase Pro + seven-day PITR on eligible compute, GitHub Actions every three hours to a separate private Cloudflare R2 recovery account, independent database/Auth/Cloudinary generations with tiered retention, client-side encryption and external freshness alerts. RPO <= 6 hours and RTO <= 4 hours are objectives pending measured testing. The three-hour cadence provides headroom for the proposed six-hour RPO. No infrastructure, backup job or restore was executed. Next phase, only when authorized: isolated development infrastructure and trusted access/Owner/RBAC/audit foundation.
 
+## AI and developer entry point
+
+Start with [AGENTS.md](AGENTS.md), the AI operating manual, then read **[HANDOVER](docs/HANDOVER.md) → [CONSTRAINTS](docs/CONSTRAINTS.md) → [ARCHITECTURE](docs/ARCHITECTURE.md) → task-relevant authorities**. HANDOVER answers where we are now; MEMORY holds durable context; Git owns detailed history. Package manifests/lockfile are the dependency inventory.
+
+Normal work is one coherent change, actual diff review and applicable [TEST_PLAN](docs/TEST_PLAN.md#ai-change-verification-gate) checks. Update HANDOVER if state changed and DECISIONS only for a meaningful decision; use [feature/bug traces](AGENTS.md#featurebug-trace-rule) only when warranted. Before shipping a meaningful customer-facing subsystem, require its [Defense](docs/defense/TEMPLATE.md) and [pre-ship checklist](docs/PRE_SHIP_CHECKLIST.md). Specialized [flow](docs/FLOW.md), [threat](docs/THREAT.md), [failure](docs/FAILURE.md) and [rollback](docs/ROLLBACK.md) maps remain separate. Development Ready v1.0: YES; Production Ready: NO. Next: **Phase 1 — Trusted Access Foundations**, not started here.
+
 ## Structure
 
 | Directory | Purpose |
@@ -17,7 +23,7 @@ Recovery selection: Supabase Pro + seven-day PITR on eligible compute, GitHub Ac
 | packages/shared | Provider-independent TypeScript types and Zod validation |
 | docs | Requirements, design, architecture and implementation checklist |
 
-Start with [PRD](docs/PRD.md), [Decisions](docs/DECISIONS.md) and [Tasks](docs/TASKS.md). Other references: [Data Model](docs/DATA_MODEL.md), [Database/Backend Selection](docs/DATABASE_BACKEND_SELECTION.md), [Architecture](docs/ARCHITECTURE.md), [Design](docs/DESIGN.md), [Security](docs/SECURITY.md), [Test Plan](docs/TEST_PLAN.md) and [Memory](docs/MEMORY.md).
+After the entry reading above, use [PRD](docs/PRD.md), [Decisions](docs/DECISIONS.md) and [Tasks](docs/TASKS.md) for scope/decision/delivery detail. Other references: [Data Model](docs/DATA_MODEL.md), [Database/Backend Selection](docs/DATABASE_BACKEND_SELECTION.md), [Architecture](docs/ARCHITECTURE.md), [Design](docs/DESIGN.md), [Security](docs/SECURITY.md), [Test Plan](docs/TEST_PLAN.md) and [Memory](docs/MEMORY.md).
 
 ## Client overview
 
@@ -48,7 +54,7 @@ npm run format:check
 npm run format
 ```
 
-Prettier formats implementation and configuration files; existing Markdown documentation is excluded from automatic formatting. The root lockfile pins the installed dependency tree. Use `npm install` when deliberately changing dependencies, and commit the resulting lockfile.
+Prettier formats implementation/configuration files and root AGENTS.md; existing docs/README Markdown is excluded from automatic formatting. Check the agent entry with `./node_modules/.bin/prettier --check AGENTS.md`. The root lockfile pins the installed dependency tree. Use `npm install` when deliberately changing dependencies, and commit the resulting lockfile.
 
 The shared workspace exports TypeScript source and is transpiled by Next.js. It currently contains a UI placeholder contract only. Expo, domain test runners and business workflows remain future work.
 

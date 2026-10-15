@@ -524,3 +524,11 @@ Historical 10 October evaluation input: database/backend selection followed this
 | Technical choices remaining | Physical decimal/FX representation, constraints/indexes, transaction/outbox strategy, auth/Owner bootstrap, storage/hosting/backup mechanism and export handling |
 
 Current next action: B1 is CLOSED and the final audit declares Development Ready v1.0: YES; begin implementation only after separate authorization. No readiness or production gate is closed merely by documenting requirements. Sections 2–23 preserve the finalized conceptual/business policies.
+
+## 25. Governance data-documentation role
+
+This document is the authoritative equivalent of the field guide's **DATA.md**; no competing DATA.md is required. Core structures/ownership/cardinalities are in §§2–18, financial/historical/tenant invariants in §19, atomic writers in §20, access patterns in §21 and trade-offs/simplification in §22. These remain conceptual responsibilities, not a physical schema.
+
+Application writers are authorized server services coordinating transaction-scoped repositories and append-only audit capture; readers are authorized service-backed UI/API/exports/reports with the same Company/resource/field boundary. Supabase Auth writes its managed identity/session state through its provider; adapter/application membership changes remain separately protected. Migration/provisioning/backup/restore identities are exceptional reviewed operations roles, never normal client/runtime authority. OPERATIONS_ARCHITECTURE defines their recovery/credential boundaries.
+
+Growth includes child histories, corrections, audit, immutable file manifests and indexes, not only one row per Trip. [Database growth estimates](DATABASE_BACKEND_SELECTION.md#9-database-growth-estimates) owns quantified planning assumptions/sensitivity; actual schema sizes, traffic and restore capacity are unmeasured until implementation. Retained file bytes/backups are separate from DB size. Measure rather than delete required history to meet a quota. No business-model or growth assumption is finalized anew by this governance section.

@@ -1,4 +1,42 @@
-# B1 recovery architecture closure and readiness reassessment
+# AI governance consolidation review
+
+Reviewed: 16 October 2026 on `feat/project-setup`. **Development Ready v1.0: YES. Production Ready: NO.** Documentation only; Phase 1, source/configuration, packages, finalized business/architecture/security/data/recovery/production requirements and existing runtime test strategy are unchanged. Incoming governance work was uncommitted and preserved except for the explicitly requested consolidation/removals. No commit/push.
+
+## Disposition
+
+Removed after merging useful rules: `docs/AI_ALLOW_POLICY.md`, `docs/DEPENDENCIES.md`, `docs/defense/README.md`. These names here record removals, not live references. No packages were removed.
+
+Retained governance structure: AGENTS; HANDOVER, CONSTRAINTS, FLOW, THREAT, FAILURE, ROLLBACK, PRE_SHIP_CHECKLIST; features/TEMPLATE, bugs/TEMPLATE and defense/TEMPLATE under docs. FLOW remains unchanged. All existing project/business/security/recovery documents remain; DATA_MODEL/DECISIONS/TEST_PLAN keep their established authority. No DATA.md or ALTERNATIVES.md introduced.
+
+Modified: AGENTS.md, README.md; docs/HANDOVER.md, CONSTRAINTS.md, PRE_SHIP_CHECKLIST.md, ROLLBACK.md, THREAT.md, FAILURE.md, MEMORY.md, TASKS.md, DECISIONS.md, DOCUMENTATION_REVIEW.md; features/TEMPLATE.md, bugs/TEMPLATE.md and defense/TEMPLATE.md (15 files relative to incoming tree). DECISIONS adds governance-only D98; existing decisions D01–D97 are unchanged.
+
+## Consolidated workflow
+
+AGENTS is the concise operating manual: required reading, before/during/after editing, SAFE / REVIEW REQUIRED / NEVER AUTOMATICALLY EXECUTE, dependency/secret rules, proportional traces, Defense and Git hygiene. Risky effects still require concrete review; prior explicit authorization is not requested repeatedly. Production access/deployment/restoration, destructive actions, unreviewed sensitive effects and security/test bypass remain protected. Manifests/lockfile own dependency inventory; no routine manual ledger.
+
+HANDOVER now has seven current-state sections and one live unverified assumption; removed resolved session trivia and history. Durable decisions/context stay in DECISIONS/MEMORY; Git holds detailed history. Normal work makes one coherent change, reviews diff, runs applicable TEST_PLAN verification and updates HANDOVER only if state changed. DECISIONS changes for an actual meaningful decision. Feature/bug traces are for multi-step/high-risk/session-spanning/hard-to-reproduce/financially or security-sensitive/architecturally significant work, not routine component/copy/style/isolated fixes. Defense/pre-ship applies before meaningful subsystem release, not every component or starting development.
+
+Corrected action/dependency/Defense links across entry, constraints, templates, specialized maps and pre-ship guidance; changed obsolete HANDOVER assumption anchors to its compact section. No competing dependency/action/Defense authority remains. Specialized threat/failure mitigations, rollback data-safety rules and all pre-production security/recovery gates remain intact.
+
+## Verification and assumptions
+
+- `python3 /tmp/transport-governance-simple/check_consolidation.py` — PASS: 33 Markdown files, 219 local links/anchors, no broken targets or table/structure errors; exactly three removals, 15 modified files and no new files relative to the incoming tree. Full before/after diff includes incoming untracked governance files. Existing authoritative requirements, hard domain/security constraints, threat/failure tables, D01–D97, historical audits and 118 planned test definitions are preserved; governance-only D98 added. No competing DATA/ALTERNATIVES authority or source/configuration/package change. Governance text reduced from 8,093 to 5,322 words; AGENTS is 670 words, HANDOVER 243.
+- `rg -n 'AI_ALLOW_POLICY|DEPENDENCIES\.md|defense/README|HANDOVER.*#open-questions|Latest Session' AGENTS.md README.md docs -g '*.md'` — only the removal/verification records match; no live stale references.
+- `./node_modules/.bin/prettier --check AGENTS.md` — PASS. Existing Prettier policy ignores docs/README Markdown; the structure/link/table checks cover those documents. No Markdown linter is configured.
+- `git diff --check` — PASS; full consolidation diff also checked for added-line whitespace, including incoming untracked files.
+- `python3 /tmp/transport-governance/scan_current.py` — PASS: 114 tracked/untracked nonignored files, including PPTX XML; zero recognizable private/provider/age keys, JWTs, credential URLs or quoted secret-assignment candidates; no actual env paths, both env examples comment-only. No secret values printed. Heuristic scope excludes ignored local files, Git history, compressed PDF/image contents and external accounts; no live credential use.
+
+All documentation checks passed. Runtime lint/typecheck/build/unit/integration/manual application tests were not run: only Markdown changed, with no runtime behavior or configuration affected. Planned security/financial/recovery acceptance tests remain unexecuted; no production-readiness claim.
+
+Assumptions: VERIFIED — incoming authorities, selected providers and development YES/production NO status; source/package changes are unnecessary. UNVERIFIED — designed runtime controls/restore effectiveness remain pre-ship work (HANDOVER GOV-04). No disproven premise requiring a business/architecture change; no open consolidation question.
+
+## Next
+
+**Phase 1 — Trusted Access Foundations**, only when separately requested. First scoped slice remains server-only nonproduction configuration/composition and environment isolation. Not started here.
+
+---
+
+## Historical B1 recovery architecture closure and readiness reassessment
 
 Reviewed: later 16 October 2026 on `feat/project-setup`. Supersedes the initial same-day blocked final audit retained below.
 

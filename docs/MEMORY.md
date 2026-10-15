@@ -1,18 +1,19 @@
 # Project Memory
-Updated: 10 October 2026
+Updated: 16 October 2026
 Purpose: Project continuity only; no personal biography or credentials.
 
 ## Current state
-Setup phase completed locally. npm workspaces contain the Next.js dashboard shell and a shared TypeScript/Zod package. All business screens are clearly labelled placeholders with no operational data. Historical setup checks passed. The 6 October UI hook/table-library lint/type/build failures are resolved by the 9 October component repair: current lint/type checks, isolated production build and targeted Chrome table interactions pass (TASKS.md). Nothing has been deployed; database/provider selection and migration remain open.
+Existing Next.js UI/environment shell remains implemented; no business/auth/persistence module or deployment exists. Business requirements/policies and conceptual model are finalized. Current V1 stack: Next.js/TypeScript thin REST handlers/services/repositories → Supabase PostgreSQL; Supabase Auth for identity, application RBAC for permission, Cloudinary private documents for development/production, Vercel with paid production acceptable. Drizzle remains a recommendation. **Development Ready v1.0: YES. B1: CLOSED. Production Ready: NO.** Recovery is selected in OPERATIONS_ARCHITECTURE.md; actual integration/operational/restore tests remain pending. The 16 October audit preserves existing working-tree changes and modifies Markdown only; see FINAL_ARCHITECTURE_AUDIT.md for findings/checks and production gates.
 
 ## Read order
 1. [PRD.md](PRD.md): business scope, requirements and acceptance criteria.
 2. [DECISIONS.md](DECISIONS.md): confirmed/proposed/open choices.
 3. [DATA_MODEL.md](DATA_MODEL.md): finalized conceptual model, snapshots/invariants and database-selection input.
-4. [ARCHITECTURE.md](ARCHITECTURE.md): implementation boundaries.
-5. [DESIGN.md](DESIGN.md): navigation and interaction specifications.
-6. [SECURITY.md](SECURITY.md): access and integrity requirements.
-7. [TEST_PLAN.md](TEST_PLAN.md): planned validation and release gates.
+4. [FINAL_ARCHITECTURE_AUDIT.md](FINAL_ARCHITECTURE_AUDIT.md) and [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md): current selections, security boundaries, recovery blocker and readiness verdict. DATABASE_BACKEND_SELECTION.md retains technical evaluation and dated Free limits.
+5. [ARCHITECTURE.md](ARCHITECTURE.md): implementation boundaries.
+6. [DESIGN.md](DESIGN.md): navigation and interaction specifications.
+7. [SECURITY.md](SECURITY.md): access and integrity requirements.
+8. [TEST_PLAN.md](TEST_PLAN.md): planned validation and release gates.
 
 ## Facts to preserve
 - One transport business; track vehicles owned by other companies.
@@ -22,9 +23,13 @@ Setup phase completed locally. npm workspaces contain the Next.js dashboard shel
 - Customer receipts and partner payments have independent balances.
 - Outsourcing is a view of the same orders, not duplicated jobs.
 - Bills must support more than 14 rows and multipage printing.
-- $0 recurring service budget; no paid plan or add-on approval.
-- Database choice remains open. MongoDB was raised later; no migration is authorized.
+- Eligible free development resources remain optional; appropriate paid production plans are acceptable (D90). No purchase/deployment occurred in this audit.
+- PostgreSQL on Supabase Free is selected for development/testing; Next.js server services are the protected backend; separate NestJS is deferred. Earlier MongoDB options are superseded for V1 development, with no migration implemented. Production selects Supabase Pro + eligible compute/seven-day PITR and the independent recovery architecture; provisioning/testing remains pending.
 - Do not infer payer, an actual tax configuration, commission type, vehicle owner or missing payment amount from ambiguous source cells.
+
+## Selected recovery — later 16 October 2026
+
+OPERATIONS_ARCHITECTURE.md is authoritative: Supabase Pro + seven-day PITR on eligible compute; private GitHub Actions every three hours with explicit application/Auth logical exports and self-contained Cloudinary original/version generations to separate private R2. Retain frequent seven days, daily 35 days, monthly 400 days; TLS + age + provider at-rest encryption, keys outside bucket/Actions/application, separate credentials/locks/prune/verifier. System Owner / Designated Technical Administrator owns operations; Owner approves production restore/cutover. Better Stack external checks warn at four hours and flag six-hour breach. Independent RPO <= 6 hours, total RTO <= 4 hours are objectives, not measured SLAs. Full isolated pre-launch and quarterly/on-change restores, monthly integrity drills required. D92–D96 supersede D91. No implementation, provider deployment, alert sending or restore occurred; user authorization is required to begin the next implementation phase.
 
 ## Data references
 Existing business sources: Drivers List - Drivers.csv; Fleet Operations Tracker - Vehicle Tracking.csv; Orders 2026 - August.csv; Petroleum_2026 (2).xlsx; Munir_Orders.xlsx.
@@ -39,13 +44,19 @@ Munir sample: fare 100,000, commission 3,000, net 97,000, advance 30,000 and bal
 - Added proposed technical/UX/security design and test cases, clearly distinguished from implemented features.
 
 ## Next work
-Business Requirements, Business Policies and Conceptual Data Model are FINALIZED (D26–D78; DATA_MODEL.md); no material conceptual/business-policy gaps remain. Next: DATABASE/BACKEND SELECTION → AUTH/STORAGE/HOSTING/BACKUP ARCHITECTURE → FINAL ARCHITECTURE AUDIT → assessment of DEVELOPMENT READY V1.0 → authorized IMPLEMENTATION. Confirm company configuration and actual staff grants before launch; validate $0 feasibility and required secure multiple-daily backups/tested restore. No providers or physical model are finalized.
-Offline sync, GPS, external portals, payroll and full accounting remain outside the initial PRD unless explicitly added.
+
+B1 is CLOSED and Development Ready v1.0: YES. Do not start business implementation in this documentation task. Once separately authorized, first implement isolated development infrastructure and trusted access: server-only config/provider boundaries, Company/User/Membership/protected Owner provisioning, invite-only auth/session recovery, service authorization and transactional redacted audit, with isolation/revocation/Owner/bundle checks. Then master records before Orders/Trips and finances.
+
+Actual production plans/domain/secrets, security/load/accessibility acceptance and measured full restore are production requirements; no runtime test absence alone blocks Development Ready. Offline sync, GPS, portals, payroll and full accounting remain deferred.
 
 ## Maintenance rules
 Treat PRD as scope authority and DECISIONS as decision history. Update this file after completed milestones, recording actual validation and limitations. Never report planned tests as passing. Keep secrets, production data dumps and private document contents out of these documents. New user requirements supersede prior proposals when explicitly stated.
 
-## Repository foundation — 5 October 2026
+## Historical milestones — superseded by the 16 October audit
+
+Dated provider/budget/next-phase statements below describe their dates. Current state and next work above take precedence.
+
+### Repository foundation — 5 October 2026
 
 Repository: https://github.com/iusama46/transport-manager. User authorized adding documents despite public visibility. No business source spreadsheets or credentials are included. Monorepo folders: apps/web, apps/mobile, packages/shared, docs. TASKS.md is the ordered implementation checklist, beginning with setup, authentication, roles/permissions and user management. Application implementation remains not started.
 
@@ -124,3 +135,19 @@ Conceptual Data Model: FINALIZED. DATA_MODEL.md is authoritative and supersedes 
 Original/normalized loaded/delivered/custom billable/shortage measures, compatible conversion, effective rates and calculated-rate/manual-total snapshots remain distinct. InvoiceVersion/InvoiceLine separates charge coverage from receivable; notes/reissues/corrections reconcile one effective financial position. Ledgers derive from obligations/allocations, PartnerPayable holds explicit agreed cost, SupplierPayable projects fuel/Expense source, and allocation moves no cash. Expense owns maintenance details; one assignment history preserves vehicle/driver/event truth separately from owner/affiliation histories. Documents have a validated typed parent and private files. Protected system Owner Role classification and protected Membership assignment enforce last-active-Owner independently of custom grants; safe actor/resource audit snapshots survive renaming.
 
 Inventory: 44 entity/association/history + 15 values/configuration/catalogs + 4 derived views = 63 named concepts, not physical storage objects. Recorded 44 invariants, 17 atomic boundaries, query pressure and database-selection requirements. No material conceptual/business-policy questions remain; no unresolved issue currently requires changes to core ownership/cardinality/financial/history/authorization/workflows. Physical representation/provider feasibility and launch/compliance configuration remain open; no Development Ready v1.0 claim. No schema/provider/API/business-feature implementation or runtime test was performed. Documentation validation evidence and reviewed/changed files are recorded in DOCUMENTATION_REVIEW.md. Next formal phase: DATABASE / BACKEND SELECTION.
+
+## Historical initial database/backend development selection — 12 October 2026
+
+Initial user choice (NestJS subsequently superseded by D84 below): PostgreSQL hosted on Supabase Free for development/testing, NestJS/TypeScript backend, existing Next.js frontend, versioned REST and DTO-based server validation. NestJS owns protected authorization/financial workflows/transactions; frontend/mobile never directly access business DB/privileged Supabase APIs. DATA_MODEL.md is unchanged; conceptual/business/V1-V2 policies remain finalized. DATABASE_BACKEND_SELECTION.md owns the evaluation and official sources.
+
+Drizzle ORM + node-postgres is recommended, not approved/implemented; explicit SQL/native integrity and pooling fit this model, with exact-decimal library/string serialization/version/migration review still required. Prisma is evaluated alternative. Auth provider/private storage/production host/DB plan/backup architecture remain open; DB selection does not choose Supabase Auth/Storage. Local development starts at $0 service subscription; no infrastructure/credentials/NestJS/schema/package changes.
+
+Official Free limits checked: 500 MB database, 1 GB object storage (not selected), 5 GB uncached plus separate 5 GB cached egress, Nano 60 direct/200 pooler clients, inactivity pausing and current one-year pause restoration guidance. Free has no managed automatic DB backups/PITR, and no production approval. Planning—not measured—growth: 36 associated records and 80 KiB/transaction (40–160 KiB sensitivity), 50 MB baseline; 500/month approximately 40.96 MB/month and 541.52 MB after a year. Multiple-daily full extracts may independently exhaust egress. No compliant $0 production recovery architecture is established; mandatory secure multiple automatic backups daily and documented/tested complete data/audit/private-object restore remain blockers until proved.
+
+D79–D83 close development selection only. Next phase AUTH / STORAGE / HOSTING / BACKUP ARCHITECTURE, then final architecture audit/readiness assessment/authorized implementation; do not start automatically. No runtime/concurrency/load/backup/restore test or implementation was performed; documentation verification is in DOCUMENTATION_REVIEW.md.
+
+## Clarified V1 full-stack deployment — later 12 October 2026
+
+User superseded separate NestJS with existing Next.js/TypeScript full-stack /api/v1/* Route Handlers backed by modular authorized server services/repositories. Vercel is selected hosting direction; $0 testing target is subject to Hobby personal/non-commercial eligibility and quotas, not a commercial production guarantee. Future Expo uses the same versioned authenticated API. Route handlers remain thin; core input/result/context/transaction/repository contracts stay framework-independent for later NestJS extraction if justified. Server Components may use the same authorized read services directly; client/mobile never access DB adapters/secrets/protected generated Supabase endpoints.
+
+D84 supersedes D80; D85/D86 record hosting/layer boundaries. PostgreSQL/Free development scope, Drizzle recommendation, domain model/I01–I44/A01–A17, V1/V2 and financial/RBAC/audit policies remain intact. Vercel Node/runtime deadlines/payload limits/multi-instance pools, preview isolation/caching, durable transactions/idempotency and object/job execution must be validated. One daily Hobby cron is not a multiple-daily backup solution; auth/storage/full recovery and hosting plan/configuration remain next-phase work. No API/schema/package/environment/deployment implementation, paid plan or readiness claim is made. Documentation checks are in DOCUMENTATION_REVIEW.md.

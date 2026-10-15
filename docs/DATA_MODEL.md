@@ -1,7 +1,7 @@
 # Conceptual Data Model
 
 Reviewed: 10 October 2026, branch `feat/project-setup`.
-Status: **Conceptual Data Model: FINALIZED**. Business Requirements and Business Policies remain Finalized. Database/backend/providers and physical schema remain open. Development Ready v1.0 is not declared.
+Status: **Conceptual Data Model: FINALIZED**. Business Requirements/Policies remain Finalized. Provider-independent conceptual responsibilities below are unchanged. Current provider selections and readiness supersede this review’s dated phase assumptions: see [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md) and [FINAL_ARCHITECTURE_AUDIT.md](FINAL_ARCHITECTURE_AUDIT.md). Physical schema is not approved; Development Ready v1.0: YES (B1 recovery architecture CLOSED); Production Ready: NO. Conceptual sections 2–23 are unchanged.
 
 ## 1. Authority, scope and review outcome
 
@@ -503,7 +503,7 @@ No unresolved issue currently requires changing core ownership, cardinality, fin
 
 ## 24. Database Selection Requirements
 
-The next formal phase is **DATABASE / BACKEND SELECTION**. Evaluate capabilities against this model; no database, backend, auth, storage or hosting provider is recommended or selected here.
+Historical 10 October evaluation input: database/backend selection followed this review. Current selections are Next.js full-stack, Supabase PostgreSQL/Auth, Cloudinary and Vercel; [final audit](FINAL_ARCHITECTURE_AUDIT.md) supersedes phase/status wording only. The requirements below still govern implementation.
 
 | Requirement | Evaluation evidence needed |
 |---|---|
@@ -519,8 +519,8 @@ The next formal phase is **DATABASE / BACKEND SELECTION**. Evaluate capabilities
 | Queries/pagination/export | Benchmark section 21 with agreed synthetic volumes, bounded filters/counts/stable paging and restricted PDF/XLSX/CSV export |
 | Private object lifecycle | Document metadata/manifest/object integrity, parent authorization, upload limits/private downloads and staged retry/removal/recovery evidence |
 | Backup and restore | Multiple automated backups daily, restricted protected backup access, documented isolated restore of data + private objects + audit and exact balances before launch |
-| $0 feasibility | Later verify current commercial free-tier terms, quotas, inactivity/runtime/network/storage/backup costs and failure modes; no paid addon/trial is assumed |
+| Operational feasibility | Verify selected plans, capacity, runtime/network/storage/recovery costs and failure modes. Free development is optional; paid production is acceptable |
 | Application/runtime fit | Trusted reusable backend operations for Next.js and later authenticated Expo API use, provider boundaries, secure credentials and maintainable testing |
 | Technical choices remaining | Physical decimal/FX representation, constraints/indexes, transaction/outbox strategy, auth/Owner bootstrap, storage/hosting/backup mechanism and export handling |
 
-After selection: AUTH / STORAGE / HOSTING / BACKUP ARCHITECTURE → FINAL ARCHITECTURE AUDIT → assessment of DEVELOPMENT READY V1.0 → authorized IMPLEMENTATION. No provider decision or readiness gate is closed merely by documenting these requirements.
+Current next action: B1 is CLOSED and the final audit declares Development Ready v1.0: YES; begin implementation only after separate authorization. No readiness or production gate is closed merely by documenting requirements. Sections 2–23 preserve the finalized conceptual/business policies.

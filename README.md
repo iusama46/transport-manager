@@ -4,7 +4,9 @@ Transport management system for orders, fleet operations, fuel, maintenance, bil
 
 ## Project status
 
-Setup phase: npm workspaces and a Next.js App Router dashboard shell with TypeScript, Tailwind CSS and ESLint. All 16 navigation sections and five Fuel Management subsections are clearly labelled placeholders. No operational records, authentication, persistence or financial functionality is implemented. Business requirements, business policies and the [conceptual data model](docs/DATA_MODEL.md) are finalized. Database/backend selection is next; hosting and other provider choices remain open. Initial recurring service budget: $0.
+Final V1 selections: Next.js/TypeScript full-stack REST `/api/v1/*`, modular authorized services/repositories, Supabase PostgreSQL, Supabase Auth and Cloudinary for development/production, hosted on Vercel with an appropriate paid production plan permitted. Business requirements/policies and conceptual model remain finalized. **Development Ready v1.0: YES. B1: CLOSED** — the recovery architecture is selected in OPERATIONS_ARCHITECTURE.md. Production Ready: NO; infrastructure, runtime security/operational checks and measured full restore remain unimplemented/unverified. Implementation remains the public UI/environment shell only. See [final audit](docs/FINAL_ARCHITECTURE_AUDIT.md) and [operations architecture](docs/OPERATIONS_ARCHITECTURE.md).
+
+Recovery selection: Supabase Pro + seven-day PITR on eligible compute, GitHub Actions every three hours to a separate private Cloudflare R2 recovery account, independent database/Auth/Cloudinary generations with tiered retention, client-side encryption and external freshness alerts. RPO <= 6 hours and RTO <= 4 hours are objectives pending measured testing. The three-hour cadence provides headroom for the proposed six-hour RPO. No infrastructure, backup job or restore was executed. Next phase, only when authorized: isolated development infrastructure and trusted access/Owner/RBAC/audit foundation.
 
 ## Structure
 
@@ -15,7 +17,7 @@ Setup phase: npm workspaces and a Next.js App Router dashboard shell with TypeSc
 | packages/shared | Provider-independent TypeScript types and Zod validation |
 | docs | Requirements, design, architecture and implementation checklist |
 
-Start with [PRD](docs/PRD.md), [Decisions](docs/DECISIONS.md) and [Tasks](docs/TASKS.md). Other references: [Data Model](docs/DATA_MODEL.md), [Architecture](docs/ARCHITECTURE.md), [Design](docs/DESIGN.md), [Security](docs/SECURITY.md), [Test Plan](docs/TEST_PLAN.md) and [Memory](docs/MEMORY.md).
+Start with [PRD](docs/PRD.md), [Decisions](docs/DECISIONS.md) and [Tasks](docs/TASKS.md). Other references: [Data Model](docs/DATA_MODEL.md), [Database/Backend Selection](docs/DATABASE_BACKEND_SELECTION.md), [Architecture](docs/ARCHITECTURE.md), [Design](docs/DESIGN.md), [Security](docs/SECURITY.md), [Test Plan](docs/TEST_PLAN.md) and [Memory](docs/MEMORY.md).
 
 ## Client overview
 
@@ -56,24 +58,40 @@ Do not commit `.refact`, credentials, environment files, private customer spread
 
 ## Verification notes
 
-The 5 October clean source copy passed installation, linting, type checking and the production build. The 6 October UI hook lint and table-library API/type failures were fixed on 9 October: current lint/type checks and an isolated production build pass. Chrome verification covers the component showcase table; see Tasks for scope and evidence. All 21 placeholder routes passed HTTP smoke checks. Scripts use Webpack because Turbopack's CSS worker could not bind a port in the setup environment. Browser visual/keyboard review remains pending due to an unavailable browser connector. See [Tasks](docs/TASKS.md) for full evidence.
+The 5 October clean source copy passed installation, linting, type checking and the production build. The 6 October UI hook lint and table-library API/type failures were fixed on 9 October: the recorded lint/type checks and isolated production build passed. Chrome verification covers the component showcase table; see Tasks for scope and evidence. All 21 placeholder routes passed HTTP smoke checks. Scripts use Webpack because Turbopack's CSS worker could not bind a port in the setup environment. Broader browser/accessibility acceptance remains pending; the later table interactions do not complete it. See [Tasks](docs/TASKS.md) for full evidence.
 
-Production dependency audit reported no vulnerabilities. The full audit reported five high-severity findings in the development lint dependency chain; automatic remediation would downgrade the Next.js lint configuration to 14.x and was not applied. ESLint 9 also emits a deprecation notice. These tooling limitations are recorded for follow-up.
+The historical 5 October production dependency audit reported no vulnerabilities. The full audit reported five high-severity findings in the development lint dependency chain; automatic remediation would downgrade the Next.js lint configuration to 14.x and was not applied. ESLint 9 also emits a deprecation notice. These tooling limitations are recorded for follow-up.
 
 ## Finalized access and audit requirements
 
 Dynamic custom roles with a protected Owner/Super Admin and company-scoped granular permissions are specified in the [master permission catalog](docs/PERMISSIONS.md). The [Activity Log contract](docs/AUDIT.md) defines immutable, redacted global and record history. These requirements are finalized; implementation remains pending. Existing navigation is the original 16-section shell, while the updated design adds Activity Log and Roles & Permissions workflows.
 
-## Business scope reconciliation — 9 October 2026
+## Historical milestones — superseded by the 16 October final audit
+
+The following dated notes preserve prior decisions/evidence. Their next-phase, budget, readiness and unresolved-provider statements describe their dates, not current selections. Current readiness is the final audit above.
+
+### Business scope reconciliation — 9 October 2026
 
 [PRD](docs/PRD.md) and [Decisions](docs/DECISIONS.md) now specify finalized V1 capabilities, including flexible Orders/Trips, historical rates and currencies, three ledgers, controlled financial corrections, custom expenses/documents, accounts, auto-approval, full export and multiple daily automatic backups. Bulk import and configurable/manual approvals are V2. Business implementation remains not started; the existing shell/environment foundations are unchanged. Business Requirements and Business Policies are Finalized; no material business-policy gaps remain. Final Conceptual Data Model Review is next. Unselected technical providers and current readiness are recorded in the [documentation review](docs/DOCUMENTATION_REVIEW.md). Client PDF/PPT snapshots remain historical.
 
-## Final business-policy review status — 9 October 2026
+### Final business-policy review status — 9 October 2026
 
 V1 now explicitly covers configurable Bill To, commissions/deductions, multi-consignee Orders, discounts/rounding, same-currency invoice settlement, quantity conversion, configurable shortage/remaining basis, rate specificity/overlap validation, calculated-rate/manual-total pricing, manual Order completion, controlled correction/rebilling, invoice-date management revenue, shared expense allocation, expiry warnings, Owner safeguards and retention-by-default. Multiple daily automatic backups and a documented restore tested before production remain mandatory.
 
 V2/Future defers configurable document-expiry assignment blocking and cross-currency invoice settlement/allocation if pursued, alongside controlled bulk import/manual approvals and existing deferred items. Next: Final Conceptual Data Model Review → Database/Backend Selection → Auth/Storage/Hosting/Backup Architecture → Final Architecture Audit → Development Ready v1.0 → Implementation. The project has not reached Development Ready v1.0; no code/providers/runtime tests were changed by this review.
 
-## Conceptual model review — 10 October 2026
+### Conceptual model review — 10 October 2026
 
 Conceptual Data Model: FINALIZED. [DATA_MODEL.md](docs/DATA_MODEL.md) now owns the provider-independent entities, relationships/cardinalities, historical snapshots, financial/tenant invariants, atomic boundaries and database-selection requirements. This supersedes the dated “conceptual review next” milestones above. Next: DATABASE / BACKEND SELECTION, then auth/storage/hosting/backup architecture and final architecture audit before assessing Development Ready v1.0. No database/provider, physical schema or business implementation was selected/added by this documentation review.
+
+### Development database/backend selection — 12 October 2026
+
+Current clarified V1 stack: Next.js Web Dashboard + thin /api/v1/* Route Handlers → modular authorized server services/repositories → Supabase PostgreSQL. Future Expo calls the same REST APIs. Separate NestJS is deferred; services remain portable for later extraction. Server-only services own authorization/business/financial workflows; client/mobile cannot access repositories or protected Supabase endpoints directly. Drizzle ORM/node-postgres is a recommendation, not an approved dependency/schema. The current repository still has no business backend/database project/API or credentials; existing setup commands remain unchanged.
+
+[DATABASE_BACKEND_SELECTION.md](docs/DATABASE_BACKEND_SELECTION.md) evaluates PostgreSQL/model atomicity, current official Free limits, growth assumptions, Prisma/Drizzle, RLS/least privilege, recovery and portability. Supabase Free is development/testing only: no managed automatic backups/PITR and no compliant $0 production recovery demonstrated. Mandatory multiple-daily automated backups and a documented successful full restore—including audit/private files—remain production gates.
+
+This supersedes the earlier dated “database selection next/no provider selected” phase wording for development only. Next: AUTH / STORAGE / HOSTING / BACKUP ARCHITECTURE in a separate task; auth/private files/production DB plan/backups remain unselected; Vercel hosting direction is selected, with plan/eligibility/configuration unresolved. Development Ready v1.0 is not declared and no production deployment was performed.
+
+### V1 framework re-evaluation — later 12 October 2026
+
+Next.js full-stack supersedes the earlier separate NestJS choice. Keep handlers thin, server-only composition/auth/database boundaries explicit, and domain/service/repository contracts free of HTTP/framework objects so extraction later does not duplicate rules. Vercel is the selected deployment direction; $0 testing remains a target subject to its personal/non-commercial Hobby restrictions and quotas, not a business-hosting guarantee. Database pooling, short durable transactions and private file/job delivery must be evaluated under function limits. No endpoint/deployment or plan is created; the conceptual model and mandatory complete backup/restore gates remain unchanged.

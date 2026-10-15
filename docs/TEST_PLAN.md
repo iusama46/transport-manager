@@ -1,9 +1,9 @@
 # Test Plan
-Updated: 9 October 2026
-Status: Business/RBAC/audit tests below are planned, not executed. Existing environment/shell verification and current build blockers are recorded in TASKS.md.
+Updated: 16 October 2026
+Status: Architecture/test-plan review completed; runtime acceptance below is planned, not executed by this audit. Existing shell/environment verification is dated evidence in TASKS.md; old table/build blockers were resolved. No runtime feature test is required to exist before its feature is implemented.
 
 ## Scope and strategy
-Validate [PRD.md](PRD.md) using domain unit tests, data/service integration tests, browser workflows and targeted manual print/accessibility checks. Vitest and Playwright are proposed. Provider-specific tests follow the database decision. Use synthetic fixtures; do not copy private identity documents into test repositories.
+Validate [PRD.md](PRD.md) using domain unit tests, data/service integration tests, browser workflows and targeted manual print/accessibility checks. Vitest and Playwright are proposed. Provider-specific tests now follow the selected Supabase/Auth/Cloudinary and recovery contracts. Use synthetic fixtures; do not copy private identity documents into test repositories.
 
 ## Traceability
 | Test | PRD criteria | Scenario and expected result | Level |
@@ -25,7 +25,7 @@ Validate [PRD.md](PRD.md) using domain unit tests, data/service integration test
 | T15 | AC-15 | Direct unauthorized API/file requests deny access | Security integration |
 | T16 | AC-16 | Filtered reports reconcile; archive preserves history | Integration/browser |
 | T17 | AC-17 | Restore export into isolated environment; counts, relationships and balances reconcile | Recovery exercise |
-| T18 | AC-18 | Review deployment configuration: free plans, no chargeable add-ons | Release review |
+| T18 | AC-18 | Review appropriate production plan/capacity and isolated environments; paid production acceptable | Release review |
 
 ## Additional financial cases
 Zero versus missing amounts; agreed decimal precision/rounding; invalid negative payment; credit/overpayment; cross-currency allocation rejection; allocation exceeding payment; payment retry after timeout; same idempotency key with different payload; reversal of a reversed entry; cancellation after invoicing.
@@ -108,7 +108,7 @@ Each case checks granted success, denied direct server requests, company-scoped 
 | T57 | FR-14 | Exercise every newly listed AUDIT.md sensitive action including export; correct actor/company/original links/before-after; secrets nested in payloads redacted; normal users/Owner cannot edit/delete events; audit failure/retry durability |
 | T58 | FR-19 | Authorized PDF/XLSX/CSV of applicable Orders/Trips/master/fuel/expense/invoice/payment/settlement/reports; unauthorized/field/foreign-company data excluded server-side; export logged and formula-leading text neutralized |
 | T59 | FR-19 | Permitted V1 Orders/Trips/fuel/expenses/invoices complete normally with AUTO APPROVAL, no routine second reviewer; draft save does not issue/post. Verify V1 navigation/services have no bulk Excel/CSV import UI/API |
-| T60 | FR-19 | Verify multiple scheduled automated backups in a day after provider selection, restricted access/security/retention; isolated documented restore reconciles records, relationships, snapshots, ledgers/accounts, audit and attachment objects; multiple-per-day and pre-production documented/tested restore are finalized requirements; exact schedule/provider/backup retention/targets remain technical |
+| T60 | FR-19 | Verify multiple scheduled automated backups in a day after provider selection, restricted access/security/retention; isolated documented restore reconciles records, relationships, snapshots, ledgers/accounts, audit and attachment objects; multiple-per-day and pre-production documented/tested restore are finalized requirements; selected schedule/provider/retention/targets follow OPERATIONS_ARCHITECTURE.md; measured acceptance remains pending |
 
 V2 T10/T11 plus future cases cover Excel/CSV upload, preview/mapping, validation, duplicate detection, errors, confirmation, target grants and audit/retry provenance; configurable manual approval thresholds/reviewers are tested only after V2 policy design. Existing release/print/accessibility/security tests remain required; no application tests ran in this documentation task.
 
@@ -137,7 +137,7 @@ These cases supplement T01–T60 without claiming runtime success. Use explicit 
 | T77 | FR-13; D67 | First Owner established at company setup; has authorized company access/user-role management. Last active Owner cannot remove/deactivate self or be removed/reassigned by another or concurrent requests; ordinary custom-role changes cannot strip/forge ownership or bypass guard |
 | T78 | FR-13/14; D67 | Protected authorized transfer to eligible active company user succeeds while always retaining an active Owner; unauthorized/ineligible/foreign recipient fails. Creation/transfer/removal/deactivation audit records correct actor and before/after; provider-backed execution waits technical selection |
 | T79 | FR-17; D68 | Scheduled jobs/default retention settings perform no automatic purge of Orders, Trips, invoices, payments, ledger/fuel/financial/history or audit, including archived/deactivated records. Referenced history remains accessible under permission; no routine audit mutation/purge API |
-| T80 | FR-19; D69 | Documentation and eventual selected infrastructure require multiple automatic backups/day, restricted access and documented restore. Production gate cannot pass without tested restore reconciling records/relationships/financial snapshots/ledgers/accounts/audit/private attachments. Exact schedule/provider/backup retention/targets await infrastructure choice; requirement existence is not execution evidence |
+| T80 | FR-19; D69 | Documentation and eventual selected infrastructure require multiple automatic backups/day, restricted access and documented restore. Production gate cannot pass without tested restore reconciling records/relationships/financial snapshots/ledgers/accounts/audit/private attachments. Selected schedule/provider/retention/targets follow OPERATIONS_ARCHITECTURE.md; architecture completion is not execution evidence |
 | T81 | FR-17/14; D68 | Documents retained by default; explicit permitted removal succeeds only with deletion grant and business/legal/dependency/integrity eligibility, with safe audit. Historical-integrity-protected or unauthorized removal rejected; no invented statutory retention period or automatic purge |
 
 V2/Future test specifications additionally cover configurable Warning Only/Block Assignment by document type and cross-currency invoice settlement/allocation if pursued; neither behavior is enabled by V1 tests. Preserve controlled bulk import/manual approvals and existing deferred tests. Planned test coverage is complete for the supplied policies; no runtime tests were executed in this documentation-only task.
@@ -174,3 +174,38 @@ Reuse existing PRD security/lifecycle acceptance (T01/T15/T16/T49/T56/T63/T65/T6
 ### Implementation verification — 10 October 2026
 
 SearchableSelect and its synthetic showcase are now implemented with React Select. Web/shared lint and type checking, targeted Prettier, git diff --check, the four existing environment tests and an isolated production build with existing installed dependencies passed. These checks do not execute T82–T101. Component interaction, browser/mobile, screen-reader and trusted-service acceptance remains pending.
+
+## Final architecture/security acceptance additions — planned, unexecuted
+
+Complete plan coverage is distinct from implemented runtime tests. T01–T101 remain required as applicable; provider-specific cases below supplement them. Unit tests cover pure exact arithmetic; real PostgreSQL integration tests prove constraints, pooled tenant context, A01–A17 transactions/concurrency and failure injection; API contracts/browser tests cover direct access and workflow/accessibility. Use at least two synthetic Company fixtures. Record environment/commit/fixtures/commands/results; do not claim pre-launch acceptance from this plan.
+
+| Test | Scenario and expected result | Level |
+|---|---|---|
+| T102 | Supabase signup/anonymous creation disabled, invite-only email/password; configured verification, reset, refresh and logout succeed; malicious callback/redirect, rate abuse and enumeration handled safely | Auth/API/security |
+| T103 | Wrong issuer/audience/signature, expired token, inactive User/Membership, revoked session/grant all deny; valid token with no resource permission denies; SSR cookie/CSRF and future bearer transports preserve identical authority; concurrent refresh and logout do not retain access | Auth/API/security |
+| T104 | Restricted first-Owner bootstrap/retried invite failure grants no accidental membership; incomplete provisioning reconciles; competing Owner changes preserve A13; custom metadata/grants cannot forge protected ownership | Integration/concurrency |
+| T105 | Cloudinary PDF/JPEG/PNG limits, MIME/signature mismatch, unsafe filenames/content/quarantine; unsigned original/derived URL, guessed asset ID and foreign parent deny; explicitly timed download expires and archive/history/delete/orphan retries preserve evidence | File/API/security |
+| T106 | Preview/fork builds cannot read production secrets/DB/Auth/Cloudinary; wrong environment IDs fail; public prefixes never contain secrets; client/mobile/shared bundle inspection finds no privileged provider/configuration modules; auth clients/cache/Set-Cookie cannot cross users | Deployment/security |
+| T107 | /api/v1 contracts: status/error envelope, bounded stable paging/filter allowlists, decimal strings/date semantics, CSRF/CORS, rate-limit 429 and Retry-After; one Idempotency-Key with changed content conflicts, concurrent timeout retry has one durable result, revoked scope cannot retrieve cached idempotent data | API/integration |
+| T108 | Concurrent A01–A17 operations exercise actual DB locks/isolation: two invoices/allocations, overlapping rates, numbering, pricing/quantity correction, partner/supplier settlement, paired transfer, expense share replacement, Owner/role changes and audit failure rollback | Real PostgreSQL concurrency |
+| T109 | Selected multiple-daily capture with independent encrypted DB/Auth/Cloudinary generations, missed job/corruption/missing object/key-access alerts; isolated restore validates manifests/checksums, immutable history, exact financial balances, active Owner/revoked access, measured approved RPO/RTO and safe cutover | Recovery exercise before launch |
+| T110 | HTTPS/domain, sanitized logs/restricted readiness, deploy failure and code rollback with compatible schema; large payload/timeouts rejected safely, cleanup/export/recovery jobs retry durably; keyboard/screen reader/zoom/tablet and print acceptance remains explicit | Operations/browser/manual |
+
+Recovery design B1 is selected and CLOSED; Development Ready v1.0: YES. Running T109 and implementing these controls are production gates; their current absence is not an architecture blocker. Dependency/security review must be repeated on the implementation lockfile before launch.
+
+## B1 recovery acceptance — planned, unexecuted
+
+OPERATIONS_ARCHITECTURE.md is the single recovery specification. Architecture completion is not runtime evidence. Extend T109/T110 with the selected tests below; retain commit/environment/data volume/tool versions, UTC timings, hashes/counts/control totals, actual lost changes, approvers, objective results and remediation evidence. No exercise has run in this documentation task.
+
+| Test | Selected acceptance / production gate |
+|---|---|
+| T111 | Supabase Pro eligible compute/seven-day PITR configuration and available window; recover a chosen managed point, record actual granularity/loss without assuming daily+PITR coexistence or Cloudinary coverage |
+| T112 | Private GitHub runner explicit app/Auth dump and snapshot manifest share one cutoff; correct PostgreSQL client/role reads all Companies/Auth under RLS without DML/DDL powers; missing managed schema/role/config fails completeness |
+| T113 | Three-hour slots, delayed/dropped run, overlap lease, >one-hour capture, four-hour stale and six-hour breach; external verifier detects no initial heartbeat, stopped scheduler, missing/corrupt/small member or forged workflow success; test email/mobile escalation and operator fallback |
+| T114 | Seven-day frequent/35-day daily/400-day monthly generations self-contained; promotion failure, lock/write/delete denial, hold and expired-prune failure detected; prune cannot remove last complete point or bypass admin locks; real R2 permission boundaries verified |
+| T115 | Auth user/identity/password-hash continuity with full table inventory, fresh signing/session boundary, invite/SMTP/config recovery, restored-session invalidation and post-cutoff deactivation/revocation fail-closed behavior; no plaintext secret/hash disclosure |
+| T116 | Independently restore current/archived original Cloudinary image/PDF/raw/version evidence after primary credentials are unavailable; source deletion/missing-byte and wrong-Company association fail; explicit asset-ID remap and private derived preview/hash reconciliation succeed |
+| T117 | TLS/age/provider encryption, compromised bucket without decrypt key, leaked runner without decrypt/admin access, signed manifest poisoning and retained-key rotation; monthly decryption drill and offline emergency kit restore verify actual key availability |
+| T118 | Full isolated pre-production then quarterly/on-change DB/Auth/Cloudinary restore; source providers unavailable, incident/restore/cutover human approvals, tenant/Owner/financial/audit/document/Auth/smoke checks pass; measure RPO <=6h and total RTO <=4h including approval. Misses require remediation/retest before launch |
+
+Before launch require working capture/monitoring/retention/custody plus successful full restore and objective evidence. After launch, monthly integrity drills and quarterly/full-on-material-change exercises remain required; missed objectives create degraded-recovery incidents and tracked remediation. None is marked complete by Development Ready status.

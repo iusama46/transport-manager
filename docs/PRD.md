@@ -1,10 +1,10 @@
 # Transport Management Dashboard
 ## Product Requirements Document — v0.6
 
-Updated: 10 October 2026
-Status: Business Requirements: Finalized. Business Policies: Finalized. Conceptual Data Model: FINALIZED (DATA_MODEL.md). Technical Architecture Providers: Open. Business Implementation: Not Started / existing shell only.
+Updated: 16 October 2026
+Status: Business Requirements/Policies and Conceptual Data Model: FINALIZED. Next.js full-stack, Supabase PostgreSQL/Auth, Cloudinary and Vercel selected. Recovery architecture B1 is CLOSED; Development Ready v1.0: YES. Production Ready: NO. See [final audit](FINAL_ARCHITECTURE_AUDIT.md). Business implementation: existing shell only.
 Phase 1: Web dashboard. Phase 2: Expo mobile app.  
-Budget constraint: $0 recurring service cost. No paid plans or add-ons without explicit approval.
+Budget direction: free development resources where appropriate; an appropriate paid production plan is acceptable. No purchase or deployment occurs in this audit.
 
 ## 1. Purpose and business storyline
 
@@ -166,7 +166,7 @@ Configure business identity, contact details, base currency, timezone, company-s
 
 Counts are populated source rows, not validated records. The original Customer/Consignee and Party columns need reviewed mapping to the agreed Customer → Consignee terminology. Neither customer nor factory names establish vehicle ownership.
 
-## 7. Technology and $0 operating constraint
+## 7. Selected technology and operating constraints
 
 | Layer | Direction |
 |---|---|
@@ -176,19 +176,23 @@ Counts are populated source rows, not validated records. The original Customer/C
 | Forms | React Hook Form + Zod |
 | Charts | Recharts |
 | Tests | Vitest for calculations; Playwright for key workflows |
-| Database | Open: Supabase PostgreSQL was proposed; user later raised MongoDB |
-| Auth/files | Supabase Auth/Storage if Supabase is selected; revisit if MongoDB is chosen |
-| Hosting | Free commercial-use-compatible hosting; Cloudflare Free is a candidate pending compatibility/limit checks |
+| Database | Supabase PostgreSQL selected; Free may serve development; production sizing/recovery must meet requirements |
+| Backend / API | Next.js + TypeScript Route Handlers at /api/v1/*; thin transport adapters, modular authorized server services/repositories; separate NestJS deferred |
+| Server validation | DTO-based server validation; frontend RHF/Zod is not trusted authority |
+| Database access | Drizzle/node-postgres recommended only; Prisma compared; no ORM schema/adoption yet |
+| Authentication | Supabase Auth, invite-only email/password; application membership/RBAC determines access |
+| Files | Cloudinary for development and production; private objects, PostgreSQL metadata |
+| Hosting | Vercel selected; appropriate paid production plan acceptable; environment/runtime validation before launch |
 | PDF | Browser print and Save as PDF initially |
 | Mobile later | Expo + React Native |
 
-No database migration is approved or scheduled. Resolve whether MongoDB is mandatory now, desired later or only an option before implementing the schema. Database changes require data migration and query changes; they are not a configuration toggle.
+The 12 October user-selected development path is Next.js /api/v1/* Route Handlers → modular server services/repositories → Supabase PostgreSQL, superseding separate NestJS; previous MongoDB alternatives are superseded for this stage. No migration/schema/backend implementation is authorized by selection alone. PostgreSQL host portability requires verified export/import/access/history recovery, not merely switching a connection string. [DATABASE_BACKEND_SELECTION.md](DATABASE_BACKEND_SELECTION.md) records the evaluation and production blocker.
 
 Put authoritative financial logic in reusable trusted backend operations available to both web and future mobile. Use atomic financial updates, duplicate-submission protection, decimal money and stable IDs. Enforce access restrictions appropriate to the chosen database; do not expose backend secrets in clients.
 
-Use free plans only. Do not enable paid add-ons, automatically charging trials or purchases without explicit approval. Use a free hosting address or existing domain. Validate current quotas, commercial-use terms, inactivity behaviour and deployment compatibility before launch. Free operation is a constraint, not a promise of unlimited capacity or availability.
+Use eligible free resources for development where appropriate. Select production service capacity/plans against security, recovery and workload requirements; paid production is acceptable. Configure a canonical HTTPS production domain and isolated preview resources under [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md). No service is purchased by this documentation task.
 
-Compress attachments, enforce upload limits and monitor quotas. If limits prevent a feature, revisit scope or architecture rather than silently upgrading. V1 requires automated backups multiple times per day, restricted access, documented restoration and backup-retention configuration determined with infrastructure. Define a no-cost backup procedure and responsible person; exact frequency/mechanism/provider remain open. Test restoration before production; paid managed backups are not assumed.
+Compress attachments, enforce upload limits and monitor quotas. If limits prevent a feature, revisit scope or architecture rather than silently upgrading. V1 requires automated backups multiple times per day, restricted access, documented restoration and backup-retention configuration determined with infrastructure. Complete database/Auth/Cloudinary recovery, operator, schedule/runner/independent store/retention/targets are selected in OPERATIONS_ARCHITECTURE.md; B1 is CLOSED. Test restoration before production; provider backup advertising alone is insufficient.
 
 ## 8. Quality requirements
 
@@ -197,7 +201,7 @@ Compress attachments, enforce upload limits and monitor quotas. If limits preven
 - Historical invoice snapshots, assignments and ownership remain stable after master-data changes.
 - Private documents and least-privilege staff access; audit important actions.
 - Business dates remain distinct from timestamps; display timestamps in configured business timezone.
-- Proposed performance target: common filtered views within two seconds at an agreed benchmark volume. Validate on the selected free setup rather than treating this as a hosting guarantee.
+- Proposed performance target: common filtered views within two seconds at an agreed benchmark volume. Validate on representative deployment capacity rather than treating this as a hosting guarantee.
 
 ## 9. Acceptance criteria
 
@@ -220,11 +224,11 @@ Compress attachments, enforce upload limits and monitor quotas. If limits preven
 | AC-15 | Unauthorized direct requests cannot access restricted documents or post financial changes. |
 | AC-16 | Reports reconcile to source records and preserve archived entities in history. |
 | AC-17 | Backup restoration recovers sample records and relationships before launch. |
-| AC-18 | Deployment uses free plans and no chargeable add-ons. |
+| AC-18 | Deployment uses an appropriate approved production plan with isolated environments, verified capacity and complete recovery; paid production is acceptable. |
 
 ## 10. Delivery phases
 
-1. Conceptual review completed (DATA_MODEL.md); next database/backend selection → auth/storage/hosting/backup architecture → final architecture audit → assessment of Development Ready v1.0 → authorized implementation; agree source mapping before later import.
+1. Business/model/provider/recovery selections complete; Development Ready v1.0: YES. Begin isolated development infrastructure and trusted access foundations only after authorization; agree source mapping before later import.
 2. Build access control and master records.
 3. Build orders, stops, assignments and outsourcing.
 4. Add fuel, maintenance and expense tracking.
@@ -237,7 +241,7 @@ GPS tracking, offline sync, automated dispatch, customer/partner portals, multip
 
 ## 11. Finalized business status and remaining technical work
 
-Business Requirements and Business Policies are Finalized; no material business-policy gaps remain after this review. Conceptual Data Model is FINALIZED in [DATA_MODEL.md](DATA_MODEL.md); database/backend selection is next, before infrastructure review and implementation. [DECISIONS.md](DECISIONS.md) retains technical choices, company-specific configuration (identity/base currency/timezone/languages, staff assignments and print branding), and jurisdiction-specific compliance review. These do not reopen the finalized configurable policies. Database/backend, auth implementation, private storage, hosting, backup details, Owner provisioning mechanism, transaction/outbox, append-only audit enforcement, physical decimal/FX representation and export/file handling remain open. The application is not yet Development Ready v1.0.
+Business Requirements/Policies and [DATA_MODEL.md](DATA_MODEL.md) are finalized. Selected stack and security/operations boundaries are in [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md). Recovery design B1 is CLOSED; [FINAL_ARCHITECTURE_AUDIT.md](FINAL_ARCHITECTURE_AUDIT.md) records Development Ready v1.0: YES and Production Ready: NO. ORM/decimal library, physical enforcement/indexing and integration configuration are implementation choices under finalized invariants. Actual production provisioning, security/load/restore tests, staff grants/branding/domain and jurisdiction-specific compliance review are launch requirements. No business workflow was implemented by the audit.
 
 ## 12. Companion documents
 
@@ -299,7 +303,7 @@ TaxConfiguration supports tax-free and configured tax rates/rules; finalized tax
 
 V1 default is AUTO APPROVAL: an actor permitted to perform an operation normally completes/approves it under its usual lifecycle without another user's approval. Saving a draft does not silently issue/post it. No routine V1 manual approval queue is required; retained approve keys govern explicit finalization where applicable, not an extra mandatory reviewer. Future threshold/manual approval rules belong in V2 unless an existing explicit approval exception is confirmed.
 
-Automated backups multiple times daily, documented restore procedure and restricted secure backups are mandatory V1. Restore capability must be tested before production launch, including financial/audit relationships and private attachments. Exact schedule, mechanism, provider and backup retention follow infrastructure selection. No provider is selected.
+Automated backups multiple times daily, documented restore procedure and restricted secure backups are mandatory V1. Restore capability must be tested before production launch, including financial/audit relationships and private attachments. Exact schedule, mechanism, provider and backup retention follow infrastructure selection. Supabase PostgreSQL/Auth, Cloudinary and Vercel are selected; the recovery runner/store/targets and retention are now specified in OPERATIONS_ARCHITECTURE.md, closing B1.
 
 Full authorized PDF reports, XLSX and CSV exports cover Orders, Trips, Vehicles, Drivers, Clients, Partners, Fuel, Expenses, Invoices, Payments, Settlements and reports where appropriate. Export enforces RBAC, tenant isolation, sensitive-field restrictions and audit coverage.
 
@@ -313,4 +317,4 @@ Acceptance for these additions is specified in TEST_PLAN.md T37–T81; all are p
 
 ## 17. Finalized Owner policy
 
-The first Owner/Super Admin is established during company setup/provisioning. Owner has full authorized company-level access under system rules and can manage users/roles. Always retain at least one active Owner; the last active Owner cannot remove/deactivate themselves or be removed through reassignment, role edits or concurrent requests. Ownership may transfer to another eligible authorized user via owners.transfer and a protected workflow that preserves an active Owner throughout. Audit Owner creation, transfer, removal and deactivation. Ordinary custom-role editing cannot bypass these rules. Provider-specific provisioning remains open; these requirements are finalized.
+The first Owner/Super Admin is established during company setup/provisioning. Owner has full authorized company-level access under system rules and can manage users/roles. Always retain at least one active Owner; the last active Owner cannot remove/deactivate themselves or be removed through reassignment, role edits or concurrent requests. Ownership may transfer to another eligible authorized user via owners.transfer and a protected workflow that preserves an active Owner throughout. Audit Owner creation, transfer, removal and deactivation. Ordinary custom-role editing cannot bypass these rules. Restricted operator-only first-Owner provisioning follows OPERATIONS_ARCHITECTURE.md; implementation remains pending and these requirements are finalized.

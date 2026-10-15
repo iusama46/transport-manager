@@ -2,7 +2,7 @@
 
 ## Client Overview & Scope
 
-9 October 2026 | Updated requirements for client review
+16 October 2026 | Updated requirements and architecture status
 
 This document describes planned capabilities. It does not certify completed features.
 
@@ -84,11 +84,11 @@ A mobile app is planned after the dashboard. Live GPS tracking, offline synchron
 
 ### Budget and scheduling
 
-The initial target is no monthly software-service subscription cost. Free services have limits, so file storage, usage and backup arrangements must be checked before launch. Paid services will require explicit approval. This document is a scope overview, not a price quotation or delivery-date commitment.
+Development may use eligible free resources; an appropriate paid production plan is acceptable. Service capacity, secure recovery and operating costs must be verified before launch. No purchase or deployment occurs in this audit. This document is a scope overview, not a price quotation or delivery-date commitment.
 
 ### Remaining configuration and technical work
 
-Business requirements and policies are finalized; no material business-policy gaps remain. The [conceptual data model](DATA_MODEL.md) was finalized on 10 October 2026; database/backend selection is next. Company identity/base currency/timezone/languages, staff-specific grants, invoice branding and backup operator/targets remain configuration work. Database/backend, auth/private storage/hosting and exact backup arrangements remain open technical decisions. Formal jurisdiction-specific invoice/retention obligations require compliance review; this overview does not certify statutory compliance.
+Business requirements/policies and conceptual data model are finalized. V1 uses Next.js/TypeScript full-stack, Supabase PostgreSQL/Auth, Cloudinary for private files in development/production and Vercel hosting with paid production acceptable. Supabase identifies users; application membership/permissions determine access. [Final audit](FINAL_ARCHITECTURE_AUDIT.md): Development Ready v1.0: YES. B1 is CLOSED by the selected coordinated database/Auth/file recovery design in OPERATIONS_ARCHITECTURE.md; Production Ready: NO. Actual restore execution is required before production. Staff settings, branding, service configuration and jurisdiction-specific compliance review remain pre-launch work. Features are planned, not implemented.
 
 ### How the first release will be accepted
 
@@ -108,7 +108,7 @@ Selected Bill To receivables (Customer Ledger), partner and fuel supplier ledger
 
 Custom expense categories and Trip/Order/Vehicle/Driver/company expenses support attributable Trip margin, excluding general company expenses. Fuel prices retain history; liters × rate and authorized actual-total overrides stay visible. Ownership, driver affiliation and assignments retain history. Multiple documents use predefined/custom types and optional expiry with configurable dashboard reminders.
 
-V1 defaults to auto-approval for authorized operations at their normal workflow stage. Configurable/manual approvals and controlled bulk import are V2. Bill To, commission/deduction, multi-consignee, pricing/discount/rounding, quantity/shortage, correction and profitability policies are finalized; database/backend/auth/storage/hosting remain open. These capabilities are planned, not implemented.
+V1 defaults to auto-approval for authorized operations at their normal workflow stage. Configurable/manual approvals and controlled bulk import are V2. Bill To, commission/deduction, multi-consignee, pricing/discount/rounding, quantity/shortage, correction and profitability policies are finalized. The 16 October selections above supersede the historical open-provider/$0 assumptions; complete recovery architecture is now selected; actual recovery implementation/testing remains pending. These capabilities are planned, not implemented.
 
 ### Final first-release financial and control policies
 

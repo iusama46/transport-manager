@@ -1,5 +1,5 @@
 # Security Requirements
-Updated: 9 October 2026
+Updated: 16 October 2026
 Status: Environment foundations implemented and checked; business security controls remain planned. No comprehensive security assessment has been performed.
 
 ## Implemented scope and verification
@@ -22,18 +22,18 @@ Use dynamic custom roles and the central [permission catalog](PERMISSIONS.md); n
 Frontend permission gates control navigation/actions; server checks independently authorize every operation. Reload active membership and effective role permissions after role or account changes; stale sessions cannot preserve revoked grants. See PERMISSIONS.md for exact lifecycle rules.
 
 ## Authentication and secrets
-Use a maintained authentication provider selected alongside hosting; do not create password cryptography. Support session expiry and revocation, protect credential-reset routes and rate-limit login attempts. Decide MFA availability for administrators during provider selection.
+Use selected Supabase Auth with invite-only email/password, configured verification, reset and refresh. Disable public/anonymous signup at the provider. Identity never implies application access. Follow the session verification/revocation, protected provisioning, CSRF, callback and cache/client isolation contract in [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md). MFA policy for privileged accounts is a pre-launch configuration/security review item; do not create password cryptography.
 Keep privileged secrets server-side, out of source control, logs and public environment variables. Distinguish intentionally public project identifiers from privileged service credentials. Use secure session cookies and CSRF/origin protections where cookie authentication is used.
 
 ## Record and action authorization
-Scope queries and mutations to the operating business and actor’s permitted records/actions. Test guessed IDs, exports and attachment routes. Validate role decisions on the server. Where Supabase is chosen, enforce RLS on client-accessible data; if another database is chosen, use equivalent server authorization. Provider-specific policies cannot be finalized yet.
+Scope queries and mutations to the operating business and actor’s permitted records/actions. Test guessed IDs, exports and attachment routes. Validate role decisions on the server. Selected development PostgreSQL is hosted on Supabase Free behind authorized Next.js server services only. Protected business resources must not be directly client-accessible through generated Supabase database APIs. Evaluate Company-qualified relationship constraints and tested RLS with a non-owner/non-superuser/no-BYPASSRLS backend role, validated transaction-local Company context and fail-closed pooled access. Detailed policies/credentials are not implemented; RLS complements server-service action/resource authorization.
 
 ## Financial integrity
 Recompute totals on trusted code, use exact decimal handling and atomic posting. Protect invoice numbers and Trip billed-amount allocations from concurrency. Persist idempotency outcomes so timeout retries cannot create additional payments.
 Use linked reversals/adjustments and reasons rather than destructive edits. Record actors and timestamps, prohibit historical audit modification through normal application operations and keep financial history readable after master-data archival. Customer and subcontractor balances remain independent.
 
 ## Attachments, export and V2 imports
-Keep all business documents private by default. Validate object access against parent-record permissions before issuing short-lived downloads. Use unpredictable storage keys, bounded upload sizes and allowlisted types. Verify content signatures where practical; do not trust filename or client MIME alone. Avoid rendering active HTML/SVG as trusted attachments.
+Cloudinary is selected for development and production; PostgreSQL stores metadata only. Follow OPERATIONS_ARCHITECTURE.md for authenticated originals/derivatives, explicitly expiring delivery, server-mediated uploads, validation, staging/audit/deletion and orphan reconciliation. Keep all business documents private by default. Validate object access against parent-record permissions before issuing short-lived downloads. Use unpredictable storage keys, bounded upload sizes and allowlisted types. Verify content signatures where practical; do not trust filename or client MIME alone. Avoid rendering active HTML/SVG as trusted attachments.
 V1 exports must neutralize spreadsheet-formula injection in exported text fields. V2 imports must bound spreadsheet row/file limits and parser resource usage, validate server-side and preserve provenance; never execute uploaded workbook formulas as application code.
 
 ## Application controls
@@ -44,11 +44,11 @@ Return useful user errors without stack traces or secret values. Limit expensive
 Log action, record ID, actor and result with minimal personal data. Exclude credentials, session tokens, raw CNIC values and private signed URLs. Restrict audit access. V1 retention-by-default prohibits automatic historical business/financial/audit purging; archived/deactivated records remain. Documents may be explicitly removed only with permission and business/legal/historical-integrity checks. Formal jurisdiction-specific periods/deletion obligations remain compliance review; no legal compliance claim is made.
 
 ## Backups and incident handling
-V1 requires automated backups multiple times per day, encrypted/protected storage and transport, restricted backup/restore access, documented recovery and a responsible operator. Exact schedule/mechanism/retention follows database/hosting selection; no provider is chosen. Include database records and an attachment manifest/objects as needed. Test isolated restore and reconciliation before launch.
+V1 requires automated backups multiple times per day, encrypted/protected storage and transport, restricted backup/restore access, documented recovery and a responsible operator. The recovery design is selected and B1 CLOSED in [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md#backup-and-disaster-recovery--authoritative-v1-specification). It specifies separate GitHub/R2 credentials, public-key encryption with off-runner custody, retention locks, independent monitoring, DB/Auth/file checkpoint consistency and deliberate production restore/cutover approval. Include database records and an attachment manifest/objects as needed. Test isolated restore and reconciliation before launch.
 If credentials leak: revoke/rotate, disable affected sessions, inspect audit history, contain exposure and document impact. If financial inconsistency appears: suspend affected posting, preserve evidence and reconcile before resuming. Do not delete logs or source records to hide an incident.
 
 ## Release checks
-Validate custom permission sets through direct requests, private downloads, session revocation, secret scanning, dependency review, upload/import abuse cases and recovery. See [TEST_PLAN.md](TEST_PLAN.md). Unresolved provider choice, backup ownership and staff permissions are implementation gates, not completed controls.
+Validate custom permission sets through direct requests, private downloads, session revocation, secret scanning, dependency review, upload/import abuse cases and recovery. See [TEST_PLAN.md](TEST_PLAN.md). B1 architecture is complete; selected provider integrations, recovery pipeline and actual staff permissions are not implemented controls. Actual runtime security/restore acceptance is required before launch.
 
 ## Fuel settlement authorization
 
@@ -83,3 +83,21 @@ V1 invoice payment/advance/reallocation currency must match invoice currency; hi
 Manual Order completion requires orders.complete, unfinished-Trip warning and audit; remaining Trip statuses stay intact. Expired documents show warnings/status/reminders; V1 assignment remains possible if otherwise authorized and expiry alone cannot block it. Future blocking is not an active V1 safeguard.
 
 First Owner is established during company setup. Owner creation/transfer/removal/deactivation is audited; always preserve an active Owner with concurrency-safe checks, deny last-Owner self-removal/deactivation and custom-role bypass. owners.transfer requires protected Owner authority and an eligible recipient; provider provisioning remains open. Multiple automatic backups daily, restricted access and a documented restore tested before production remain launch requirements, not completed verification.
+
+## Database/backend selection security boundary — 12 October 2026
+
+[DATABASE_BACKEND_SELECTION.md](DATABASE_BACKEND_SELECTION.md) records PostgreSQL/Supabase Free + Next.js full-stack selection and native/application/infrastructure requirements. Modular server services own identity/membership/role/grant/resource validation, financial transactions and redacted audit; thin Route Handlers provide the REST adapter. Frontend/mobile cannot bypass these operations with direct DB credentials or protected Supabase data endpoints. Supabase Auth and Cloudinary are selected by the 16 October user direction; Supabase Storage is not selected. Application grants remain independent of provider authentication.
+
+Required future safeguards: least-privilege runtime separate from migration/backup credentials, unexposed business schema/generated-API grant controls, parameterized values and allowlisted identifiers, TLS verification, short transaction-owned queries, concurrency/idempotency tests, RLS context isolation across pooled connections and append-only audit permissions. Backend-asserted Company context defends against scope bugs but cannot by itself defeat a compromised backend credential able to assert another context; treat that credential as a protected authority and validate this threat boundary before release. Ordinary runtime cannot alter RLS/schema/roles, truncate audit or silently rewrite issued versions.
+
+No production security/recovery approval: Free has no managed automatic backup/PITR; multiple automatic daily backups and documented successful complete restore of financial/audit/private-object history are still mandatory. Scheduler/store/key custody/operator/retention/targets/monitoring are selected in OPERATIONS_ARCHITECTURE.md; B1 is CLOSED at architecture level, with implementation/restore tests still required before launch. Vercel permits an appropriate paid production plan; its concrete configuration and auth/private-file controls must be implemented/tested before launch. No credential, schema, policy or security test is created by provider selection.
+
+## Full-stack transport safeguards — clarified 12 October 2026
+
+Every /api/v1/* request repeats verified identity, active company membership, action/resource/field/lifecycle checks through authorized services; middleware/Proxy, hidden controls or route placement are insufficient. Server Components and any future Server Actions use those same services with validated context. Client/shared UI imports cannot reach DB/provider/auth secrets; composition/repository entry points are server-only, while service/domain contracts avoid framework/request objects for later extraction. Private responses must not enter shared static/public caches; test cross-user/company reads and permission revocation.
+
+Vercel many-instance execution requires transaction-scoped DB/RLS context, bounded pools, durable idempotency and same-transaction success audit; no in-memory mutex, timer or post-response callback establishes financial correctness. Respect request deadlines and private-file body limits without weakening historical/tenant/document invariants. No auth provider, application control or API is implemented here. Use an appropriate production plan; the previous $0/Hobby constraint is superseded and is not a development blocker.
+
+## Recovery architecture security disposition — 16 October 2026
+
+Development Ready v1.0: YES; Production Ready: NO. Follow only the authoritative recovery specification in OPERATIONS_ARCHITECTURE.md for backup trust boundaries, encryption/custody, credential separation, threat model, monitoring and human recovery approvals. Newly documented risks include delayed/dropped scheduler events, silent Auth omission in default CLI exports, mutable administrator-controlled bucket locks, broad export credentials, poisoned backups and resurrection of revoked access after rollback. The selected controls address the design; direct permission/locked-delete/scheduler-failure/Auth-revocation and full recovery acceptance remain unexecuted. No irreversible WORM, six-hour scheduler SLA or four-hour measured restoration is claimed.

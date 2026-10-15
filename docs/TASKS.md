@@ -1,6 +1,8 @@
 # Implementation Tasks
 
-Updated: 10 October 2026
+Updated: 16 October 2026
+
+**Development Ready v1.0: YES. B1: CLOSED. Production Ready: NO.** Final recovery architecture is selected; pipeline/control implementation and measured full restore remain pending. [Final audit](FINAL_ARCHITECTURE_AUDIT.md) is current authority; dated milestones below retain their historical evidence.
 
 Use this checklist in build order. [x] means the stated deliverable is completed; unchecked means not completed. Implementation and verification are separate tasks. The setup shell is implemented and verified as recorded below; operational functionality remains unimplemented.
 
@@ -13,11 +15,18 @@ Use this checklist in build order. [x] means the stated deliverable is completed
 - [x] Add the [client overview](CLIENT_OVERVIEW.md) as the main editable source, with shareable [PDF](client/CLIENT_OVERVIEW.pdf) and [PowerPoint](client/Transport_Manager_Client_Presentation.pptx) snapshots linked from README.md. Documentation only; no application functionality is marked implemented.
 - [x] Close final business-policy review gates through D51–D69; business requirements/policies finalized, no material policy gaps remain.
 - [x] Complete final conceptual data model review; DATA_MODEL.md is the authoritative provider-independent model (D70–D78).
-- [ ] Resolve database/backend and subsequent infrastructure decisions, plus company/launch configuration.
+- [x] Select PostgreSQL on Supabase Free for development/testing and clarified Next.js full-stack Route Handlers/services (D79/D84).
+- [x] Record finalized Supabase Auth, Cloudinary development/production and Vercel paid-production direction (D87–D90).
+- [x] Complete final architecture/security/documentation audit; requirements/model remain finalized.
+- [x] Close recovery architecture B1: select runner/store, schedule/retention/encryption/custody, RPO/RTO, operator/monitoring, DB/Auth/Cloudinary consistency, approved restore and drills; reassess Development Ready v1.0: YES.
+- [ ] Production integration/capacity/company configuration and later runtime security/restore acceptance; keep separate from architecture readiness.
 
 ## 1. Project setup
 
-- [ ] Resolve database, authentication, storage and free hosting choices (O01/O09).
+- [x] Resolve development database/backend (O01; D79/D84); ORM remains recommendation only.
+- [x] Select Supabase Auth, Cloudinary and Vercel; paid production is acceptable.
+- [x] Resolve recovery design B1/O10 and declare Development Ready v1.0: YES (D92–D96).
+- [ ] Implement/test selected recovery and provider integrations in an authorized implementation phase; full measured restore before launch.
 - [x] Choose package manager and workspace configuration (npm workspaces).
 - [x] Scaffold Next.js in apps/web and configure shared package.
 - [x] Configure TypeScript, ESLint and Prettier. No application environment variables are required; actual environment files remain ignored, with safe `.env.example` templates allowed.
@@ -146,8 +155,8 @@ V2 backlog (not V1):
 
 - [ ] Execute TEST_PLAN.md and record actual results.
 - [ ] Complete access, accessibility, print and representative performance checks.
-- [ ] Define provider-dependent multiple-daily automatic backup schedule/mechanism/retention and owner; document restore procedure and test restricted secure restoration before production launch.
-- [ ] Confirm free-plan compatibility, quotas and absence of paid add-ons.
+- [ ] Implement the selected recovery schedule/retention/operator/runbook from OPERATIONS_ARCHITECTURE.md and pass restricted secure full restore/objective testing before production launch.
+- [ ] Confirm appropriate production plans, workload/cost limits and isolation; paid production is acceptable.
 - [ ] Deploy dashboard and perform smoke checks.
 
 ## 17. Later mobile phase
@@ -160,7 +169,11 @@ V2 backlog (not V1):
 
 Record implementation commit and test evidence when completing a feature. A written plan is not implementation. Keep decision blockers in DECISIONS.md and current state in MEMORY.md.
 
-## Setup verification — 5 October 2026
+## Historical implementation and review evidence
+
+The dated milestones below preserve previous outcomes and task state. Provider/budget/readiness assumptions are superseded by the 16 October audit and current checklist above.
+
+### Setup verification — 5 October 2026
 
 Evidence applies to the current working tree; no implementation commit was created in this task. Node.js 20.19.5, npm 10.8.2, Next.js 16.3.8.
 
@@ -234,7 +247,8 @@ Historical 7 October status: ready for the next requirements review; provider/ho
 - [x] Move bulk import to V2; record V1 auto-approval, full export and multiple-daily automatic backup requirements.
 - [x] Close O02–O06/O13–O18 business-policy gates and finalize Owner/retention/recovery minimums; retain unrelated technical/configuration/compliance entries.
 - [x] Perform FINAL CONCEPTUAL DATA MODEL REVIEW before database/backend selection; policy/model/workflow mapping and conceptual invariants are recorded in DATA_MODEL.md.
-- [ ] Select database/backend/auth/storage, then deployment, verifying $0 feasibility and financial/audit/backup capabilities.
+- [x] Select development database/backend; official Free-limit/financial-model evaluation is in DATABASE_BACKEND_SELECTION.md.
+- [ ] Select auth/storage/production deployment/recovery architecture and prove feasibility, keeping multiple-daily secure backups/tested restore mandatory.
 - [ ] Implement effective-dated transport rates/date configuration/Trip snapshots and permissioned overrides.
 - [ ] Implement optional planned, loaded/delivered/custom billable quantity and shortage handling.
 - [ ] Implement partial Trip invoicing, credit/debit notes and locked-record correction rules.
@@ -258,7 +272,8 @@ Earlier dated reviews/test evidence above are historical. Their references to un
 - [ ] Enforce same-currency invoice settlement, controlled correction/reissue/notes, invoice-date revenue and shared expense allocation with exact reconciliation.
 - [ ] Implement warning-only document expiry, manual Order completion with unchanged unfinished Trips, protected Owner setup/transfer/last-active safeguards and retention-by-default.
 - [x] Complete final conceptual model review (10 October; D70–D78).
-- [ ] Complete database/backend selection → auth/storage/hosting/backup architecture → final architecture audit. Only then assess Development Ready v1.0 and begin authorized implementation.
+- [x] Complete development database/backend selection (12 October; D79–D83).
+- [ ] Complete auth/storage/hosting/backup architecture → final architecture audit. Only then assess Development Ready v1.0 and begin authorized implementation.
 - [ ] Execute production-gate recovery evidence: multiple automatic backups/day, restricted access, documented restore tested with records/ledgers/audit/files.
 
 V2/Future additions: configurable document-type expiry assignment blocking and cross-currency invoice settlement/allocation if pursued. Existing controlled bulk import/manual approvals/mobile/dark mode and other future scope stay deferred. Earlier dated open-policy reviews are historical and superseded by D51–D69. Current documentation status does not complete implementation or certify providers/runtime tests.
@@ -282,7 +297,8 @@ This supersedes the 6 October hook/table-library blockers. It does not complete 
 - [x] Add planned T82–T101 component/browser and future trusted-service acceptance scenarios; writing them does not execute them.
 - [x] Check the five-file Markdown-only diff, local links/anchors, table column consistency, unique test IDs (20 new scenarios) and git diff --check; passed. No runtime component/service tests executed.
 - [x] Normalize the existing Combobox foundation and showcase imports into SearchableSelect; Combobox is a compatibility export of the React Select implementation.
-- [ ] Complete the specified gaps (rich options, explicit searchable multi mode, full validation/state/accessibility behavior) and extend synthetic /dev/components fixtures, then execute component cases.
+- [x] Implement rich options/multi/state contracts and synthetic fixtures (10 October milestone below); acceptance execution remains open.
+- [ ] Execute interaction/accessibility cases and correct demonstrated gaps before feature rollout.
 - [ ] Integrate thin feature pickers as modules are built; configure bounded loaders/thresholds/filters and execute server tenant/permission/relationship/lifecycle cases when trusted services exist.
 
 This milestone is Markdown only: no component/form refactor, backend/schema logic, dependency/provider choice or runtime test execution. Business policies, initial single Role assignment, independent Bill To/ownership roles and architecture gates remain unchanged. COMPONENTS.md owns the contract; DESIGN.md maps presentation/screens; TEST_PLAN.md owns acceptance evidence.
@@ -304,7 +320,51 @@ This supersedes the implementation status of the earlier documentation-only mile
 - [x] Review parties/Bill To, flexible receivers, quantities/rates/pricing, adjustments/coverage/corrections, three ledgers/payments/accounts/FX, fuel/expenses/history/documents, protected Owner and immutable audit.
 - [x] Record 44 invariants, 17 logical strong-consistency/atomic boundaries, reporting/query pressure, simplification decisions and provider-selection requirements.
 - [x] Finalize conceptual model with no remaining material conceptual/business-policy question; synchronize architecture/decisions/current phase references and preserve historical milestone evidence.
-- [ ] Evaluate DATABASE / BACKEND SELECTION against DATA_MODEL.md section 24 without assuming any historical candidate is selected.
+- [x] Evaluate DATABASE / BACKEND SELECTION against DATA_MODEL.md section 24; user-selected PostgreSQL/Supabase Free development and Next.js full-stack are D79/D84, distinct from unselected production providers.
 - [ ] Prove provider-specific constraints/atomicity/authorization/audit/backup restore and execute application acceptance after architecture/implementation; documentation walkthroughs are not runtime tests.
 
 No physical schema, provider selection, repository/API or business feature was added. Development Ready v1.0 remains unassessed. Documentation validation evidence is recorded in DOCUMENTATION_REVIEW.md.
+
+## Database/backend selection — 12 October 2026
+
+- [x] Read prioritized repository/model/security/environment documentation and user-selected stack; preserve conceptual model and business/V1-V2 invariants.
+- [x] Create DATABASE_BACKEND_SELECTION.md with native/application/infrastructure mapping P01–P20 and A01–A17, current official Supabase limits, growth estimates, ORM comparison, security/recovery/portability risks and next-phase inputs.
+- [x] Finalize PostgreSQL on Supabase Free development/testing + clarified Next.js full-stack versioned Route Handlers/services/runtime DTO validation (D84 supersedes initial NestJS D80); no client protected-business bypass.
+- [x] Recommend Drizzle/node-postgres only; retain Prisma comparison and explicit exact-decimal/native-integrity/version review requirements.
+- [x] Retain production blocker: no compliant $0 backup/hosting/storage architecture demonstrated; Free lacks managed backups/PITR; multiple automatic daily backups and full tested restore remain required.
+- [ ] Resolve AUTH / STORAGE / HOSTING / BACKUP ARCHITECTURE in a separate authorized task; no automatic start.
+- [ ] Approve ORM/version/decimal implementation, design physical constraints/RLS/migrations and execute concurrency/security/recovery tests only after architecture/readiness gates.
+
+This is Markdown selection/evaluation only. No database project, schema, NestJS module, API, credential, package/lockfile, workflow or production deployment is created. Documentation checks are recorded in DOCUMENTATION_REVIEW.md; no runtime/load/backup/restore acceptance executed.
+
+## V1 backend-framework re-evaluation — later 12 October 2026
+
+- [x] Replace separate NestJS service with Next.js full-stack /api/v1/* Route Handlers plus modular authorized services/repositories; Vercel is hosting direction, $0 testing target subject to plan/eligibility.
+- [x] Record thin HTTP adapters, framework-independent core contracts, server-only composition/secrets, shared Expo API and direct authorized Server Component read path; NestJS extraction deferred.
+- [x] Re-evaluate Node/serverless pools/context/deadlines/caching/private-file/job constraints and current Vercel Hobby terms; preserve all DB/domain/security/recovery requirements.
+- [ ] Resolve Vercel eligible testing/production plan/configuration with auth/storage/backup architecture separately; no deployment or paid upgrade authorized here.
+- [ ] Implement/API-test services/repositories/auth/validation/transaction/audit only after remaining architecture/readiness gates; no handler scaffold/business feature added in this task.
+
+## Final audit — 16 October 2026
+
+- [x] Review every repository Markdown document and relevant shell/configuration/selector source.
+- [x] Reconcile Supabase Auth, Cloudinary, Vercel paid production and stale phase/budget wording; preserve finalized business/model invariants.
+- [x] Define authentication/document/API/environment/deployment security contracts and identify recovery blocker B1.
+- [x] Scan current files/reachable Git-history blobs for recognizable credentials; record scope/limitations and documentation verification in FINAL_ARCHITECTURE_AUDIT.md.
+- [ ] Close B1 and rerun readiness assessment. Development Ready v1.0 remains NO.
+- [ ] After readiness and authorization, implement isolated development infrastructure + trusted access/Owner/RBAC/audit foundation; then master records → Orders/Trips → rates/costs → billing/payments/reports.
+
+No business implementation, schema, endpoint, provider provisioning, deployment or runtime acceptance test is part of this audit.
+
+## B1 closure — later 16 October 2026
+
+This milestone supersedes the initial same-day blocked audit and its unchecked B1 item above.
+
+- [x] Validate current official Supabase managed/PITR/logical/Auth, Cloudinary version/download and R2 encryption/permissions/locks capabilities plus GitHub scheduling limitations.
+- [x] Select complete recovery architecture in OPERATIONS_ARCHITECTURE.md, including three-hour capture for six-hour RPO headroom, retention/custody, independent monitoring and approved restore/testing process.
+- [x] Close B1 and reassess Development Ready v1.0: YES; no new material architecture blocker.
+- [ ] In authorized implementation: build private operations capture/verification/prune automation, bucket locks, configuration/custody and monitoring without exposing production secrets to application CI.
+- [ ] Before production: prove generation completeness, Auth/private-file/tenant/finance/audit integrity, failure alerts, retained keys and full RPO/RTO in the selected restore exercises.
+- [ ] Next phase after user authorization: isolated development infrastructure and trusted access/Owner/RBAC/audit foundation. Do not start it in this documentation task.
+
+No feature, workflow, schema, secret, infrastructure or restore was created/executed here. Restore tests remain planned, unexecuted.

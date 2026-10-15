@@ -1,6 +1,6 @@
 # Decision Log
-Updated: 10 October 2026
-Status key: Confirmed = explicit user direction; FINALIZED = final business-policy or explicitly labelled conceptual-model decision; Closed = answered/superseded with traceability; Proposed = design recommendation; Open = unresolved technical/configuration/compliance item. Business Requirements: Finalized; Business Policies: Finalized; Conceptual Data Model: FINALIZED; Technical Architecture Providers: Open; Business Implementation: Not Started / existing shell only.
+Updated: 16 October 2026
+Status key: Confirmed = explicit user direction; FINALIZED = business-policy or labelled conceptual decision; Proposed = recommendation; Open = unresolved item. Current selections D87–D90 supersede dated provider/$0 assumptions below: Next.js full-stack, Supabase PostgreSQL/Auth, Cloudinary and Vercel; paid production is acceptable. Business requirements/policies/model remain finalized. D92–D96 close D91/B1: Development Ready v1.0: YES. Production Ready: NO; recovery implementation and measured objectives are pending. Business workflows are unimplemented. Earlier dated milestone conclusions are historical evidence.
 
 ## Recorded decisions
 | ID | Status | Decision | Reason / consequence |
@@ -11,7 +11,7 @@ Status key: Confirmed = explicit user direction; FINALIZED = final business-poli
 | D04 | Confirmed | Factory → Customer → customer’s receiver | Receiver is linked to the customer |
 | D05 | Confirmed in visible discussion/current PRD | Use Consignee (Receiver) instead of Party | Keep Customer distinct; do not silently rename |
 | D06 | Confirmed | Include outsourced orders | Partner assignments and financial tracking in scope |
-| D07 | Confirmed | Target $0 recurring service cost | No paid plans/add-ons without approval |
+| D07 | Superseded for production by D90 | Historical $0 recurring-service target | Eligible free development resources remain optional; paid production is acceptable |
 | D08 | Implemented shell; workflows pending | Next.js + TypeScript dashboard | Versions pinned in package lockfile; no business implementation claim |
 | D09 | Proposed | Tailwind/shadcn, TanStack Table, RHF/Zod, Recharts | Reusable dashboard UI; verify versions when implementing |
 | D10 | Proposed | Shared domain services for web/mobile | Keep financial logic consistent |
@@ -25,7 +25,7 @@ Original questions are retained here with their final disposition on 9 October 2
 
 | ID | Original question | Disposition / replacement |
 |---|---|---|
-| O01 | Supabase, MongoDB now, or MongoDB later? | OPEN technical: database/backend selection; historical candidates are not selections |
+| O01 | Supabase, MongoDB now, or MongoDB later? | CLOSED development selection — 12 October D79/D84: PostgreSQL on Supabase Free for development/testing; initial NestJS choice D80 superseded by Next.js full-stack D84. MongoDB alternatives superseded. Production/recovery direction selected by D92–D96; provisioning/testing pending |
 | O02 | Who owes the transport bill? | CLOSED — D51: explicit selectable Bill To determines debtor |
 | O03 | Does Munir receive net fare and advance? | CLOSED as a product-policy gate — D51/D52: explicit debtor, partner obligation and payment direction, configurable deductions; illustrative agreement is not verification of source-row events |
 | O04 | Fixed or percentage commission; cost deductions? | CLOSED — D52: both, multiple extensible categories, configured automatic/manual calculation and historical gross/net |
@@ -33,8 +33,8 @@ Original questions are retained here with their final disposition on 9 October 2
 | O06 | Fare basis, tax/currency, discounts/rounding/FX allocation? | CLOSED business policy — D27–D29/D44/D54/D55: configurable discounts/rounding preserve gross; V1 invoice settlement same currency. Physical decimal/FX and non-invoice transfer mechanics stay technical |
 | O07 | Currency, timezone, business name, languages? | OPEN company configuration: identity/base currency/timezone/languages; PKR/Asia-Karachi remain historical suggestions |
 | O08 | Which staff receive grants and correction authority? | OPEN deployment configuration: actual staff assignments; dynamic RBAC and granular correction/Owner safeguards finalized by PERMISSIONS.md |
-| O09 | Hosting/auth/files within free constraints? | OPEN technical: auth implementation, private object/file storage and hosting/deployment; no provider selected |
-| O10 | Backup owner/schedule/mechanism/retention/recovery target? | FINALIZED minimum — D69: multiple automatic backups/day, restricted access, documented and pre-launch tested restore. OPEN infrastructure operations: exact schedule/provider/mechanism/backup retention, operator and recovery targets |
+| O09 | Hosting/auth/files within free constraints? | CLOSED provider direction D87–D90: Supabase Auth, Cloudinary and Vercel; paid production acceptable. Integration/deployment configuration remains work |
+| O10 | Backup owner/schedule/mechanism/retention/recovery target? | CLOSED architecture B1/D92–D96: selected in OPERATIONS_ARCHITECTURE.md; actual implementation and measured full restore are production gates |
 | O11 | Exact approved bill design? | OPEN presentation/configuration: exact branding/template; existing multipage/Urdu acceptance remains |
 | O12 | Audit/business/document retention and exceptional disposal? | FINALIZED default — D68: retained, no automatic historical purge; explicit permitted document removal only. Formal jurisdiction-specific periods/legal holds and exceptional lawful disposal remain compliance review; archival/security-stream mechanics remain technical |
 | O13 | Rate specificity, overlaps, missing dates and snapshot timing? | CLOSED — D59/D60/D61: most-specific valid recommendation, authorized alternative valid match, exact-condition interval rejection, provisional until rate-date resolved then historical lock |
@@ -111,7 +111,7 @@ These explicit product/architecture decisions supersede older conflicting propos
 | D49 | Preserve/extend dynamic RBAC, immutable credential-redacted audit and company isolation for every new concept | PERMISSIONS.md; AUDIT.md; SECURITY.md |
 | D50 | Preserve Factory → Customer (Client) → Consignee; separate V1 from V2 and conceptual model from provider schema | PRD; ARCHITECTURE.md |
 
-D11/D12 are now required in the scope above: outsourced views reuse existing records and financial posting preserves traceability/concurrency integrity. O05/O06 capability questions were resolved here; D51–D69 now close the narrower remaining business-policy questions. Database/backend and hosting are NOT selected.
+D11/D12 are now required in the scope above: outsourced views reuse existing records and financial posting preserves traceability/concurrency integrity. O05/O06 capability questions were resolved here; D51–D69 now close the narrower remaining business-policy questions. At this 9 October milestone database/backend and hosting were NOT selected; D79/D80 below supersede development database/backend status on 12 October, with production hosting still open.
 
 ## FINALIZED business-policy decisions — 9 October 2026
 
@@ -143,11 +143,9 @@ V1/V2 scope, permission additions and audit events reflect these decisions in th
 
 ## Remaining technical choices and operational configuration
 
-Remain OPEN: database/backend technology; authentication provider/implementation; private object/file storage; hosting/deployment; exact backup schedule/provider/mechanism/retention; provider-specific Owner provisioning; transaction/outbox implementation; append-only audit enforcement; physical decimal/FX representation; provider-specific export/file handling. Preserve the $0 constraint and prove backup/security/financial requirements with the eventual architecture. Non-invoice currency transfer representation must preserve explicit historical conversion and paired account effects without authorizing cross-currency invoice settlement. Future import commit mechanics and notification adapters remain deferred.
+Current architecture: D87–D90 below and [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md). Recovery architecture B1/O10 is CLOSED by D92–D96; Development Ready v1.0: YES. Exact closure evidence is in [FINAL_ARCHITECTURE_AUDIT.md](FINAL_ARCHITECTURE_AUDIT.md). ORM adoption/pinning, exact decimal runtime, physical constraints/indexes/RLS/audit/idempotency enforcement and bounded loader/HTTP defaults are implementation choices within fixed I01–I44/A01–A17.
 
-Company identity/base currency/timezone/languages, actual staff grants, bill branding/template, backup operator/targets and formal jurisdiction-specific compliance/retention obligations remain configuration, operations or compliance work. They do not reopen configurable Bill To, discounts/rounding, Owner safeguards or retention defaults. No current material business gap is identified that requires a different schema, financial, authorization or core workflow policy; detailed conceptual mapping and technical feasibility are still to be reviewed.
-
-Current sequence after the 10 October conceptual review: DATABASE/BACKEND SELECTION → AUTH/STORAGE/HOSTING/BACKUP ARCHITECTURE → FINAL ARCHITECTURE AUDIT → assessment of DEVELOPMENT READY V1.0 → authorized IMPLEMENTATION.
+Company settings, staff grants, domain/branding, actual service plans/capacity, SMTP/MFA/compliance configuration and implemented security/performance/restore acceptance are pre-launch work. They do not reopen finalized business policies. Next: authorized isolated development infrastructure and trusted-access foundation implementation; no automatic implementation. The remaining dated milestones below preserve historical review evidence; unselected providers/$0/next-phase wording is superseded by D87–D91.
 
 ## Final conceptual data model review — 10 October 2026
 
@@ -166,3 +164,53 @@ These are provider-independent model decisions derived by cross-checking finaliz
 | D78 | FINALIZED conceptual | Conceptual Data Model: FINALIZED; next DATABASE / BACKEND SELECTION | No remaining material ownership/cardinality/finance/snapshot/authorization/workflow issue identified; no provider/schema/readiness approval. Sections 23–24 |
 
 No database/backend/auth/storage/hosting selection, physical schema or business implementation was performed. Physical precision/index/transaction/outbox/audit/Owner bootstrap/object/backup mechanisms, non-invoice transfer enablement and launch/compliance configuration remain open under the documented invariants. No Development Ready v1.0 claim is made.
+
+## Development database/backend selection — 12 October 2026
+
+Historical initial 12 October selection: user explicitly selected the following development stack. The later clarified V1 constraints supersede D80 via D84; current hosting direction is D85. [DATABASE_BACKEND_SELECTION.md](DATABASE_BACKEND_SELECTION.md) evaluates model section 24, all 20 requested requirements and A01–A17 using current official documentation. These entries supersede earlier dated “no provider selected/database selection next” status only for this development scope; business policies and conceptual model are unchanged.
+
+| ID | Status | Decision | Consequence |
+|---|---|---|---|
+| D79 | Confirmed / FINALIZED development | PostgreSQL hosted on Supabase Free for development/testing | Engine/initial development host selected; no project provisioned. Free capacity/inactivity and missing managed backups/PITR prohibit a production-ready claim; production plan/host remains open |
+| D80 | Superseded by D84 | NestJS/TypeScript, versioned REST, DTO server validation; existing Next.js → NestJS → PostgreSQL | NestJS owns authorization/domain/financial workflows/transactions; frontend/mobile cannot bypass it. Auth provider and private storage remain separate pending decisions |
+| D81 | Recommended, unapproved | Drizzle ORM with node-postgres; Prisma evaluated alternative | Explicit SQL/native PostgreSQL control and portable pool/transactions suit financial/reporting predicates; exact decimal runtime, pinned supported version and migrations must be reviewed before adoption. No ORM schema/dependency implementation |
+| D82 | Required production gate; unresolved architecture | Supabase Free approved for development/testing only; mandatory multiple-daily automated backups/full tested restore retained | No compliant $0 production architecture yet established; scheduler/private off-site copies/object history/keys/monitoring/operator/RPO/RTO/retention and costs remain next-phase work. Daily-only backup/export availability is not completion |
+| D83 | FINALIZED phase outcome | Next AUTH / STORAGE / HOSTING / BACKUP ARCHITECTURE; stop after selection task | Then final architecture audit/readiness assessment/authorized implementation. No automatic next-phase start, deployment, credentials or Development Ready v1.0 |
+
+Official limits were checked on 12 October, including the current one-year paused-project restore window rather than older 90-day guidance. Growth assumes 36 associated records and 80 KiB/transaction with 40–160 KiB sensitivity, plus 50 MB fixed baseline; these are planning assumptions, not measured schema/benchmark results. Paid alternatives require explicit later budget approval; no paid plan/provider is selected. DATA_MODEL.md stays byte-for-byte unchanged.
+
+## Clarified V1 backend/deployment constraints — later 12 October 2026
+
+Re-evaluation supersedes the separate NestJS deployment, preserving PostgreSQL/domain/invariants and the portable service boundary. [ARCHITECTURE.md](ARCHITECTURE.md) and [DATABASE_BACKEND_SELECTION.md](DATABASE_BACKEND_SELECTION.md) are updated to the current path; no implementation/deployment occurs.
+
+| ID | Status | Decision | Consequence |
+|---|---|---|---|
+| D84 | Confirmed / FINALIZED V1; supersedes D80 | Next.js + TypeScript full-stack Route Handlers at /api/v1/*, server-side services/repositories/auth/validation/database adapters | One Vercel application path removes a separately hosted API. Thin HTTP handlers invoke modular authorized use cases; browser/Expo use the same REST contract, Server Components may use the same authorized read service directly |
+| D85 | Confirmed hosting direction; plan/eligibility gated | Vercel hosting, $0 testing target | No deployed project/paid plan authorization. Hobby is personal/non-commercial only; commercial/internal business testing requires an eligible plan determination. Function/pool/job/backup/production settings remain unproved; no $0 commercial-production promise |
+| D86 | Confirmed architecture boundary | Portable domain/services/repository ports with Next-specific transport/auth wiring at adapters; separate NestJS deferred | No financial formulas/ORM queries in route handlers, no framework objects/decorators in core contracts, no client credentials/repository bypass. Later Nest extraction requires justified runtime/team/scaling needs and preserves API/business invariants |
+
+Auth/private storage/production DB plan/backup architecture/ORM adoption remain open. Exact decimal, transaction/idempotency/RLS/audit, multiple-daily secure backups and full tested restoration are unchanged. Next architecture phase stays separate; no Development Ready v1.0 or application implementation is declared.
+
+## Final architecture audit — 16 October 2026
+
+| ID | Status | Decision | Consequence |
+|---|---|---|---|
+| D87 | Confirmed user direction | Supabase PostgreSQL is the selected authoritative business datastore for V1; Next.js/TypeScript full-stack REST and portable service/repository boundaries retained | Supabase Free may serve development; actual production capacity/recovery must meet invariants; no new database candidate review |
+| D88 | Confirmed user direction | Supabase Auth, invite-only email/password, configured verification/reset/refresh/activation | Identity is separate from application membership/RBAC/resource authority; no public/anonymous signup. Session/revocation/bootstrap safeguards follow OPERATIONS_ARCHITECTURE.md |
+| D89 | Confirmed user direction | Cloudinary stores file bytes in development AND production; PostgreSQL stores metadata | No Supabase Storage selection or binary-in-DB design. Authorized server-mediated private upload/delivery, originals/derivatives, version/manifests, audit and cleanup requirements documented |
+| D90 | Confirmed user direction; supersedes D07 production/D85 cost gate | Vercel selected; appropriate paid production plan acceptable, eligible free resources optional for development | Hobby/$0 eligibility is no longer a production architecture blocker. No purchase or deployment authorized/performed by this audit |
+| D91 | Historical audit outcome; superseded by D92–D96 | Initial verdict: Development Ready v1.0: NO — recovery architecture was incomplete | Select runner/independent store/cadence/retention/key custody/targets/operator/monitoring and consistent DB/Auth/file recovery; then reassess. Runtime feature tests and actual restore execution are production gates, not prerequisites to starting implementation after architecture closure |
+
+No finalized business policy or conceptual responsibility is redesigned. No schema, migration, endpoint, feature, credential, package or deployment was created. Final evidence: FINAL_ARCHITECTURE_AUDIT.md and DOCUMENTATION_REVIEW.md.
+
+## B1 recovery architecture closure — later 16 October 2026
+
+[OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md#backup-and-disaster-recovery--authoritative-v1-specification) is the single selected recovery specification. These are architecture decisions under the user's request, not infrastructure procurement/configuration or restore execution.
+
+| ID | Status | Decision | Rationale / consequence |
+|---|---|---|---|
+| D92 | Selected V1 recovery architecture | Supabase Pro + eligible Small-or-higher compute, seven-day PITR; independent logical DB/Auth archives from protected private GitHub Actions to a separate private Cloudflare R2 Standard recovery account | Managed recovery and off-provider/account recovery are separate paths; explicit Auth coverage, configuration/secrets inventory and immutable file manifests required |
+| D93 | Selected cadence/objectives | Capture every three hours with one-hour sealing budget; independent RPO <= 6 hours and total RTO <= 4 hours are objectives pending measured exercises | Replaces proposed six-hour starts to provide completion/delay headroom. GitHub schedules can be delayed/dropped; monitoring/fallback exposes breaches rather than promising a scheduler SLA |
+| D94 | Selected retention/security/custody | Seven-day frequent, 35-day daily and 400-day monthly self-contained encrypted generations, tier locks, separate prune/verification access; age decryption identities in independent vault/offline custody | No keys with backup objects or capture-runner decrypt keys. R2 admin can remove locks; separate administration/MFA/dual approval and external alerts mitigate residual risk |
+| D95 | Selected operations/recovery | System Owner / Designated Technical Administrator owns alerts/investigation/execution/evidence; Owner approves production restore and traffic cutover; Better Stack external freshness monitoring; explicit DB/Auth/Cloudinary runbook and drills | Four-hour stale warning, six-hour RPO breach; pre-production full isolated restore, monthly integrity drills, quarterly/full-on-change restores. No test has been executed |
+| D96 | Final readiness reassessment; supersedes D91 | B1: CLOSED. Development Ready v1.0: YES. Production Ready: NO | All B1 decisions selected; no new material architecture/business blocker identified. Runtime security, operational configuration/capacity and measured restore remain production gates; next implementation phase needs separate authorization |

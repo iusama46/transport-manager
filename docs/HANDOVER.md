@@ -6,21 +6,22 @@ Development Ready v1.0: YES
 
 Production Ready: NO
 
-Next phase: **Trusted Access Foundations**. Branch: `feat/project-setup`; governance baseline: `72a737b` (Git records subsequent commits). Current work is documentation only. [AGENTS.md](../AGENTS.md) is the operating manual; architecture/decisions, MEMORY and Git hold durable context/history.
+Next phase: **Trusted Access Foundations**. Working branch: `feat/trusted-access-foundations`, created from local `main` after the setup closeout. Setup source reviewed: `0763b6a`; Git records the closeout commit. [AGENTS.md](../AGENTS.md) is the operating manual; architecture/decisions, MEMORY and Git hold durable context/history.
 
 ## Recently Done
 
 - B1 recovery architecture closed; [final audit](FINAL_ARCHITECTURE_AUDIT.md) remains current.
 - Governance consolidated: action/dependency rules in AGENTS, lightweight traces and one Defense template. Checks/results: [DOCUMENTATION_REVIEW](DOCUMENTATION_REVIEW.md).
 - Existing app is still the public UI/environment shell; no business subsystem has been implemented.
+- Setup closeout reviewed on 18 October 2026: lint, isolated typecheck/build, four environment tests, seven HTTP smoke checks and documentation checks passed. Full formatting check still fails on 51 existing source files; details/limits are in DOCUMENTATION_REVIEW.
 
 ## In Progress
 
-No implementation in progress. Governance consolidation is complete; the user subsequently authorized committing it and pushing this branch to GitHub.
+No implementation in progress. Setup is closed; the user authorized the final review/commit, local promotion to `main` and creation of the next branch. This transition includes no remote push or Phase 1 implementation.
 
 ## Broken/Risky
 
-Runtime Auth/RBAC/tenant/financial/file/audit and recovery acceptance remain unverified; do not load private data into the shell. Current dependency advisory review and client PDF/PPT refresh remain pre-ship work.
+Runtime Auth/RBAC/tenant/financial/file/audit and recovery acceptance remain unverified; do not load private data into the shell. Current dependency advisory review, client PDF/PPT refresh and the existing formatter failure remain outstanding.
 
 ## Next
 

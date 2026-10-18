@@ -1,3 +1,26 @@
+# Project setup closeout — 18 October 2026
+
+Scope: final local review of setup source `0763b6a` on `feat/project-setup`, followed by a documentation closeout commit, fast-forward of local `main` and creation of `feat/trusted-access-foundations`. The incoming working tree was clean; governance was already committed. The new diff changes only this record and HANDOVER. No Phase 1 implementation, dependency/configuration change, deployment, provider operation or remote push is included.
+
+Disposition: usable as the local development baseline, with the existing formatter failure retained explicitly. **Development Ready v1.0: YES. Production Ready: NO.** Review covered branch ancestry/diff inventory, shell routes and components, shared/environment boundaries, scripts, manifests/lockfile and current governance/readiness evidence. This does not replace the planned subsystem security, financial, accessibility or recovery acceptance.
+
+Verification on existing installed dependencies:
+
+- `npm run lint` — PASS for web/shared, zero warnings.
+- `npm run typecheck` and `npm run build` — PASS in an isolated tracked-source copy, with existing `node_modules` linked, local environment files excluded and a minimal process environment. Next.js 16.3.8/Webpack completed production compilation and prerendering. This was not a fresh `npm ci`.
+- `node --test scripts/environment.test.mjs` — PASS, 4 tests, no failures/skips.
+- Local Python/urllib HTTP smoke against the isolated production-mode shell — PASS, 7 requests: `/`, `/orders`, `/fuel`, `/fuel/purchases` return 200 with expected content; `/dev/components`, an unknown top-level route and an unknown fuel tab return 404. Overview navigation links are present and the showcase link is absent. The default sandbox blocked socket creation; the approved local-server retry passed and stopped the server afterward. No deployment occurred.
+- `npm run format:check` — FAIL on 51 existing source files. Source was unchanged from the reviewed commit; no formatter configuration was weakened or broad cleanup introduced. Scoped `./node_modules/.bin/prettier --check AGENTS.md` — PASS; docs/README Markdown remains ignored by the configured formatter and was validated separately.
+- Local Python structure/link/table validation — PASS: 33 Markdown files, 219 local links/anchors, 84 tables, no errors. Manifest/lockfile comparison — PASS, no dependency-inventory mismatches across the three manifests and 644 lockfile entries.
+- Heuristic reachable-history scan — no recognized private-key/provider-token/JWT/credential-URL candidates across 232 blobs; no tracked actual environment files. No secret values printed. This is not comprehensive secret assurance: compressed binary contents, ignored/unreachable/remote-only files and external accounts were not examined.
+- `git diff --check main...HEAD` and `git diff --check` — PASS for the setup range and final documentation diff. Both changed files were reviewed in full; no new/deleted files. Final documentation validation retained the counts above.
+
+Not run: fresh dependency installation/current advisory audit, browser interaction/screen-reader checks, feature/API/database/concurrency/Auth/file/recovery acceptance and client binary regeneration. Dependencies were reused; no feature/provider behavior changed, no protected subsystem exists, and these production gates remain pending. HTTP smoke does not establish browser or accessibility acceptance.
+
+**Assumptions made:** VERIFIED — the initial tree was clean, local `main` was an ancestor of setup, and the shell runs without application secrets. Scope assumption — the requested transition is local; no new push was requested and remote state was not refreshed. UNVERIFIED — designed runtime controls and recovery objectives still require implementation/exercises (HANDOVER GOV-04). No disproven premise changes the selected architecture. Remaining risks include the formatter failure, unreviewed current advisories, stale client binaries and unexecuted production acceptance.
+
+---
+
 # AI governance consolidation review
 
 Reviewed: 16 October 2026 on `feat/project-setup`. **Development Ready v1.0: YES. Production Ready: NO.** Documentation only; Phase 1, source/configuration, packages, finalized business/architecture/security/data/recovery/production requirements and existing runtime test strategy are unchanged. Incoming governance work was uncommitted and preserved except for the explicitly requested consolidation/removals. No commit/push.

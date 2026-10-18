@@ -8,6 +8,7 @@ playwright-report/
 test-results/
 .env
 .env.*
+# Only reviewed, secret-free templates may be committed at any depth.
 !.env.example
 *.log
 .DS_Store
@@ -18,3 +19,14 @@ backups/
 *.key
 
 .refact/
+
+# Local tooling, credentials and generated TypeScript caches
+*.tsbuildinfo
+.aws/
+credentials
+credentials.*
+*.credentials.json
+service-account*.json
+secrets/
+.envrc
+.npmrc

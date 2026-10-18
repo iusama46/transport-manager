@@ -1,0 +1,2 @@
+import type {ComponentProps} from "react";
+export function RadioGroup({legend,options,name,...props}:Omit<ComponentProps<"input">,"type"> & {legend:string;name:string;options:{value:string;label:string}[]}) {return <fieldset className="field"><legend>{legend}</legend><div className="actions">{options.map(option=><label className="choice" key={option.value}><input {...props} type="radio" name={name} value={option.value} checked={props.value===option.value} className="check"/>{option.label}</label>)}</div></fieldset>;}

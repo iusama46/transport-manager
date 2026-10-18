@@ -1,0 +1,2 @@
+import type {ReactNode} from "react";
+export function EmptyState({filtered=false,title,children,action}:{filtered?:boolean;title?:string;children?:ReactNode;action?:ReactNode}){return <div className="empty-state" role="status"><h2>{title??(filtered?"No matching records":"No records yet")}</h2><p>{children??(filtered?"Try changing or clearing the filters.":"Records will appear here when added.")}</p>{action}</div>;}

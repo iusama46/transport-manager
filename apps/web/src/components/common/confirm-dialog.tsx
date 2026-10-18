@@ -1,0 +1,3 @@
+"use client";
+import {Dialog} from "../ui/dialog";import {Button} from "../ui/button";import {Alert} from "../ui/alert";
+export function ConfirmDialog({open,onOpenChange,title,description,actionLabel,onConfirm,pending,error}:{open:boolean;onOpenChange:(open:boolean)=>void;title:string;description:string;actionLabel:string;onConfirm:()=>void;pending?:boolean;error?:string}){return <Dialog open={open} onOpenChange={value=>{if(!pending)onOpenChange(value);}} title={title} description={description}>{error&&<Alert tone="error" title="Action failed">{error}</Alert>}<Button variant="destructive" loading={pending} onClick={onConfirm}>{actionLabel}</Button></Dialog>;}

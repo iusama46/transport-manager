@@ -1,0 +1,3 @@
+"use client";
+import {DateField} from "./date-field";
+export function DateRangeField({start,end,onChange,disabled}:{start:string|null;end:string|null;onChange:(range:{start:string|null;end:string|null})=>void;disabled?:boolean}){return <fieldset className="stack"><legend>Date range (inclusive)</legend><div className="form-grid"><DateField label="Start date" value={start} disabled={disabled} onValueChange={start=>onChange({start,end})}/><DateField label="End date" value={end} disabled={disabled} min={start??undefined} error={start&&end&&end<start?"End date must be on or after start date.":undefined} onValueChange={end=>onChange({start,end})}/></div></fieldset>;}

@@ -1,84 +1,126 @@
 # Architecture
-Updated: 5 October 2026  
-Status: Proposed implementation design; database and deployment decisions remain open.
+Updated: 16 October 2026
+Status: Business Requirements/Policies and Conceptual Data Model: FINALIZED. Next.js full-stack + Supabase PostgreSQL/Auth + Cloudinary + Vercel selected. Paid production hosting is acceptable. Drizzle recommended, not adopted. Development Ready v1.0: YES — B1 CLOSED with selected recovery architecture in [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md); see [final audit](FINAL_ARCHITECTURE_AUDIT.md).
 
 ## Scope and references
-Implement [PRD.md](PRD.md). See [DECISIONS.md](DECISIONS.md) for status and [SECURITY.md](SECURITY.md) for trust boundaries. No application has been implemented or deployed by this documentation task.
+Implement [PRD.md](PRD.md) under [DATA_MODEL.md](DATA_MODEL.md) and the selected development boundary in [DATABASE_BACKEND_SELECTION.md](DATABASE_BACKEND_SELECTION.md). See [DECISIONS.md](DECISIONS.md) for status and [SECURITY.md](SECURITY.md) for trust boundaries. No application has been implemented or deployed by this documentation task.
 
-## Components
-- Next.js App Router dashboard with TypeScript.
-- Server components for initial authorized reads where the eventual host supports them; client components for forms, interactive tables and charts.
-- Application services for orders, assignments, invoicing, payments, imports and reports.
-- A persistence layer containing database-specific queries; do not scatter database calls across UI components.
-- Authentication and private object storage providers, selected with the database and hosting.
-- Later Expo app using authenticated API endpoints and the same application rules.
+## Selected V1 components and ownership — clarified 12 October 2026
 
-Proposed dependency direction: UI and HTTP handlers call application services; services enforce rules and call repositories/storage adapters. Domain calculations do not import UI or provider SDKs. This reduces duplication but does not make database migration automatic.
+- Existing Next.js App Router/TypeScript application provides both Web Dashboard and versioned REST Route Handlers at `/api/v1/*`.
+- Thin HTTP adapters decode/validate input, establish verified request identity/context, invoke an authorized service and map its result/errors. They contain no billing calculations, ORM queries or duplicated workflow rules.
+- Modular server-side services own company/resource/action authorization, business rules, exact financial calculations, transactions/idempotency and durable redacted audit; repositories own PostgreSQL access under those service boundaries.
+- Supabase PostgreSQL remains the selected database, initially on Free for development/testing only. Drizzle/node-postgres remains recommended, not adopted. Supabase Auth and Cloudinary are selected; recovery architecture B1 is CLOSED. Supabase Pro + seven-day PITR is the production recovery direction, alongside independent copies.
+- Vercel is selected for V1, with an appropriate paid production plan permitted. Development may use eligible free resources. Validate actual runtime/capacity settings before launch; Hobby eligibility is not an architecture blocker.
+- Future Expo/React Native calls the same authenticated Next.js `/api/v1/*` endpoints; Server Actions are not the mobile API contract.
+- A separate NestJS service is deferred. Extract the existing domain/services/repository contracts only if sustained job/runtime/scaling/organization needs justify a later architecture decision.
 
-## Proposed code organization
+Direction: browser/Expo → Next.js Route Handler → authorized server service → repository/transaction → Supabase PostgreSQL. Server Components may invoke the same authorized read service directly, avoiding a self-HTTP round trip, after establishing verified identity/context. They cannot bypass service authorization through direct ORM/repository access. Any future Server Action also calls the same service, with request identity and validation repeated. Client/mobile bundles never contain server modules, DB credentials or privileged Supabase keys; protected direct Supabase database endpoints remain disallowed.
+
+## Proposed code organization — future implementation only
+
 | Path | Responsibility |
 |---|---|
-| src/app | Routes, layouts, server entry points and API handlers |
-| src/features | Forms, tables and views grouped by business module |
-| src/domain | Money, status rules and financial calculations |
-| src/services | Authorized business operations and transaction boundaries |
-| src/repositories | Data access and query implementations |
-| src/integrations | Auth, private files and export integrations |
-| src/shared | Reusable UI and validation |
-| tests | Unit, integration and browser tests |
+| apps/web/src/app | Existing routes/layouts/server rendering; service-backed reads and presentation |
+| apps/web/src/app/api/v1/<resource>/route.ts | Future thin versioned REST adapters; no endpoint created in this task |
+| apps/web/src/features | Web components/forms/tables, consuming API/data contracts rather than repositories |
+| apps/web/src/server/services/<module> | Future authorized application operations, transaction/idempotency/audit coordination |
+| apps/web/src/server/repositories/<module> | Future PostgreSQL access; receives a transaction-scoped connection, no HTTP/UI dependencies |
+| apps/web/src/server/auth | Supabase identity adapter plus application membership/permission/context checks; not implemented |
+| apps/web/src/server/validation | Runtime-validatable DTO/input/output contracts; decimal strings, scoped filters and bounded payloads |
+| apps/web/src/server/composition | Server-only wiring of auth, repositories, exact calculation and provider adapters |
+| apps/web/src/server/integrations | Cloudinary private-file adapter, export/recovery integrations; not implemented |
+| packages/shared | Provider-independent API/domain types and pure calculations; current placeholder-only exports retained |
+| tests | Future domain, real PostgreSQL concurrency/security and versioned API/browser/mobile contract acceptance |
 
-Use a modular application initially. No separate microservices are required by the PRD.
+Service/domain interfaces use plain TypeScript input/results and verified actor/company context plus injected repository/transaction ports, not NextRequest/NextResponse, cookies/headers, React, Nest decorators or Supabase SDK types. Framework request/session handling and server-only import protection stay at composition/adapter boundaries; mark secret-bearing DB/provider entry modules server-only. Pure calculations remain portable and do not import ORM Decimal types. This keeps a later NestJS controller/composition adapter possible without redesigning business rules or HTTP DTO contracts. Do not build a generic framework or a second backend in advance.
 
-## Logical data model
-This is conceptual, not an approved SQL schema or MongoDB collection layout.
+Use the Node.js runtime for pg-backed handlers; select and test serverless pool/context/timeouts under actual Vercel settings. Keep financial transactions short and durable; in-memory state/global mutexes and post-response tasks cannot establish financial/audit correctness. Private uploads, larger exports and multiple-daily backup scheduling require separately validated execution/object paths. Current quotas/terms and extraction criteria are evaluated in DATABASE_BACKEND_SELECTION.md. No backend/API/schema/deployment is implemented by this revision.
 
-| Record | Relationships / important fields |
-|---|---|
-| Business | Settings, currency, timezone |
-| UserMembership | User, business, role, active status |
-| ContactEntity | Person/company, business roles, contact details |
-| CustomerConsignee | Customer-to-receiver relationship |
-| Vehicle | Normalized registration, current owner, type, capacity |
-| Driver | Contact, licence and availability |
-| Order | Factory, customer, consignee, dates, cargo, fulfilment type |
-| OrderStop | Order, sequence, location and completion |
-| Assignment | Order, vehicle, driver, partner, historical owner, effective period |
-| FuelTransaction | Vehicle, supplier, quantity, rate, cost, source reference |
-| MaintenanceExpense | Vehicle, supplier/workshop, breakdown or legacy total |
-| Invoice / InvoiceLine | Billing account, immutable issued details, linked orders |
-| PartnerObligation | Outsourced order, agreed calculation inputs and payable |
-| Payment / Allocation | Direction, counterparty, currency, target obligation, amount |
-| Attachment | Private object key, parent record, uploader and metadata |
-| AuditEvent | Actor, action, record, timestamp and permitted change summary |
-| ImportBatch / ImportRow | Source provenance, review results, commit status |
+## Authoritative conceptual data model
 
-Stable IDs establish relationships. Keep normalized registration matching separate from display values. Do not introduce multiple operating tenants as a product feature merely because records include business IDs.
+[DATA_MODEL.md](DATA_MODEL.md) is the finalized provider-independent V1 model, replacing the earlier capability inventory in this section. It owns the entity/association/value inventory, cardinalities, snapshot matrix, invariant catalog, strong-consistency boundaries and database-selection requirements. PRD remains the business scope authority; no physical schema is approved.
 
-## Financial operations
-Invoice finalization must authorize the actor, validate all orders and account/currency consistency, recompute totals, reserve a unique number, snapshot details and commit atomically. An idempotency key prevents retried requests from creating another invoice. Concurrent finalization must not bill the same eligible order twice.
+- Company is the operating tenant. Tenant-local BusinessParty (the former ContactEntity identity responsibility) has narrow Factory/Client/Partner/FuelSupplier profiles and Client-specific Consignee relationships; external counterparties never confer membership. Bill To is independent of source/customer/receiver and vehicle owner is independent of executor.
+- OrderConsignee captures potential receivers; Trip records one actual receiver when resolved. Draft/unknown fields remain explicit. Order has 0..N recorded Trips, with 1..N for fulfilled movement; manual completion leaves unfinished Trip states unchanged.
+- Original/normalized loaded, delivered, billable and shortage measures, conversion/rate/tax/FX/adjustment inputs, ownership/affiliation and assignments retain historical evidence. Calculated-rate and Manual Total pricing have distinct snapshots.
+- InvoiceVersion/InvoiceLine and original-linked notes/corrections separate covered Trip charges from final receivable amounts. Posted obligation/allocation/account evidence is authoritative; three ledgers and SupplierPayable are derived views, while PartnerPayable holds the independently agreed cost source.
+- MaintenanceDetail belongs to Expense; one Assignment timeline also serves DriverVehicleAssignmentHistory. Document has a validated typed parent and multiple private AttachmentFiles. No unsafe arbitrary resource association is introduced.
+- Protected system Owner Role classification and protected Membership lifecycle enforce always-active Owner authority independently of custom grants. Audit retains safe actor/resource snapshots and immutable successful-change evidence.
 
-Posting a payment validates account, direction, amount and allocations. Commit payment, allocations and audit event together. Derive balances from effective posted transactions. Reversals reference originals; do not erase posted history. Advances are payments, not an extra deduction field. Persist decimal values or agreed integer minor units without binary floating-point money calculations.
+The inventory contains 44 entity/association/owned-history concepts, 15 values/configuration/catalog concepts and 4 derived views. These 63 named responsibilities are not 63 proposed persistence objects. ImportBatch/ImportRow remain V2 and are outside that inventory. See the [relationship map](DATA_MODEL.md#18-relationship-and-cardinality-map), [snapshots](DATA_MODEL.md#17-historical-snapshot-matrix), [invariants](DATA_MODEL.md#19-invariant-catalog) and [atomic operations](DATA_MODEL.md#20-strong-consistency-and-atomic-operations).
 
-Use version checks for conflicting operational edits. Return a conflict with current values; do not silently overwrite another staff member.
+Stable internal IDs are system controlled. Display numbering is company configurable (e.g. ORD-000123, TRIP-000456, INV-000078, RB-ORD-2026-000123), collision-safe and distinct from Factory/PO/Bilty/DO/consignment references. Registration matching remains separate from display values.
 
-## API conventions
-Proposed routes: /api/orders, /api/orders/:id/assignments, /api/invoices/:id/finalize, /api/payments, /api/payments/:id/reverse, /api/imports/:id/commit and /api/reports.
-Validate inputs server-side. Return structured validation, forbidden, conflict and quota errors. Paginate lists with stable ordering and bounded page size. Allowlist sorting/filter fields. Never accept a client-supplied role or total as authoritative.
+## Financial operations and lifecycle integrity
 
-## Imports and reporting
-Stage imports, preserve raw source values, resolve entities, preview errors and commit reviewed rows with durable provenance. Define either atomic batch commit or resumable row commits explicitly before implementation. A retry must report existing committed rows rather than duplicate them.
-Report queries use an explicit date basis and reconcile against ledgers. Store business dates separately from timestamps. Snapshot historical ownership and issued billing details.
+Trusted services authorize actor/company/action/resource, validate lifecycle and related entities, recompute exact decimal amounts, reserve numbering and atomically commit business effects plus immutable audit history. Idempotency and concurrency guards protect partial billing, allocations, refunds and account transfers; version checks prevent stale operational overwrites.
 
-## Free deployment and offline boundary
-Database options remain unresolved; Supabase was proposed and MongoDB was raised later. Do not implement a speculative migration. Verify auth, file storage, runtime compatibility, transaction support and commercial free-tier terms together before choosing providers.
-Cloudflare is only a hosting candidate. No payment plan is authorized. Keep backup/export procedures viable without managed paid backups.
-Offline edits and synchronization are not approved scope. Browser draft recovery may be considered separately, but must never suggest a financial post succeeded while offline.
+Trip billing balance is Billable Amount − effective Invoiced Amount. Default invoice preparation consumes the selected remaining amount; authorized partial billing consumes only its explicit portion. Concurrent invoices cannot exceed the Trip balance or rebill a fully consumed Trip. Issuing captures immutable InvoiceLines and tax/FX/pricing-method/quantity details. Trace covered Trip charge portions separately from final payable invoice/note amounts: invoice discounts/deductions/rounding cannot reopen already-covered charges as billable remainder. Multi-Trip and partial billing preserve attributable adjustment/coverage links. Draft edit/delete is permission/dependency restricted; issued corrections use authorized correction/reissue where business/legal rules allow, retaining original versions, or linked CreditNote/DebitNote preserving the original, with reason and automatic ledger effect. Resolve payment allocations before cancelling paid invoices. Reconcile effective corrected Trip billable/invoiced amounts, tax/historical FX, notes and allocations atomically; do not reset eligibility or invoice an adjustment twice. Corrections/reissues preserve the original’s trace and avoid duplicate revenue.
+
+Invoice outstanding derives from effective invoice/note amounts minus effective allocations. Payment available credit derives from posted amount less effective allocations/refunds/reversals. A payment can span targets or remain an advance. Reallocations retain original allocation history. Customer receivables, partner payables and fuel/workshop payables use common principles but remain separate by direction, counterparty, company and currency. Reject over-allocation and cross-counterparty relationships. V1 payment currency MUST match invoice currency, including advance/reallocation targets; reject cross-currency invoice settlement regardless of stored FX/base equivalent. Full multi-currency transactions/accounts/reporting remain V1; cross-currency invoice settlement/allocation is V2/Future if pursued.
+
+Accounts derive balances from valid posted movements. InternalTransfer posts linked balanced source/destination effects without income/expense; cross-currency transfers, if enabled after the separate technical/configuration review, retain explicit historical conversion inputs and paired account effects; physical representation remains a technical choice. Reversal/bounce/refund/partial refund/unallocation never erases the original; apply auditable linked effects and reconcile all affected ledgers/accounts.
+
+Draft/In Progress editing is permission governed; Delivered sensitive edits require additional grants; invoiced/settled relevant Trip fields and issued financial values lock. Controlled correction preserves original values. Dependency-free unused records may be deleted with permission; referenced historical records can only archive/deactivate, with permitted reactivation. New selectors exclude archived records while historical joins still resolve them. Order cancellation/reopening follows PRD FR-03 with reason, permissions and dependent Trip/financial checks. orders.complete permits manual completion with unfinished Trips after a visible warning; preserve Trip statuses, audit completion and report Order/Trip status separately. No aggregation silently completes/cancels Trips. V1 never automatically purges historically significant operational/financial/audit records. Documents are retained except explicit permitted removal where legal/business and historical-integrity rules allow.
+
+V1 management revenue is recognized by Invoice Date; later payment only reduces receivable and changes accounts. Operational Trip/dispatch/delivery dates remain separate. This policy is not statutory accounting certification. Trip margin uses attributable invoice/note revenue minus partner cost, fuel and Trip expense shares. Allocate shared expenses equally, by compatible quantity, manual amount or manual percentage; persist method/basis/values, reconcile to source expense (including explicit rounding remainder), authorize and audit changes, and prevent double-counting. Unallocated general company expenses are excluded. Reports reconcile in original currencies and separately in base currency using stored historical FX, not live rates.
+
+## API conventions — conceptual, not implemented
+
+Services cover Orders/Trips, rate versions and override, fuel prices/amount override, expenses/categories, eligible Trip billing/partial billing, invoice issue/cancel/correction/reissue and notes, manual Order completion, manual-total pricing and shared expense allocation, receipt/payable allocation/unallocation/reallocation/reversal/refund, accounts/transfers, documents/expiry, archives, roles/audit and export. Endpoint naming remains provisional; no V1 bulk-import commit endpoint is included. Server validation returns scoped validation/forbidden/conflict/quota errors, with stable bounded pagination and allowlisted sorts/filters. Client roles, totals and company flags are never authority.
+
+### REST contract requirements
+
+- `/api/v1/*` is the web/future Expo contract. Use HTTP verbs/status semantics and runtime input/output validation. Breaking changes require a new API version or reviewed compatibility plan; do not expose framework action protocol as the mobile API.
+- Success uses a documented `data` envelope with bounded `meta` for paging. Errors use `error.code`, a safe `error.message`, optional allowlisted field errors and a non-secret `requestId`. Never return SQL/provider errors, stack traces, tokens or foreign-resource contents. DTO money/quantity/FX are validated decimal strings; business dates are date-only and instants use explicit UTC offsets.
+- Map unauthenticated to 401, forbidden to 403 (or a consistent 404 for inaccessible individual resources to avoid existence leaks), missing to 404, malformed to 400, invalid fields/business input to 422, stale version/duplicate financial/idempotency conflict to 409, oversized payload to 413 and rate limits to 429 with Retry-After. Unavailable dependencies produce safe retryable 503 responses without falsely claiming a failed/committed financial outcome.
+- Lists/lookups/counts/export share authorized tenant/resource/field scope. Use stable ordering with an ID tie-breaker, bounded page sizes/cursors and allowlisted filters/sorts. The feature chooses page defaults/cursor encoding; never fetch all records for large SearchableSelect datasets. Stored selected IDs resolve through authorized exact lookup or permitted historical snapshots, independently of active result pages.
+- Financial issue/post/correction/allocation/transfer operations require a durable Idempotency-Key scoped to Company, verified actor/operation and payload fingerprint. Same key/different content conflicts; concurrent attempts share one committed outcome. Reauthorize before returning prior results; timeout retries reconcile durable outcomes. Persist business result/idempotency/audit together. Version preconditions reject stale operational changes; no UI disabled button or process mutex substitutes for database concurrency controls.
+- Enforce body/query/field limits before expensive work and shared durable rate limits for login/recovery, search, upload/export and mutations. Document retry rules; unsafe mutations must not be blindly repeated under a fresh key. CSRF/origin defenses apply to cookie-authenticated mutations; bearer/CORS/callback/security controls follow OPERATIONS_ARCHITECTURE.md. Protected responses and auth refresh are private/no-store.
+
+## Configurable rate resolution
+
+Transport agreement config chooses Order Date, Loading/Dispatch Date, Delivery Date or custom/agreed date. Resolve applicable effective-dated versions using optional company/factory/client/origin/destination/material/vehicle-category/rate-type/currency dimensions. Recommend the most specific valid match, retaining recommended and selected references/values. Authorized trips.override_rate can select another valid match, with optional reason and audit; do not invent an arbitrary rate. Equally specific/incomparable candidates require explicit valid resolution. Validate date intervals (start ≤ end, inclusive effective days, open-ended when no end) and reject overlap for identical exact match conditions; distinct conditions may coexist. Fuel price lookup uses transaction date and supplier/branch where applicable; preserve actual used rate. Fuel calculated total and actual total remain separate with override actor/time/reason/diff. Trip calculated rates may remain provisional until the configured rate-date event is known; require a resolved date/valid rate before final financial snapshot. Missing or unresolved candidates cannot silently finalize. Manual Total is an authorized alternative agreed total with its own historical snapshot; neither pricing mode bypasses financial locks/correction rules. Physical interval indexing and decimal representation remain technical choices.
+
+## Documents, reminders, approval and export
+
+Reusable private Document/Attachment supports multiple files and entity-scoped authorization, predefined/custom types and optional expiry. Reminder periods are company configurable; compute expired/expiring-soon dashboard views. V1 warnings/status never block otherwise-authorized assignment solely for expiry; configurable Warning Only/Block Assignment by type is V2/Future. Abstract reminder events from delivery adapters so future notification channels do not redesign the document model.
+
+V1 auto-approves permitted operations at their normal finalization point, without a routine reviewer queue. Draft, issue/post and correction safeguards still apply. Future configurable/manual approval rules are V2 extensibility; no active threshold approval requirement is invented.
+
+V1 authorized PDF/XLSX/CSV exports apply the same company/resource/field restrictions as reads and generate safe audit events. Reports expose date basis and reconcile with ledgers; business dates stay distinct from timestamps. V2 import staging preserves raw source values, provenance and reviewed mapping, detects duplicates, reports errors and requires confirmation; atomic versus resumable import commit remains a future technical choice.
+
+## Deployment, authentication, documents and recovery
+
+[OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md) owns the selected Supabase Auth invite-only session/identity boundary, application RBAC/Owner bootstrap requirements, Cloudinary private uploads/delivery/lifecycle, environment isolation, Vercel deployment/rollback/observability and recovery gap. PostgreSQL remains the authoritative business datastore; Cloudinary holds bytes and database metadata identifies immutable file versions. No protected direct Supabase business-data API is allowed.
+
+[DATABASE_BACKEND_SELECTION.md](DATABASE_BACKEND_SELECTION.md) retains PostgreSQL suitability, P01–P20/A01–A17 mappings, historical Free estimates and portability. Free may be used for development; production selects Supabase Pro + seven-day PITR with eligible compute and independent recovery. The former $0 production constraint is superseded. Supabase Storage and mandatory NestJS are not V1 selections.
 
 ## Implementation gates
-Resolve database/provider choice, billing responsibility, partner settlement interpretation, order cardinality and currency/rounding before their affected schema and rules. A thin vertical slice should prove login → create order → persist → reload before building all modules.
+
+Business requirements/policies/model, named providers and end-to-end recovery are selected. **B1: CLOSED. Development Ready v1.0: YES. Production Ready: NO.** The single recovery specification in OPERATIONS_ARCHITECTURE.md selects private GitHub Actions capture, separate R2 storage, three-hour cadence/retention/encryption/custody, DB/Auth/file consistency, monitoring, RPO <= 6 hours, RTO <= 4 hours and the approved restore/drill process. A successful implemented restore is required before production, not before development. ORM/version/decimal library, physical precision/indexes and exact API pagination settings are implementation-time choices under fixed invariants, not architecture blockers.
+
+Readiness is declared for development only. Next implementation phase, after explicit authorization: isolated development infrastructure and trusted access foundation — server-only provider/configuration boundaries, minimal Company/User/Membership/Role provisioning with protected first Owner, invite/login/reset/refresh/logout, central service authorization and transactional redacted audit; prove tenant isolation, revocation, Owner concurrency and secret-free client bundles through one protected read. Then implement master records → Orders/Trips → cost/rate workflows → billing/payments/reports in dependency order. Do not implement that phase during this documentation task. Offline sync remains outside V1.
 
 ## Fuel supplier/branch model — confirmed extension
 
-Add FuelSupplier and FuelBranch (supplier ID, name, contact, location, active status). FuelTransaction references both supplier and branch with an enforced relationship. Payment identifies the supplier/payee and optional branch scope; allocations reference specific fuel purchases. A central supplier payment may allocate across that supplier’s branches, while a branch-scoped payment allocates only to that branch. All allocations must match supplier and currency. Validate sums and remaining obligations atomically. Derive branch and supplier totals from the same effective allocations; report unallocated supplier credit separately. Keep branch history stable and require import review for missing branch mappings.
+Use FuelSupplier and FuelSupplierBranch (Branch/Pump) (supplier ID, name, contact, location, active status). FuelTransaction references both supplier and branch with an enforced relationship. Payment identifies the supplier/payee and optional branch scope; allocations reference specific fuel purchases. A central supplier payment may allocate across that supplier’s branches, while a branch-scoped payment allocates only to that branch. All allocations must match supplier and currency. Validate sums and remaining obligations atomically. Derive branch and supplier totals from the same effective allocations; report unallocated supplier credit separately. Keep branch history stable and require V2 import review for missing branch mappings.
 
-Repository layout is a monorepo: apps/web, apps/mobile, packages/shared and docs. The proposed src paths above live under apps/web unless deliberately shared. Applications and workspace tooling are not scaffolded yet.
+Repository layout currently contains apps/web, reserved apps/mobile, packages/shared and docs. V1 backend services/repositories live in future server-only modules within apps/web; no apps/api or separate NestJS service is planned for V1. A later extraction would preserve shared domain/service/API contracts. Web/shared workspaces and a public placeholder shell exist; protected operations, RBAC and audit persistence are not implemented.
+
+## Authorization and audit flow — finalized design
+
+[PERMISSIONS.md](PERMISSIONS.md) owns permission names, role lifecycle, delegation and company boundaries; [AUDIT.md](AUDIT.md) owns event fields, coverage, redaction and retention. These concepts are provider-independent, not a finalized SQL schema or MongoDB collection design.
+
+Request → verify authentication/session → resolve active user and company membership → load active role/effective catalog grants → check action and scoped resource/relationships → validate business change → persist change and immutable redacted audit event → return only permitted data. Frontend receives a safe effective-permission view for navigation and actions, but the server repeats checks. Client-supplied role/company flags never establish authority. Revalidate after role/assignment changes; any caching requires invalidation/version checks so revoked permissions cannot remain active.
+
+All server components, API handlers, jobs and future mobile APIs use the same authorization services. Scope repositories, joins/lookups, counts, attachments and exports to company context. A protected Owner still needs authorized company context and cannot modify audit history. External companies remain counterparties within one operating business; independent tenant onboarding and Owner cross-tenant access are not supported by the current scope.
+
+Role updates and active-user reassignment/deletion checks require concurrency-safe persistence. Permission keys come from the central catalog; role names remain arbitrary. Appending a new catalog action does not silently grant it to custom roles.
+
+For successful sensitive changes, derive the diff from trusted previous and persisted new states and atomically persist business state with audit history. Provider-specific transaction or durable outbox mechanics remain an implementation gate. Authentication failures/denials use the separately protected event path described in AUDIT.md. Database access must prevent ordinary application identities from updating/deleting audit events. No application audit mutation API is designed.
+
+## Protected Owner lifecycle
+
+Provision the first Owner during company setup; keep at least one active Owner at all times, including concurrent transfer/removal/deactivation/reassignment. Owner manages company users/roles under system safeguards. Transfer to an eligible authorized user requires owners.transfer and protected Owner authority; ordinary custom-role editing cannot create/remove system ownership. Audit Owner creation/transfer/removal/deactivation. Provider-backed provisioning and concurrency mechanism remain open technical choices.

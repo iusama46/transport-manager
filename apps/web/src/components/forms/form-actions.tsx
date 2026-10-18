@@ -1,0 +1,2 @@
+import {Button} from "../ui/button";import {Alert} from "../ui/alert";
+export function FormActions({pending,onCancel,error}:{pending?:boolean;onCancel?:()=>void;error?:string}){return <div className="stack">{error&&<Alert tone="error" title="Could not save">{error}</Alert>}<div className="actions"><Button type="submit" loading={pending}>Save</Button>{onCancel&&<Button variant="outline" disabled={pending} onClick={onCancel}>Cancel</Button>}</div></div>;}

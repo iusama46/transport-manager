@@ -1,0 +1,2 @@
+import type {ReactNode} from "react";import {Button} from "../ui/button";
+export function BulkActionBar({count,onClear,children}:{count:number;onClear:()=>void;children?:ReactNode}){if(!count)return null;return <div className="actions" role="group" aria-label="Selected rows"><span>{count} selected on this page</span>{children}<Button variant="ghost" onClick={onClear}>Clear selection</Button></div>;}

@@ -1,0 +1,4 @@
+"use client";
+import { useId, type ReactNode } from "react";
+export type FieldProps={id?:string;label:string;help?:string;error?:string;required?:boolean};
+export function FormField({id, label,help,error,required,children}:FieldProps & {children:(props:{id:string;"aria-describedby":string|undefined;"aria-invalid":boolean;required:boolean|undefined})=>ReactNode}) {const generated=useId();const controlId=id??generated;return <div className="field"><label htmlFor={controlId}>{label}{required && <span> (required)</span>}</label>{children({id:controlId,"aria-describedby":[help?`${controlId}-help`:null,error?`${controlId}-error`:null].filter(Boolean).join(" ")||undefined,"aria-invalid":!!error,required})}{help&&<p id={`${controlId}-help`} className="supporting">{help}</p>}{error&&<p id={`${controlId}-error`} className="inline-error">{error}</p>}</div>;}

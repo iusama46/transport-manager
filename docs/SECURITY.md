@@ -1,14 +1,14 @@
 # Security Requirements
-Updated: 16 October 2026
+Updated: 18 October 2026
 Status: Environment foundations implemented and checked; business security controls remain planned. No comprehensive security assessment has been performed.
 
 ## Implemented scope and verification
 
 The current application contains public placeholder pages and UI demos only. Inspection found no API handlers, server actions, persistence, private records, exports or attachment operations to authorize. The existing `/dev/components` page checks execution mode on the server and returns not-found outside development. This is not user authentication.
 
-- Actual environment files are ignored at every monorepo depth; exact `.env.example` templates are allowed. Web and reserved mobile templates contain comments only because no application variables are required.
-- Node-only configuration validation is invoked by the web Next configuration. Required-name validation produces errors without values; the current required list is empty. All public-prefix variables are rejected until explicitly reviewed public configuration is implemented.
-- Environment tests verify empty configuration, missing/blank required values, public-prefix rejection without value disclosure, and root/nested Git ignore behavior.
+- Actual environment files are ignored at every monorepo depth; exact `.env.example` templates are allowed. Web requires APP_ENV and documents optional inactive server provider contracts; reserved mobile remains comment-only.
+- The Node parser validates explicit environment selection, host/provider-label consistency, complete provider groups and safe URL/value formats with value-free errors. Next bootstrap and the typed immutable runtime getter reuse it. All public-prefix variables remain rejected; no SDK or connection exists. [ENVIRONMENT](ENVIRONMENT.md) owns the variable contract.
+- Configuration tests cover missing/invalid values, production/preview mismatch, public-prefix rejection/redaction, immutable snapshots and recursive Git ignores. The isolated Next boundary probe checks server imports, browser-bundle exclusion and compiler denial of a transitive Client Component import; [Phase 1.1 evidence](features/phase-1-1-environment.md) records actual results. Operator environment labels do not prove credential ownership; real target/host isolation remains an integration gate.
 - A targeted scan of 89 tracked index files found no actual environment files or recognizable credential patterns. This does not cover Git history or every secret format. See [ENVIRONMENT.md](ENVIRONMENT.md) for setup, boundaries and scan limitations.
 
 Authentication, session handling, role/permission checks, company/record scoping and provider data policies are **not implemented or verified**. There are no implemented protected business operations to retrofit. Add server enforcement and adversarial direct-request tests with the first protected operation; do not infer protection from this foundation. All requirements below remain planned unless explicitly identified above.

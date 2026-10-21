@@ -20,6 +20,12 @@ const supabaseNames = [
   "SUPABASE_PUBLISHABLE_KEY",
   "SUPABASE_SERVICE_ROLE_KEY",
 ];
+const databaseNames = [
+  "DATABASE_ENV",
+  "DATABASE_URL",
+  "DATABASE_PROJECT_REF",
+  "DATABASE_CA_CERT",
+];
 const cloudinaryNames = [
   "CLOUDINARY_ENV",
   "CLOUDINARY_CLOUD_NAME",
@@ -94,6 +100,65 @@ function supabaseUrl(value, appEnv) {
   return url.origin;
 }
 
+/** @param {EnvironmentInput} input @param {AppEnvironment} appEnv */
+function databaseConfig(input, appEnv) {
+  if (!hasGroup(input, databaseNames)) return null;
+  const environment = providerEnvironment(input, "DATABASE_ENV", appEnv);
+  const connectionString = required(input, "DATABASE_URL");
+  const projectRef = required(input, "DATABASE_PROJECT_REF");
+  let url;
+  try {
+    url = new URL(connectionString);
+  } catch {
+    invalid("DATABASE_URL");
+  }
+  const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+  // Reject query options so URL parsing cannot override verified TLS/driver settings.
+  if (
+    !["postgres:", "postgresql:"].includes(url.protocol) ||
+    !url.password ||
+    !url.username ||
+    url.search ||
+    url.hash ||
+    url.pathname !== "/postgres"
+  ) {
+    invalid("DATABASE_URL");
+  }
+  if (local) {
+    if (
+      !["development", "test"].includes(appEnv) ||
+      projectRef !== "local" ||
+      url.username !== "tm_runtime" ||
+      !url.port
+    )
+      invalid("DATABASE_URL");
+  } else if (
+    !/^[a-z0-9]{20}$/.test(projectRef) ||
+    !/^[a-z0-9-]+\.pooler\.supabase\.com$/.test(url.hostname) ||
+    url.port !== "6543" ||
+    url.username !== `tm_runtime.${projectRef}`
+  ) {
+    invalid("DATABASE_URL, DATABASE_PROJECT_REF");
+  }
+  const ca = input.DATABASE_CA_CERT;
+  if (
+    ca !== undefined &&
+    (local ||
+      !/^-----BEGIN CERTIFICATE-----\r?\n[A-Za-z0-9+/=\r\n]+\r?\n-----END CERTIFICATE-----\s*$/.test(
+        ca,
+      ))
+  ) {
+    invalid("DATABASE_CA_CERT");
+  }
+  return Object.freeze({
+    environment,
+    connectionString,
+    projectRef,
+    local,
+    ca,
+  });
+}
+
 /**
  * Parse an explicit input without reading/mutating process.env or making connections.
  * Provider groups are absent until configured; a partial group always fails closed.
@@ -132,8 +197,8 @@ export function parseServerConfig(input) {
   }
   const unknownProviders = Object.keys(input).filter(
     (name) =>
-      /^(SUPABASE_|CLOUDINARY_)/.test(name) &&
-      ![...supabaseNames, ...cloudinaryNames].includes(name),
+      /^(SUPABASE_|CLOUDINARY_|DATABASE_)/.test(name) &&
+      ![...supabaseNames, ...cloudinaryNames, ...databaseNames].includes(name),
   );
   if (unknownProviders.length) {
     throw new Error(
@@ -158,7 +223,12 @@ export function parseServerConfig(input) {
         apiSecret: required(input, "CLOUDINARY_API_SECRET"),
       })
     : null;
-  return Object.freeze({ appEnv, supabase, cloudinary });
+  return Object.freeze({
+    appEnv,
+    supabase,
+    cloudinary,
+    database: databaseConfig(input, appEnv),
+  });
 }
 
 /** Bootstrap validation deliberately returns no secret-bearing object. @param {EnvironmentInput} input */

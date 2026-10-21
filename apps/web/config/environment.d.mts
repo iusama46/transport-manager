@@ -14,10 +14,18 @@ export type CloudinaryConfig = Readonly<{
   apiKey: string;
   apiSecret: string;
 }>;
+export type DatabaseConfig = Readonly<{
+  environment: AppEnvironment;
+  connectionString: string;
+  projectRef: string;
+  local: boolean;
+  ca: string | undefined;
+}>;
 export type ServerConfig = Readonly<{
   appEnv: AppEnvironment;
   supabase: SupabaseConfig | null;
   cloudinary: CloudinaryConfig | null;
+  database: DatabaseConfig | null;
 }>;
 
 export function parseServerConfig(input: EnvironmentInput): ServerConfig;

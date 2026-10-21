@@ -4,6 +4,8 @@ Reviewed: 12 October 2026 on `feat/project-setup`, against the finalized [DATA_M
 
 Status update — 16 October 2026: Next.js/TypeScript full-stack + Supabase PostgreSQL/Auth + Cloudinary + Vercel are selected. Appropriate paid production plans are acceptable. **Development Ready v1.0: YES** — recovery architecture B1 is CLOSED in [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md); [FINAL_ARCHITECTURE_AUDIT.md](FINAL_ARCHITECTURE_AUDIT.md) owns current readiness. PostgreSQL suitability/P01–P20/A01–A17 and ORM recommendation below remain evaluation evidence. Quota/pricing/growth figures are dated 12 October inputs, not current plan guarantees or remaining provider-selection gates.
 
+Implementation update — 19 October 2026: Phase 1.2 selects direct node-postgres, superseding D81's unapproved Drizzle recommendation (D99–D102 in [DECISIONS](DECISIONS.md)). [Evidence](features/phase-1-2-database.md) records local implementation/verification. Earlier ORM comparisons remain historical evaluation; no live connection, schema, role or production operation is implied.
+
 ## 1. Executive decision and authority
 
 | Area | Decision / status |
@@ -15,7 +17,7 @@ Status update — 16 October 2026: Next.js/TypeScript full-stack + Supabase Post
 | Frontend | Existing Next.js application — retained |
 | API | Versioned REST at `/api/v1/*` — selected, shared by web and future Expo; no endpoint created |
 | Server validation | Runtime-validatable DTO/input contracts in the server adapter/service layer; Zod recommended, not a Nest ValidationPipe requirement; frontend validation is not authority |
-| Database access | **Drizzle ORM with node-postgres recommended, unapproved/unimplemented**; Prisma remains a viable alternative |
+| Database access | **Direct node-postgres adopted in Phase 1.2 (D99)**; Drizzle and Prisma evaluated alternatives |
 | Auth / private files | Supabase Auth and Cloudinary selected by explicit 16 October direction; no Supabase Storage selection |
 | Hosting / deployment / backups | Vercel selected, paid production acceptable; Supabase Pro + seven-day PITR and independent GitHub Actions/R2 recovery selected in OPERATIONS_ARCHITECTURE.md; implementation before launch |
 | Testing cost | $0 target using local Next.js + Free DB and eligible Vercel testing; Hobby personal/non-commercial eligibility/quotas must be established, with no paid addon/trial authorized |

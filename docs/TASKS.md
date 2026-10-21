@@ -1,6 +1,6 @@
 # Implementation Tasks
 
-Updated: 18 October 2026
+Updated: 19 October 2026
 
 **Development Ready v1.0: YES. B1: CLOSED. Production Ready: NO.** Final recovery architecture is selected; pipeline/control implementation and measured full restore remain pending. [Final audit](FINAL_ARCHITECTURE_AUDIT.md) is current authority; dated milestones below retain their historical evidence.
 
@@ -36,11 +36,14 @@ Writing these rules does not complete runtime controls or authorize Phase 1, com
 - [x] Phase 1.1 implementation: explicit APP_ENV, typed immutable server getter, fail-fast value-free validation, optional inactive provider contracts and safe web template. No external connections or business subsystem. Scope/evidence: [feature trace](features/phase-1-1-environment.md).
 - [x] Phase 1.1 local verification: 20 Node configuration/boundary tests, lint/typecheck, isolated provider-free/preview builds and changed-code formatter passed. Full formatter still reports the same 51 existing files; detailed commands/limits in the trace.
 - [ ] Human review of the actual Phase 1.1 configuration/security diff before acceptance/shipping; development verification does not complete real provider/environment or production gates.
-- [ ] **Next: Phase 1.2 — Supabase Database + Data-Access Foundation**, separately scoped/authorized; not started here.
+- [x] Phase 1.2 local implementation: server-only direct pg composition, explicit repository/transaction contexts, safe errors, exact numeric parsers, DB configuration/isolation assertions and offline reviewed SQL migration foundation; no business schema/Auth or provider modification. [Evidence](features/phase-1-2-database.md).
+- [x] Phase 1.2 synthetic verification: DB/config/planner tests, compiler boundary/bundle checks, lint/typecheck/build and changed-file formatting. See evidence for actual commands, corrected initial failures and existing formatter/advisory failures.
+- [ ] Human review of the actual Phase 1.2 dependency/configuration/adapter/migration diff before acceptance/shipping; live integration/privilege/isolation/migration execution remain UNVERIFIED.
+- [ ] **Next: Phase 1.3 — Company/User/Membership/Protected Owner Foundation**, separately authorized; not started.
 
 ## 1. Project setup
 
-- [x] Resolve development database/backend (O01; D79/D84); ORM remains recommendation only.
+- [x] Resolve development database/backend (O01; D79/D84); direct pg adopted in Phase 1.2; no ORM.
 - [x] Select Supabase Auth, Cloudinary and Vercel; paid production is acceptable.
 - [x] Resolve recovery design B1/O10 and declare Development Ready v1.0: YES (D92–D96).
 - [ ] Implement/test selected recovery and provider integrations in an authorized implementation phase; full measured restore before launch.

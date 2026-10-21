@@ -7,6 +7,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
+    "test:db": "vitest run",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
@@ -16,8 +17,10 @@
     "@radix-ui/react-tooltip": "^1.2.16",
     "@tanstack/react-table": "^9.2.6",
     "@transport-manager/shared": "*",
+    "@vercel/functions": "3.10.1",
     "lucide-react": "^0.468.0",
     "next": "16.3.8",
+    "pg": "8.23.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.89.0",
@@ -29,6 +32,7 @@
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
     "@types/node": "^20",
+    "@types/pg": "8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint-config-next": "16.3.8",

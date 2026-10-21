@@ -51,7 +51,12 @@ test("explicit environments parse independently of Node production compilation m
       PATH: "/bin",
     });
     const result = parseServerConfig(input);
-    assert.deepEqual(result, { appEnv, supabase: null, cloudinary: null });
+    assert.deepEqual(result, {
+      appEnv,
+      supabase: null,
+      cloudinary: null,
+      database: null,
+    });
     assert.ok(Object.isFrozen(result));
     assert.equal(validateEnvironment(input), undefined);
   }
@@ -113,6 +118,7 @@ test("complete provider contracts parse into immutable server-only snapshots", (
   const config = parseServerConfig(input);
   assert.deepEqual(config, {
     appEnv: "test",
+    database: null,
     supabase: {
       environment: "test",
       url: supabase.SUPABASE_URL,
@@ -283,6 +289,7 @@ test("parsing another environment cannot reuse stale credentials or mutate suppl
   assert.deepEqual(Object.keys(second).sort(), [
     "appEnv",
     "cloudinary",
+    "database",
     "supabase",
   ]);
 });
@@ -321,4 +328,95 @@ test("actual env files are ignored at all workspace depths, exact templates allo
       { status: 1 },
     );
   }
+});
+
+const database = {
+  DATABASE_ENV: "test",
+  DATABASE_PROJECT_REF: "abcdefghijklmnopqrst",
+  DATABASE_URL:
+    "postgresql://tm_runtime.abcdefghijklmnopqrst:synthetic-db-sentinel@aws-0-test.pooler.supabase.com:6543/postgres",
+};
+
+test("database contract is independent of Auth SDK keys, immutable and environment matched", () => {
+  const result = parseServerConfig({ APP_ENV: "test", ...database });
+  assert.equal(result.supabase, null);
+  assert.ok(Object.isFrozen(result.database));
+  assert.equal(result.database.local, false);
+  assert.equal(result.database.connectionString, database.DATABASE_URL);
+  for (const APP_ENV of ["development", "preview", "staging", "production"]) {
+    rejectsWithoutValues({ APP_ENV, ...database }, "DATABASE_ENV");
+  }
+  for (const name of Object.keys(database)) {
+    for (const value of [undefined, "", " "]) {
+      rejectsWithoutValues(
+        { APP_ENV: "test", ...database, [name]: value },
+        name,
+      );
+    }
+  }
+});
+
+test("database rejects nonpool, privileged, project-mismatched and TLS-override URLs safely", () => {
+  for (const DATABASE_URL of [
+    "synthetic-private-invalid-url",
+    database.DATABASE_URL.replace(":6543", ":5432"),
+    database.DATABASE_URL.replace("tm_runtime.", "postgres."),
+    database.DATABASE_URL.replace("tm_runtime.", "service_role."),
+    database.DATABASE_URL.replace(
+      "abcdefghijklmnopqrst:",
+      "zyxwvutsrqponmlkjihg:",
+    ),
+    database.DATABASE_URL.replace(
+      "aws-0-test.pooler.supabase.com",
+      "unapproved.invalid",
+    ),
+    database.DATABASE_URL.replace("/postgres", "/other"),
+    database.DATABASE_URL + "?sslmode=disable",
+    database.DATABASE_URL + "?sslrootcert=/private/key",
+    database.DATABASE_URL + "#fragment",
+    database.DATABASE_URL.replace("postgresql:", "https:"),
+  ])
+    rejectsWithoutValues(
+      { APP_ENV: "test", ...database, DATABASE_URL },
+      "DATABASE_URL",
+    );
+  rejectsWithoutValues(
+    { APP_ENV: "test", DATABASE_UNKNOWN: "synthetic-secret" },
+    "DATABASE_UNKNOWN",
+  );
+});
+
+test("local database access is explicit and restricted to development/test", () => {
+  for (const APP_ENV of environments) {
+    const input = {
+      APP_ENV,
+      DATABASE_ENV: APP_ENV,
+      DATABASE_PROJECT_REF: "local",
+      DATABASE_URL:
+        "postgresql://tm_runtime:synthetic-db-sentinel@localhost:5432/postgres",
+    };
+    if (["test", "development"].includes(APP_ENV))
+      assert.equal(parseServerConfig(input).database.local, true);
+    else rejectsWithoutValues(input, "DATABASE_URL");
+  }
+});
+
+test("optional database CA accepts certificates only; public DB aliases are forbidden", () => {
+  const cert =
+    "-----BEGIN CERTIFICATE-----\nU3ludGhldGlj\n-----END CERTIFICATE-----";
+  assert.equal(
+    parseServerConfig({ APP_ENV: "test", ...database, DATABASE_CA_CERT: cert })
+      .database.ca,
+    cert,
+  );
+  for (const DATABASE_CA_CERT of ["", "synthetic-private-invalid-cert"])
+    rejectsWithoutValues(
+      { APP_ENV: "test", ...database, DATABASE_CA_CERT },
+      "DATABASE_CA_CERT",
+    );
+  for (const name of ["NEXT_PUBLIC_DATABASE_URL", "EXPO_PUBLIC_DATABASE_URL"])
+    rejectsWithoutValues(
+      { APP_ENV: "test", [name]: database.DATABASE_URL },
+      name,
+    );
 });

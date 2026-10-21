@@ -57,6 +57,7 @@ test("Next enforces configuration bootstrap and the server/client boundary", asy
   const sentinels = [
     "synthetic-private-service-boundary-sentinel",
     "synthetic-private-cloud-boundary-sentinel",
+    "synthetic-private-db-boundary-sentinel",
   ];
   const configured = {
     ...environment,
@@ -66,6 +67,9 @@ test("Next enforces configuration bootstrap and the server/client boundary", asy
     SUPABASE_URL: "https://synthetic-preview.supabase.invalid",
     SUPABASE_PUBLISHABLE_KEY: "synthetic-publishable-key",
     SUPABASE_SERVICE_ROLE_KEY: sentinels[0],
+    DATABASE_ENV: "preview",
+    DATABASE_PROJECT_REF: "abcdefghijklmnopqrst",
+    DATABASE_URL: `postgresql://tm_runtime.abcdefghijklmnopqrst:${sentinels[2]}@aws-0-test.pooler.supabase.com:6543/postgres`,
     CLOUDINARY_ENV: "preview",
     CLOUDINARY_CLOUD_NAME: "synthetic-preview-cloud",
     CLOUDINARY_API_KEY: "synthetic-api-key",
@@ -146,6 +150,8 @@ export default function Probe() {
           ...sentinels,
           "SUPABASE_SERVICE_ROLE_KEY",
           "CLOUDINARY_API_SECRET",
+          "DATABASE_URL",
+          "tm_runtime.abcdefghijklmnopqrst",
           "Invalid server configuration:",
         ]) {
           assert.ok(
@@ -180,6 +186,77 @@ export default function Probe() {
       assert.match(result.output, /src\/server\/config\/index\.ts/);
       assert.match(result.output, /config-boundary-probe\/config-access\.ts/);
       assert.match(result.output, /config-boundary-probe\/page\.tsx/);
+      for (const value of sentinels) assert.ok(!result.output.includes(value));
+    },
+  );
+  await t.test(
+    "DB imports are lazy and safe for server rendering with no connectivity",
+    () => {
+      writeFileSync(
+        probe,
+        `import { database } from "@/server/db";
+export default function Probe() {
+  return <p>Database capability: {typeof database.withTransaction}</p>;
+}
+`,
+      );
+      const result = build(configured);
+      assert.equal(result.status, 0, result.output);
+      const output = join(fixture, "apps/web/.next");
+      const html = readFileSync(
+        join(output, "server/app/config-boundary-probe.html"),
+        "utf8",
+      );
+      assert.match(html, /Database capability: .*function/);
+      for (const path of readdirSync(join(output, "static"), {
+        recursive: true,
+      }).filter((path) => path.endsWith(".js"))) {
+        const content = readFileSync(join(output, "static", path), "utf8");
+        for (const forbidden of [
+          ...sentinels,
+          "DATABASE_URL",
+          "tm_runtime.abcdefghijklmnopqrst",
+          "SELECT 1 AS ok",
+        ]) {
+          assert.ok(
+            !content.includes(forbidden),
+            `DB configuration/code reached browser bundle ${path}`,
+          );
+        }
+      }
+      const checked = spawnSync("npm", ["run", "typecheck"], {
+        cwd: fixture,
+        env: { ...environment, APP_ENV: "test" },
+        encoding: "utf8",
+        timeout: 60_000,
+      });
+      assert.ifError(checked.error);
+      assert.equal(checked.status, 0, checked.stdout + checked.stderr);
+    },
+  );
+
+  await t.test(
+    "a transitive Client Component DB import fails at the real compiler boundary",
+    () => {
+      writeFileSync(
+        join(dirname(probe), "db-access.ts"),
+        'export { database } from "@/server/db";\n',
+      );
+      writeFileSync(
+        probe,
+        `"use client";
+import { database } from "./db-access";
+export default function Probe() {
+  return <p>{typeof database.withTransaction}</p>;
+}
+`,
+      );
+      const result = build(configured);
+      assert.notEqual(result.status, 0);
+      assert.match(result.output, /server-only/);
+      assert.match(result.output, /only available in Server Components/);
+      assert.match(result.output, /src\/server\/db\/index\.ts/);
+      assert.match(result.output, /config-boundary-probe\/db-access\.ts/);
       for (const value of sentinels) assert.ok(!result.output.includes(value));
     },
   );

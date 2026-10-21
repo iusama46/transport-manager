@@ -6,6 +6,7 @@ export type {
   ServerConfig,
   SupabaseConfig,
   CloudinaryConfig,
+  DatabaseConfig,
 } from "../../../config/environment.mjs";
 
 /** Read a validated immutable snapshot; never serialize or log this object. */

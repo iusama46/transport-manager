@@ -12,7 +12,7 @@ Recovery selection: Supabase Pro + seven-day PITR on eligible compute, GitHub Ac
 
 Start with [AGENTS.md](AGENTS.md), the AI operating manual, then read **[HANDOVER](docs/HANDOVER.md) → [CONSTRAINTS](docs/CONSTRAINTS.md) → [ARCHITECTURE](docs/ARCHITECTURE.md) → task-relevant authorities**. HANDOVER answers where we are now; MEMORY holds durable context; Git owns detailed history. Package manifests/lockfile are the dependency inventory.
 
-Normal work is one coherent change, actual diff review and applicable [TEST_PLAN](docs/TEST_PLAN.md#ai-change-verification-gate) checks. Update HANDOVER if state changed and DECISIONS only for a meaningful decision; use [feature/bug traces](AGENTS.md#featurebug-trace-rule) only when warranted. Before shipping a meaningful customer-facing subsystem, require its [Defense](docs/defense/TEMPLATE.md) and [pre-ship checklist](docs/PRE_SHIP_CHECKLIST.md). Specialized [flow](docs/FLOW.md), [threat](docs/THREAT.md), [failure](docs/FAILURE.md) and [rollback](docs/ROLLBACK.md) maps remain separate. Development Ready v1.0: YES; Production Ready: NO. Next: **Phase 1 — Trusted Access Foundations**, not started here.
+Normal work is one coherent change, actual diff review and applicable [TEST_PLAN](docs/TEST_PLAN.md#ai-change-verification-gate) checks. Update HANDOVER if state changed and DECISIONS only for a meaningful decision; use [feature/bug traces](AGENTS.md#featurebug-trace-rule) only when warranted. Before shipping a meaningful customer-facing subsystem, require its [Defense](docs/defense/TEMPLATE.md) and [pre-ship checklist](docs/PRE_SHIP_CHECKLIST.md). Specialized [flow](docs/FLOW.md), [threat](docs/THREAT.md), [failure](docs/FAILURE.md) and [rollback](docs/ROLLBACK.md) maps remain separate. Development Ready v1.0: YES; Production Ready: NO. Phase 1.1 implements the environment/server configuration boundary; subsequent trusted-access work remains pending.
 
 ## Structure
 
@@ -35,10 +35,11 @@ Use Node.js 20.9 or newer and npm 10 or newer. Verified with Node.js 20.19.5 and
 
 ```sh
 npm ci
+cp -n apps/web/.env.example apps/web/.env.local
 npm run dev
 ```
 
-Open http://localhost:3000. No environment file, API key or external service is required. Stop the server with Ctrl+C.
+Open http://localhost:3000. The web template sets required `APP_ENV=development`; leave provider groups commented out. No API key or external service is required. Stop the server with Ctrl+C. If `.env.local` already exists, preserve it and set only the documented variable.
 
 ```sh
 npm run lint
@@ -60,7 +61,7 @@ The shared workspace exports TypeScript source and is transpiled by Next.js. It 
 
 ## Data and secrets
 
-Do not commit `.refact`, credentials, environment files, private customer spreadsheets or identity documents. Actual `.env` and `.env.*` files are ignored at every directory level; reviewed `.env.example` templates are allowed. No application environment variables are needed in this phase. See [environment setup and production configuration](docs/ENVIRONMENT.md). Private data belongs outside Git, for example in the ignored `private-data/` directory.
+Do not commit `.refact`, credentials, environment files, private customer spreadsheets or identity documents. Actual `.env` and `.env.*` files are ignored at every directory level; reviewed `.env.example` templates are allowed. `APP_ENV` is required; provider credentials remain optional inactive contracts and all public-prefix variables are rejected. See [environment setup and production configuration](docs/ENVIRONMENT.md). Private data belongs outside Git, for example in the ignored `private-data/` directory.
 
 ## Verification notes
 

@@ -29,3 +29,7 @@ Expo never gets privileged provider credentials or direct repository access. Nat
 ## Maintenance
 
 **Update this document when actual implementation paths exist.** Link entry points/services/tests then; preserve the distinction between intended flow and verified behavior. Relevant [failure](FAILURE.md) and [threat](THREAT.md) entries belong in each subsystem's Defense brief before shipping.
+
+## Implemented persistence foundation — Phase 1.2
+
+Future authorized service → repository receiving `DatabaseContext` → [server-only database adapter](../apps/web/src/server/db/index.ts) → lazy validated Node pool → Supabase shared transaction pooler. Services use `database.withTransaction` and pass the callback context to participating repositories. [Module conventions](../apps/web/src/server/db/README.md) define nesting, safe SQL, decimal strings, error categories and ambiguous commit handling. Synthetic tests verify orchestration; no live DB, business repository, protected workflow or API is implemented. Migration planning stays offline and separate from application runtime; [procedure](../db/migrations/README.md).

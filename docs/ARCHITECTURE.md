@@ -1,6 +1,6 @@
 # Architecture
-Updated: 16 October 2026
-Status: Business Requirements/Policies and Conceptual Data Model: FINALIZED. Next.js full-stack + Supabase PostgreSQL/Auth + Cloudinary + Vercel selected. Paid production hosting is acceptable. Drizzle recommended, not adopted. Development Ready v1.0: YES — B1 CLOSED with selected recovery architecture in [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md); see [final audit](FINAL_ARCHITECTURE_AUDIT.md).
+Updated: 19 October 2026
+Status: Business Requirements/Policies and Conceptual Data Model: FINALIZED. Next.js full-stack + Supabase PostgreSQL/Auth + Cloudinary + Vercel selected. Paid production hosting is acceptable. Phase 1.2 adopts direct node-postgres under D99; Drizzle remains an evaluated alternative. Development Ready v1.0: YES — B1 CLOSED with selected recovery architecture in [OPERATIONS_ARCHITECTURE.md](OPERATIONS_ARCHITECTURE.md); see [final audit](FINAL_ARCHITECTURE_AUDIT.md).
 
 ## Scope and references
 Implement [PRD.md](PRD.md) under [DATA_MODEL.md](DATA_MODEL.md) and the selected development boundary in [DATABASE_BACKEND_SELECTION.md](DATABASE_BACKEND_SELECTION.md). See [DECISIONS.md](DECISIONS.md) for status and [SECURITY.md](SECURITY.md) for trust boundaries. No application has been implemented or deployed by this documentation task.
@@ -10,20 +10,21 @@ Implement [PRD.md](PRD.md) under [DATA_MODEL.md](DATA_MODEL.md) and the selected
 - Existing Next.js App Router/TypeScript application provides both Web Dashboard and versioned REST Route Handlers at `/api/v1/*`.
 - Thin HTTP adapters decode/validate input, establish verified request identity/context, invoke an authorized service and map its result/errors. They contain no billing calculations, ORM queries or duplicated workflow rules.
 - Modular server-side services own company/resource/action authorization, business rules, exact financial calculations, transactions/idempotency and durable redacted audit; repositories own PostgreSQL access under those service boundaries.
-- Supabase PostgreSQL remains the selected database, initially on Free for development/testing only. Drizzle/node-postgres remains recommended, not adopted. Supabase Auth and Cloudinary are selected; recovery architecture B1 is CLOSED. Supabase Pro + seven-day PITR is the production recovery direction, alongside independent copies.
+- Supabase PostgreSQL remains the selected database, initially on Free for development/testing only. Direct node-postgres is adopted by Phase 1.2 (D99), superseding the earlier Drizzle recommendation. Supabase Auth and Cloudinary are selected; recovery architecture B1 is CLOSED. Supabase Pro + seven-day PITR is the production recovery direction, alongside independent copies.
 - Vercel is selected for V1, with an appropriate paid production plan permitted. Development may use eligible free resources. Validate actual runtime/capacity settings before launch; Hobby eligibility is not an architecture blocker.
 - Future Expo/React Native calls the same authenticated Next.js `/api/v1/*` endpoints; Server Actions are not the mobile API contract.
 - A separate NestJS service is deferred. Extract the existing domain/services/repository contracts only if sustained job/runtime/scaling/organization needs justify a later architecture decision.
 
 Direction: browser/Expo → Next.js Route Handler → authorized server service → repository/transaction → Supabase PostgreSQL. Server Components may invoke the same authorized read service directly, avoiding a self-HTTP round trip, after establishing verified identity/context. They cannot bypass service authorization through direct ORM/repository access. Any future Server Action also calls the same service, with request identity and validation repeated. Client/mobile bundles never contain server modules, DB credentials or privileged Supabase keys; protected direct Supabase database endpoints remain disallowed.
 
-## Proposed code organization — future implementation only
+## Code organization — foundation implemented, domain modules future
 
 | Path | Responsibility |
 |---|---|
 | apps/web/src/app | Existing routes/layouts/server rendering; service-backed reads and presentation |
 | apps/web/src/app/api/v1/<resource>/route.ts | Future thin versioned REST adapters; no endpoint created in this task |
 | apps/web/src/features | Web components/forms/tables, consuming API/data contracts rather than repositories |
+| apps/web/src/server/db | Implemented lazy Node PostgreSQL adapter, DatabaseContext, transactions, safe errors and internal probe; see its README |
 | apps/web/src/server/services/<module> | Future authorized application operations, transaction/idempotency/audit coordination |
 | apps/web/src/server/repositories/<module> | Future PostgreSQL access; receives a transaction-scoped connection, no HTTP/UI dependencies |
 | apps/web/src/server/auth | Supabase identity adapter plus application membership/permission/context checks; not implemented |
@@ -99,7 +100,7 @@ V1 authorized PDF/XLSX/CSV exports apply the same company/resource/field restric
 
 ## Implementation gates
 
-Business requirements/policies/model, named providers and end-to-end recovery are selected. **B1: CLOSED. Development Ready v1.0: YES. Production Ready: NO.** The single recovery specification in OPERATIONS_ARCHITECTURE.md selects private GitHub Actions capture, separate R2 storage, three-hour cadence/retention/encryption/custody, DB/Auth/file consistency, monitoring, RPO <= 6 hours, RTO <= 4 hours and the approved restore/drill process. A successful implemented restore is required before production, not before development. ORM/version/decimal library, physical precision/indexes and exact API pagination settings are implementation-time choices under fixed invariants, not architecture blockers.
+Business requirements/policies/model, named providers and end-to-end recovery are selected. **B1: CLOSED. Development Ready v1.0: YES. Production Ready: NO.** The single recovery specification in OPERATIONS_ARCHITECTURE.md selects private GitHub Actions capture, separate R2 storage, three-hour cadence/retention/encryption/custody, DB/Auth/file consistency, monitoring, RPO <= 6 hours, RTO <= 4 hours and the approved restore/drill process. A successful implemented restore is required before production, not before development. Driver selection is D99; decimal library, physical precision/indexes and exact API pagination settings are implementation-time choices under fixed invariants, not architecture blockers.
 
 Readiness is declared for development only. Next implementation phase, after explicit authorization: isolated development infrastructure and trusted access foundation — server-only provider/configuration boundaries, minimal Company/User/Membership/Role provisioning with protected first Owner, invite/login/reset/refresh/logout, central service authorization and transactional redacted audit; prove tenant isolation, revocation, Owner concurrency and secret-free client bundles through one protected read. Then implement master records → Orders/Trips → cost/rate workflows → billing/payments/reports in dependency order. Do not implement that phase during this documentation task. Offline sync remains outside V1.
 
